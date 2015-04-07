@@ -1,0 +1,194 @@
+Index: WebContent/scripts/sales/salesPlanning.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/scripts/sales/salesPlanning.js	(revision 8511)
++++ WebContent/scripts/sales/salesPlanning.js	(revision )
+@@ -27,37 +27,48 @@
+     //$.messager.defaults = {ok: '是', cancel: '否'};
+     $('#sales_tab').tabs({
+         'onSelect': function (title) {
++            try {
+-            var index = $('#sales_tab').tabs('getTabIndex', $('#sales_tab').tabs('getTab', title));
++                var index = $('#sales_tab').tabs('getTabIndex', $('#sales_tab').tabs('getTab', title));
+ 
+-            var box_name = role_to_search[me_js + index][0];
+-            if (box_name) {
+-                $('#box_name').html(box_name);
+-            }
+-            departmentTreeByType("areaDepartmentIds", role_to_search[me_js + index][1], role_to_search[me_js + index][2], localStorage.getItem('department'));
++                var box_name = role_to_search[me_js + index][0];
++                if (box_name) {
++                    $('#box_name').html(box_name);
++                }
++                departmentTreeByType("areaDepartmentIds", role_to_search[me_js + index][1], role_to_search[me_js + index][2], localStorage.getItem('department'));
+ 
+-            var arr_index = getIndexsofSelections();
+-            if (arr_index[0] == index) {
+-                $('#' + role_to_tab[me_js + index]).tabs({
+-                    'onSelect': function (title) {
+-                        var _index = $('#' + role_to_tab[me_js + index]).tabs('getTab', title);
+-                        if (arr_index[1] != _index && sessionStorage.getItem('edit')) {
+-                            $.messager.confirm('提示', '<p style="width: 85%" align="center">是否保存当前修改？</p>', function (ret) {
+-                                if (ret) {
+-                                    //save
+-                                    sessionStorage.removeItem('edit');
+-                                    saveAll();
+-                                } else {
+-                                    //cancel save
+-                                    cancelEdit();
+-                                }
+-                            });
+-                        }
+-                    }
+-                });
+-            } else {
+-                if (sessionStorage.getItem('edit')) {
+-                    saveAll();
+-                }
++                var arr_index = getIndexsofSelections();
++                if (arr_index[0] == index) {
++                    $('#' + role_to_tab[me_js + index]).tabs({
++                        'onSelect': function (title) {
++                            var _index = $('#' + role_to_tab[me_js + index]).tabs('getTab', title);
++                            if (arr_index[1] != _index && sessionStorage.getItem('edit')) {
++                                $.messager.confirm('提示', '<p style="width: 85%" align="center">是否保存当前修改？</p>', function (ret) {
++                                    if (ret) {
++                                        //save
++                                        sessionStorage.removeItem('edit');
++                                        saveAll();
++                                    } else {
++                                        //cancel save
++                                        cancelEdit();
++                                    }
++                                });
++                            }
++                        }
++                    });
++                } else {
++                    if (sessionStorage.getItem('edit')) {
++                        saveAll();
++                    }
++                }
++            } catch (err) {
++                console.info(err + ' ===>[may be nothing important!]')
++            }
++
++            /*
++            *   限制编辑操作 i.e. 大区经理可查看但不可编辑营业部销售计划
++            */
++            if (me_js && me_js == 'regionMgr') {
++                index == 1 ? $("#edit").linkbutton("disable") : $("#edit").linkbutton("enable");
+             }
+         }
+     });
+Index: WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp	(revision 8512)
++++ WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp	(revision )
+@@ -208,7 +208,7 @@
+         configWidthAndColspan('sales_tab_subs_contract_counterparts', '10%', 1);
+     </script>
+ </c:if>
+-<c:if test="${me eq 'admin' or me eq 'cityMgr'}">
++<c:if test="${me eq 'admin' or me eq 'cityMgr' or me eq 'regionMgr'}">
+     <div id="tab3" title="营业部销售计划">
+         <div id="sales_tab_depart" class="easyui-tabs" fit="true" style="padding: 1px;">
+             <c:choose>
+@@ -326,6 +326,83 @@
+                         </form>
+                     </div>
+                 </c:when>
++
++                <%--*******************************************start--%>
++                <%--营业部销售计划 apply for 大区经理--%>
++                <c:when test="${me eq 'regionMgr'}">
++                    <div id="loan_region" title="放款量（单位/笔）">
++                        <form>
++                            <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                <tr style="width: 100%">
++                                    <th class="myTH">
++                                        <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                    </th>
++                                    <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                </tr>
++                                <c:forEach items="${subs}" var="sub">
++                                    <c:forEach items="${departmentMap[sub.departmentId].departmentIds}"
++                                               var="entity"
++                                               varStatus="status">
++                                        <tr>
++                                            <c:if test="${status.count == 1}">
++                                                <td class="myTH"
++                                                    rowspan="${fn:length(departmentMap[sub.departmentId].departmentIds)}"
++                                                    width="7%">
++                                                        ${sub.departmentName}
++                                                </td>
++                                            </c:if>
++                                            <td class="myTH" width="10%" nowrap="nowrap">
++                                                    ${departmentMap[entity].departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${departmentMap[entity].departmentName}"
++                                                   scope="request"/>
++                                            <c:set var="departmentId" value="${departmentMap[entity].departmentId}"
++                                                   scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </c:forEach>
++                            </table>
++                        </form>
++                    </div>
++                    <div id="contract_region" title="合同金额（单位/万元）">
++                        <form>
++                            <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                <tr style="width: 100%">
++                                    <th class="myTH">
++                                        <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                    </th>
++                                    <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                </tr>
++                                <c:forEach items="${subs}" var="sub">
++                                    <c:forEach items="${departmentMap[sub.departmentId].departmentIds}"
++                                               var="entity"
++                                               varStatus="status">
++                                        <tr>
++                                            <c:if test="${status.count == 1}">
++                                                <td class="myTH"
++                                                    rowspan="${fn:length(departmentMap[sub.departmentId].departmentIds)}"
++                                                    width="7%">
++                                                        ${sub.departmentName}
++                                                </td>
++                                            </c:if>
++                                            <td class="myTH" width="10%" nowrap="nowrap">
++                                                    ${departmentMap[entity].departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${departmentMap[entity].departmentName}"
++                                                   scope="request"/>
++                                            <c:set var="departmentId" value="${departmentMap[entity].departmentId}"
++                                                   scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </c:forEach>
++                            </table>
++                        </form>
++                    </div>
++                </c:when>
++                <%--*******************************************end--%>
++
+                 <c:when test="${me eq 'cityMgr'}">
+                     <div id="sales_tab_depart_loan_counterparts" title="放款量（单位/笔）">
+                         <form>
+@@ -382,5 +459,7 @@
+         configWidthAndColspan('sales_tab_depart_contract', '15%', 3);
+         configWidthAndColspan('sales_tab_depart_loan_counterparts', '15%', 0);
+         configWidthAndColspan('sales_tab_depart_contract_counterparts', '15%', 0);
++        configWidthAndColspan('loan_region', '15%', 2);
++        configWidthAndColspan('contract_region', '15%', 2);
+     </script>
+ </c:if>
+\ No newline at end of file

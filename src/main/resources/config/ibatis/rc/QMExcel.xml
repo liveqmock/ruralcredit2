@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="qmexcel">
+	<typeAlias alias="pagination"
+		type="com.creditease.rc.framework.pager.Pagination" />
+	<!-- 量化管理map对象 -->
+	<resultMap id="qmMap" class="java.util.HashMap">
+		<result column="col_2" javaType="java.lang.String" property="comName" />
+		<result column="col_3" javaType="java.lang.String" property="busNum" />
+		<result column="col_4" javaType="java.lang.String" property="infoSor" />
+		<result column="col_5" javaType="java.lang.String" property="hTown" />
+		<result column="col_6" javaType="java.lang.String" property="mTown" />
+		<result column="col_8" javaType="java.lang.String" property="planName" />
+		<result column="col_9" javaType="java.lang.Double" property="applyLimit" />
+		<result column="col_10" javaType="java.lang.String" property="offerName" />
+		<result column="col_11" javaType="java.lang.Double" property="maxCapital" />
+		<result column="col_12" javaType="java.util.Date" property="loanDate" />
+		<result column="col_13" javaType="java.util.Date" property="cofDate" />
+		<result column="col_14" javaType="java.lang.String" property="loanUse" />
+		<result column="col_15" javaType="java.lang.String" property="loanUseInd" />
+		<result column="col_16" javaType="java.lang.Double" property="firAmount" />
+		<result column="col_17" javaType="java.lang.Double" property="endAmount" />
+		<result column="contract_amount" javaType="java.lang.Double"
+			property="contract_amount" />
+		<result column="trade_time" javaType="java.lang.String"
+			property="trade_time" />
+		<result column="bizId" javaType="java.lang.String" property="bizId" />
+		<result column="revolving_credit" javaType="java.lang.String"
+			property="revolving_credit" />
+			<result column="loanbalance" javaType="java.lang.String" 
+			property="loanbalance"/>
+		<result column="loanUseIndStair" javaType="java.lang.String"
+			property="loanUseIndStair" />
+        <result column="industryDetails" javaType="java.lang.String" property="industryDetails" />
+        <result column="industryName" javaType="java.lang.String" property="industryName" />
+        <result column="incomeFrequency" javaType="java.lang.String" property="incomeFrequency" />
+        <result column="projectCT" javaType="java.lang.String" property="projectCT" />
+	</resultMap>
+	<!-- 客户经理业绩map对象 -->
+	<resultMap id="cmpMap" class="java.util.HashMap">
+		<result column="col_1" javaType="java.lang.String" property="loanOfficerName" />
+		<result column="col_2" javaType="java.lang.String" property="companyName" />
+		<result column="col_3" javaType="java.lang.String" property="lendNum" />
+		<result column="col_4" javaType="java.lang.Double" property="lendAmount" />
+		<result column="col_5" javaType="java.lang.String" property="returnedNum" />
+		<result column="col_6" javaType="java.lang.Double" property="returnedAmount" />
+		<result column="col_7" javaType="java.lang.String" property="businessCycle" />
+		<result column="col_8" javaType="java.lang.String" property="maxBusinessCycle" />
+		<result column="col_9" javaType="java.lang.String" property="minBusinessCycle" />
+	</resultMap>
+	<!-- 业务详情map对象 -->
+	<resultMap id="bdMap" class="java.util.HashMap">
+		<result column="col_25" javaType="java.lang.String" property="auditStatusShow" />
+		<result column="col_2" javaType="java.lang.String" property="comName" />
+		<result column="col_3" javaType="java.lang.String" property="busNum" />
+		<result column="col_4" javaType="java.lang.String" property="identityNum" />
+		<result column="col_5" javaType="java.lang.String" property="infoSor" />
+		<result column="col_6" javaType="java.lang.String" property="mTown" />
+		<result column="col_8" javaType="java.lang.String" property="planName" />
+		<result column="col_9" javaType="java.lang.Double" property="applyLimit" />
+		<result column="col_10" javaType="java.util.Date" property="applyTime" />
+		<result column="col_11" javaType="java.lang.String" property="offerName" />
+		<result column="col_13" javaType="java.lang.Double" property="maxCapital" />
+		<result column="col_14" javaType="java.util.Date" property="submitTime" />
+		<result column="col_15" javaType="java.util.Date" property="loanDate" />
+		<result column="col_16" javaType="java.util.Date" property="firLoanTime" />
+		<result column="col_17" javaType="java.util.Date" property="endLoanTime" />
+		<result column="col_18" javaType="java.lang.String" property="loanOfficer" />
+		<result column="col_19" javaType="java.util.Date" property="cofDate" />
+		<result column="col_20" javaType="java.util.Date" property="tradeDate" />
+		<result column="col_21" javaType="java.lang.String" property="loanUse" />
+		<result column="col_22" javaType="java.lang.String" property="loanUseInd" />
+		<result column="col_23" javaType="java.lang.Double" property="firAmount" />
+		<result column="col_24" javaType="java.lang.Double" property="endAmount" />
+		<result column="mindate" javaType="java.util.Date" property="minExamDate" />
+		<result column="maxdate" javaType="java.util.Date" property="maxExamDate" />
+		<result column="contract_amount" javaType="java.lang.Double"
+			property="contract_amount" />
+		<result column="create_date" javaType="java.lang.String"
+			property="create_date" />
+		<result column="revolving_credit" javaType="java.lang.String"
+			property="revolving_credit" />
+			<result column="loanbalance" javaType="java.lang.String" 
+			property="loanbalance"/>
+		<result column="loanUseIndStair" javaType="java.lang.String"
+			property="loanUseIndStair" />
+        <result column="industryDetails" javaType="java.lang.String" property="industryDetails" />
+        <result column="industryName" javaType="java.lang.String" property="industryName" />
+        <result column="incomeFrequency" javaType="java.lang.String" property="incomeFrequency" />
+        <result column="projectCT" javaType="java.lang.String" property="projectCT" />
+	</resultMap>
+	<!-- 量化管理sql -->
+    <!--
+       量化管理sql 结构
+     select col_2,
+       daikuanyue as loanbalance
+     from (select *
+          from (
+            col_2
+            ) haoqa
+          left join (
+             daikuanyue
+          ) daikuan
+            on haoqa.col_1 = daikuan.creditapplicationId
+    )
+    -->
+	<sql id="selectqm">
+        <![CDATA[
+	       select col_2,
+       col_3,
+       col_4,
+       col_5,
+       col_6,
+       col_8,
+       col_9,
+       col_10,
+       col_11,
+       col_12,
+       col_13,
+       col_14,
+       col_15,
+       (select min(raat.exam_amount)
+          from rl_apply_audit_table raat
+         where raat.exam_date = mindate) col_16,
+       (select min(raat.exam_amount)
+          from rl_apply_audit_table raat
+         where raat.exam_date = maxdate) col_17,
+       contract_amount,
+       bizId,
+       trade_time,
+       loanUseIndStair,
+       revolving_credit,
+       daikuanyue as loanbalance,
+       industry_details as industryDetails,
+       industry_name as industryName,
+       income_frequency as incomeFrequency,
+       projectCT as projectCT
+  from (select *
+          from (select distinct ca.creditapplication_id col_1,
+                                ca.company_name col_2,
+                                ca.business_number col_3,
+                                (select ct.code_value
+                                   from rl_codetable ct
+                                  where ct.code_key = cc.infomation_source
+                                    and ct.section = 'infomationSource') col_4,
+                                bsa.home_address col_5,
+                                bsa.residence_address col_6,
+                                ca.repayment_plan_name col_8,
+                                bsa.apply_limit col_9,
+                                ca.loan_officer_name col_10,
+                                ca.capital_upper_limit col_11,
+                                (select rc.code_value
+                                   from rl_codetable rc, rl_codetable rc1
+                                  where rc.codetable_id = rc1.parentid
+                                    and rc1.code_key = cc.industry_category
+                                    and rc1.section = 'industryCategory'
+                                    and rc.section = 'industryCategoryTotal') loanUseIndStair,
+                                ca.signagreement_date col_12,
+                                glr.loan_confirm_time col_13,
+                                (select ct.code_value
+                                   from rl_codetable ct
+                                  where ct.code_key = cc.borrow_use
+                                    and ct.section = 'borroerUserConsult') col_14,
+                                (select ct.code_value
+                                   from rl_codetable ct
+                                  where ct.code_key = cc.industry_category
+                                    and ct.section = 'industryCategory') col_15,
+                                (select min(aat1.exam_date)
+                                   from rl_apply_audit_table aat1
+                                  where aat1.creditapplication_id =
+                                        ca.creditapplication_id) mindate,
+                                (select max(aat1.exam_date)
+                                   from rl_apply_audit_table aat1
+                                  where aat1.creditapplication_id =
+                                        ca.creditapplication_id) maxdate,
+                                glr.LOAN_AMOUNT contract_amount,
+                                financeMoney.bizId bizId,
+                                to_char(financeMoney.TRADE_TIME,
+                                        'yyyy-mm-dd HH24:mi:ss') trade_time,
+                                decode(nvl(ca.revolving_credit, '0'),
+                                       '0',
+                                       '否',
+                                       '是') revolving_credit
+                  from rl_credit_application ca
+                  left join rl_apply_audit_table aat
+                    on (aat.creditapplication_id = ca.creditapplication_id and
+                       aat.exam_result = '04')
+                  left join rl_group_loan_regist glr
+                    on (glr.creditapplication_id = ca.creditapplication_id and
+                       glr.regist_status = '1')
+                  left join (select distinct t.CREDITAPPLICATION_ID creditapplicationId,
+                                            f.BIZ_ID               bizId,
+                                            f.TRADE_TIME
+                              from rl_finance_money f
+                              left join RL_GROUP_LOAN_REGIST g
+                                on g.GROUP_LOAN_REGIST_ID = f.association_id
+                              left join RL_CREDIT_APPLICATION t
+                                on t.creditapplication_id =
+                                   g.creditapplication_id
+                              left join rl_amount_confirm a
+                                on a.credit_application_id =
+                                   t.creditapplication_id
+                              left join rl_borrower_service_app b
+                                on t.creditapplication_id =
+                                   b.creditapplication_id
+                               and b.valid_state = '1'
+                               and b.leader = '1'
+                             where f.TYPE = 'F'
+                               and f.HISTORY_FLAG = 'F'
+                               and a.HISTORY_FLAG = '0'
+                               and f.FINANCE_STATUS = '2'
+                            UNION
+                            SELECT distinct t.CREDITAPPLICATION_ID creditapplicationId,
+                                            f.BIZ_ID               bizId,
+                                            f.TRADE_TIME
+                              from rl_finance_money f
+                              left join rl_amount_confirm a
+                                on a.amount_confirm_id = f.association_id
+                              left join rl_credit_application t
+                                on t.creditapplication_id =
+                                   a.credit_application_id
+                              left join rl_borrower_service_app b
+                                on t.creditapplication_id =
+                                   b.creditapplication_id
+                               and b.valid_state = '1'
+                               and b.leader = '1'
+                             where f.TYPE = 'F'
+                               and f.HISTORY_FLAG = 'F'
+                               and a.HISTORY_FLAG = '0'
+                               and f.FINANCE_STATUS = '2') financeMoney
+                    on financeMoney.creditapplicationId =
+                       ca.creditapplication_id, rl_customer_consult cc,
+                 rl_borrower_service_app bsa, sid_view v
+        ]]>
+		<dynamic prepend="where">
+			ca.customer_consult_id = cc.customer_consult_id
+			and
+			bsa.creditapplication_id = ca.creditapplication_id
+			and bsa.leader =
+			'1'
+			and cc.status='1'
+			<isNotEmpty property="groupNumber">
+				and ca.business_number like
+				'%$groupNumber$%'
+		    </isNotEmpty>
+			<isNotEmpty property="beginLoanDate">
+				<![CDATA[ and ca.signagreement_date >= to_date(#beginLoanDate#,'yyyy-MM-dd') ]]>
+			</isNotEmpty>
+			<isNotEmpty property="endLoanDate">
+				<![CDATA[ and ca.signagreement_date <= to_date(#endLoanDate#,'yyyy-MM-dd')  ]]>
+			</isNotEmpty>
+			<isNotEmpty property="companyId">
+				and ca.company_id in ($companyId$)
+			</isNotEmpty>
+			<isNotEmpty property="authList">
+				and ca.creditapplication_id=
+				v.object_id_identity
+				and
+				v.class='com.creditease.rc.domain.CreditApplication'
+				and v.ace_sid IN
+				($authList$)
+			</isNotEmpty>
+		</dynamic>
+        <![CDATA[
+        	group by ca.creditapplication_id,
+                          ca.company_name,
+                          ca.business_number,
+                          cc.infomation_source,
+                          bsa.home_address,
+                          bsa.residence_address,
+                          ca.address,
+                          ca.repayment_plan_name,
+                          bsa.apply_limit,
+                          ca.loan_officer_name,
+                          ca.capital_upper_limit,
+                          ca.creditapplication_id,
+                          ca.signagreement_date,
+                          glr.loan_confirm_time,
+                          cc.borrow_use,
+                          aat.exam_amount,
+                          cc.industry_category_detail,
+                          cc.industry_category,
+                          glr.LOAN_AMOUNT,
+                          financeMoney.bizId,
+                          trade_time,
+                          revolving_credit) haoqa
+          left join (select cccc.creditapplicationId,
+                           (cccc.benxifuwufei) as daikuanyue
+                      from (select ca.creditapplication_id as creditapplicationId,
+                                   (decode(l.df_corpus, null, 0, l.df_corpus) +
+                                   decode(l.df_interest,
+                                           null,
+                                           0,
+                                           l.df_interest) +
+                                   decode(l.df_overhead,
+                                           null,
+                                           0,
+                                           l.df_overhead)) as benxifuwufei,
+                                   sum(decode(o.odf_forfeit,
+                                              null,
+                                              0,
+                                              o.odf_forfeit) +
+                                       decode(o.odf_latefee,
+                                              null,
+                                              0,
+                                              o.odf_latefee)) as zhinajinfaxi
+                              from rl_credit_application ca
+                              left join rl_laon_balance_data l
+                                on ca.sys_guid = l.sys_guid
+                              left join rl_overdue_data o
+                                on l.laon_balance_data_id =
+                                   o.laon_balance_data_id
+                            
+                             group by (ca.creditapplication_id, l.df_corpus,
+                                       l.df_interest, l.df_overhead)) cccc) daikuan
+            on haoqa.col_1 = daikuan.creditapplicationId
+        left join (
+          select
+                t.industry_details,t.industry_name,t.income_frequency,t.creditapplication_id,
+                row_number() over(partition by t.creditapplication_id order by t.month_avg desc nulls last) rno ,
+                sum(1) over(partition by t.creditapplication_id ) projectCT
+              from
+                   (select  case
+                                   when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_day * 30
+                                    = 0 then '每天'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_week/7  * 30
+                                    = 0 then '每周'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_month,0)
+                                    = 0 then '每月'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_quarter,0)/3
+                                    = 0 then '每季度'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_half_year,0)/6
+                                    = 0 then '每半年'
+                                     else '每年' end income_frequency,
+                                     bs.operating_items_detail industry_details,
+                                     bs.code_value industry_name ,
+                                     bs.creditapplication_id ,
+                                     greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) month_avg
+                          from rl_cashstream cah
+                          join  (  select bi.operating_items,bi.operating_items_detail,ct.code_value,bsa.creditapplication_id
+                                    from rl_survey_business_info bi
+                                    join  rl_codetable ct on bi.operating_items = ct.code_key and  ct.section = 'industryCategory'
+                                    join rl_borrower_service_app bsa on bsa.borrower_service_app_id = bi.borrower_service_app_id and bsa.leader = 1
+                            ) bs  on bs.creditapplication_id = cah.creditapplication_id and bs.operating_items = cah.project_codekey and cah.project_type like 'operIn_proj%' and  cah.project_name = bs.operating_items_detail
+                        union
+                        select case
+                                 when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_day * 30
+                                  = 0 then '每天'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_week/7  * 30
+                                  = 0 then '每周'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_month,0)
+                                  = 0 then '每月'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_quarter,0)/3
+                                  = 0 then '每季度'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_half_year,0)/6
+                                  = 0 then '每半年'
+                                   else '每年' end income_frequency,
+                                   cah.project_name industry_name,
+                                   ct.code_value    industry_details,
+                                   cah.creditapplication_id ,
+                                   greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) month_avg
+                        from rl_cashstream cah
+                        join rl_codetable ct on  cah.project_codekey = ct.code_key
+                         and  ct.section = 'cashIncomeFamily'  and cah.project_type like 'familyIn_%'
+                        ） t
+        ) cash on cash.creditapplication_id = haoqa.col_1 and  cash.rno = 1   )
+        ]]>
+	</sql>
+	<select id="selectByPagination" parameterClass="map" resultMap="qmMap">
+		<include refid="selectqm" />
+	</select>
+	<select id="countByPage" parameterClass="map" resultClass="int">
+		SELECT COUNT(*) FROM (
+		<include refid="selectqm" />
+		)
+	</select>
+	<!-- 客户经理业绩sql -->
+	<sql id="selectCMP">
+		select ca.loan_officer_name col_1,ca.company_name
+		col_2,count(glr.creditapplication_id) col_3,sum(glr.loan_amount) col_4
+		,'' col_5,'' col_6,avg(ceil((glr.loan_regist_date-ca.submit_date)))
+		col_7,max(ceil((glr.loan_regist_date-ca.submit_date))) col_8
+		,min(ceil((glr.loan_regist_date-ca.submit_date))) col_9
+		from
+		rl_group_loan_regist glr,rl_credit_application ca
+		<dynamic prepend="where">
+			glr.creditapplication_id = ca.creditapplication_id
+			and
+			glr.regist_status='1'
+			<isNotEmpty property="beginDate">
+				<![CDATA[ and glr.loan_regist_date >= to_date(#beginDate#,'yyyy-MM-dd') ]]>
+			</isNotEmpty>
+			<isNotEmpty property="endDate">
+				<![CDATA[ and glr.loan_regist_date <= to_date(#endDate#,'yyyy-MM-dd')  ]]>
+			</isNotEmpty>
+			<isNotEmpty property="companyId">
+				and ca.company_id = #companyId#
+			</isNotEmpty>
+		</dynamic>
+		group by ca.company_name,ca.loan_officer_name
+	</sql>
+	<select id="selectCMPByPagination" parameterClass="map"
+		resultMap="cmpMap">
+		<include refid="selectCMP" />
+	</select>
+	<select id="countCMPByPage" parameterClass="map" resultClass="int">
+		SELECT COUNT(*) FROM (
+		<include refid="selectCMP" />
+		)
+	</select>
+
+	<!-- 业务详情sql -->
+    <!-- 结构大致如下
+    select         col_1,
+       daikuanyue as loanbalance
+   from
+   (select *
+          from (
+               col_1
+             )   tab1
+          left join (
+              daikuanyue
+            ) daikuan     on tab1.col_1 = daikuan.creditapplicationId
+    )  tab2
+    left join rl_finance_money fm            on (fm.association_id = tab2.col_0 and fm.type = 'F' and   fm.finance_status = '2' and fm.history_flag = 'F')
+    -->
+	<sql id="selectbd">
+        <![CDATA[
+	      select col_1,
+               col_2,
+               col_3,
+               col_4,
+               col_5,
+               col_6,
+               col_8,
+               col_9,
+               col_10,
+               col_11,
+               col_13,
+               col_14,
+               col_15,
+               col_16,
+               col_17,
+               col_18,
+               col_19,
+               loanUseIndStair,
+               fm.trade_time col_20,
+               col_21,
+               col_22,
+               col_25,
+               (select max(raat.exam_amount)
+                  from rl_apply_audit_table raat
+                 where raat.exam_date = mindate) col_23,
+               (select max(raat.exam_amount)
+                  from rl_apply_audit_table raat
+                 where raat.exam_date = maxdate) col_24,
+               mindate,
+               maxdate,
+               create_date,
+               contract_amount,
+               revolving_credit,
+               daikuanyue as loanbalance,
+               cash.industry_details as industryDetails,
+               cash.industry_name as industryName,
+               cash.income_frequency as incomeFrequency,
+               cash.projectCT as projectCT
+  from (select *
+          from (select max(glr.group_loan_regist_id) col_0,
+                       ca.creditapplication_id col_1,
+                       ca.company_name col_2,
+                       ca.business_number col_3,
+                       bsa.credentials_number col_4,
+                       (select ct.code_value
+                          from rl_codetable ct
+                         where ct.code_key = cc.infomation_source
+                           and ct.section = 'infomationSource') col_5,
+                       bsa.residence_address col_6,
+                       ca.repayment_plan_name col_8,
+                       bsa.apply_limit col_9,
+                       bsa.apply_date col_10,
+                       ca.loan_officer_name col_11,
+                       ca.capital_upper_limit col_13,
+                       ca.submit_date col_14,
+                       ca.signagreement_date col_15,
+                       glr.loan_officer_name col_18,
+                       max(glr.loan_confirm_time) col_19,
+                       (select rc.code_value
+                          from rl_codetable rc, rl_codetable rc1
+                         where rc.codetable_id = rc1.parentid
+                           and rc1.code_key = cc.industry_category
+                           and rc1.section = 'industryCategory'
+                           and rc.section = 'industryCategoryTotal') loanUseIndStair,
+                       (select ct.code_value
+                          from rl_codetable ct
+                         where ct.code_key = cc.borrow_use
+                           and ct.section = 'borroerUserConsult') col_21,
+                           (select ct.code_value
+                          from rl_codetable ct
+                         where ct.code_key = ca.audit_status
+                           and ct.section = 'auditStatus') col_25,
+                       (select ct.code_value
+                          from rl_codetable ct
+                         where ct.code_key = cc.industry_category
+                           and ct.section = 'industryCategory') col_22,
+                       min(aat.exam_date) mindate,
+                       max(aat.exam_date) maxdate,
+                       min(glr.LOAN_REGIST_DATE) col_16,
+                       max(glr.LOAN_REGIST_DATE) col_17,
+                       to_char(ca.create_date, 'yyyy-mm-dd hh24:mi:ss') create_date,
+                       glr.loan_amount contract_amount,
+                       decode(nvl(ca.revolving_credit, '0'), '0', '否', '是') revolving_credit
+                  from rl_credit_application ca
+                  left join rl_apply_audit_table aat
+                    on (aat.creditapplication_id = ca.creditapplication_id)
+                  left join rl_group_loan_regist glr
+                    on (glr.creditapplication_id = ca.creditapplication_id and glr.regist_status='1'),
+                 rl_customer_consult cc, rl_borrower_service_app bsa
+        ]]>
+		<dynamic prepend="where">
+			ca.customer_consult_id = cc.customer_consult_id
+			and
+			bsa.creditapplication_id = ca.creditapplication_id
+			and bsa.leader =
+			'1'
+			and ca.valid_state='1'
+			<isNotEmpty property="groupNumber">
+				and ca.business_number like
+				'%$groupNumber$%'
+		    </isNotEmpty>
+			<isNotEmpty property="beginLoanDate">
+				<![CDATA[ and ca.signagreement_date >= to_date(#beginLoanDate#,'yyyy-MM-dd') ]]>
+			</isNotEmpty>
+			<isNotEmpty property="endLoanDate">
+				<![CDATA[ and ca.signagreement_date <= to_date(#endLoanDate#,'yyyy-MM-dd')  ]]>
+			</isNotEmpty>
+			<isNotEmpty property="companyId">
+				and ca.company_id in ($companyId$)
+			</isNotEmpty>
+			<!-- 创建时间开始 -->
+			<isNotEmpty property="createDateStart">
+				<![CDATA[ and ca.create_date >= trunc(to_date(#createDateStart#,'yyyy-MM-dd'))]]>
+			</isNotEmpty>
+			<isNotEmpty property="createDateEnd">
+				<![CDATA[and ca.create_date <= trunc(to_date(#createDateEnd#,'yyyy-MM-dd')+1)]]>
+			</isNotEmpty>
+			<!-- 创建时间结束 -->
+			<isNotEmpty property="auditStatus">
+				and ca.audit_status in ($auditStatus$)
+			</isNotEmpty>
+		</dynamic>
+        <![CDATA[
+        group by ca.creditapplication_id,
+                          ca.company_name,
+                          ca.business_number,
+                          bsa.credentials_number,
+                          cc.infomation_source,
+                          bsa.residence_address,
+                          ca.repayment_plan_name,
+                          bsa.apply_limit,
+                          bsa.apply_date,
+                          ca.loan_officer_name,
+                          ca.capital_upper_limit,
+                          ca.submit_date,
+                          ca.signagreement_date,
+                          glr.loan_officer_name,
+                          cc.borrow_use,
+                          cc.industry_category,
+                          glr.loan_amount,
+                          ca.create_date,
+                          ca.audit_status,
+                          revolving_credit) tab1
+          left join (select cccc.creditapplicationId,
+                           (cccc.benxifuwufei) as daikuanyue
+                      from (select ca.creditapplication_id as creditapplicationId,
+                                   (decode(l.df_corpus, null, 0, l.df_corpus) +
+                                   decode(l.df_interest,
+                                           null,
+                                           0,
+                                           l.df_interest) +
+                                   decode(l.df_overhead,
+                                           null,
+                                           0,
+                                           l.df_overhead)) as benxifuwufei,
+                                   sum(decode(o.odf_forfeit,
+                                              null,
+                                              0,
+                                              o.odf_forfeit) +
+                                       decode(o.odf_latefee,
+                                              null,
+                                              0,
+                                              o.odf_latefee)) as zhinajinfaxi
+                              from rl_credit_application ca
+                              left join rl_laon_balance_data l
+                                on ca.sys_guid = l.sys_guid
+                              left join rl_overdue_data o
+                                on l.laon_balance_data_id =
+                                   o.laon_balance_data_id
+                             group by (ca.creditapplication_id, l.df_corpus,
+                                       l.df_interest, l.df_overhead)) cccc) daikuan
+            on tab1.col_1 = daikuan.creditapplicationId) tab2
+            left join rl_finance_money fm
+            on (fm.association_id = tab2.col_0 and fm.type = 'F' and
+               fm.finance_status = '2' and fm.history_flag = 'F')
+            left join (
+              select
+                t.industry_details,t.industry_name,t.income_frequency,t.creditapplication_id,
+                row_number() over(partition by t.creditapplication_id order by t.month_avg desc nulls last) rno ,
+                sum(1) over(partition by t.creditapplication_id ) projectCT
+              from
+                   (select  case
+                                   when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_day * 30
+                                    = 0 then '每天'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_week/7  * 30
+                                    = 0 then '每周'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_month,0)
+                                    = 0 then '每月'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_quarter,0)/3
+                                    = 0 then '每季度'
+                                      when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_half_year,0)/6
+                                    = 0 then '每半年'
+                                     else '每年' end income_frequency,
+                                     bs.operating_items_detail industry_details,
+                                     bs.code_value industry_name ,
+                                     bs.creditapplication_id ,
+                                     greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) month_avg
+                          from rl_cashstream cah
+                          join  (  select bi.operating_items,bi.operating_items_detail,ct.code_value,bsa.creditapplication_id
+                                    from rl_survey_business_info bi
+                                    join  rl_codetable ct on bi.operating_items = ct.code_key and  ct.section = 'industryCategory'
+                                    join rl_borrower_service_app bsa on bsa.borrower_service_app_id = bi.borrower_service_app_id and bsa.leader = 1
+                            ) bs  on bs.creditapplication_id = cah.creditapplication_id and bs.operating_items = cah.project_codekey and  cah.project_name = bs.operating_items_detail and cah.project_type like 'operIn_proj%'
+                        union
+                        select case
+                                 when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_day * 30
+                                  = 0 then '每天'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - cah.every_week/7  * 30
+                                  = 0 then '每周'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_month,0)
+                                  = 0 then '每月'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_quarter,0)/3
+                                  = 0 then '每季度'
+                                    when greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) - nvl(cah.every_half_year,0)/6
+                                  = 0 then '每半年'
+                                   else '每年' end income_frequency,
+                                   cah.project_name industry_name,
+                                   ct.code_value    industry_details,
+                                   cah.creditapplication_id ,
+                                   greatest (nvl(cah.every_day,0) * 30,nvl(cah.every_week,0)/7 * 30,nvl(cah.every_month,0),nvl(cah.every_quarter,0)/3,nvl(cah.every_half_year,0)/6 ,nvl(cah.every_year,0)/12) month_avg
+                        from rl_cashstream cah
+                        join rl_codetable ct on  cah.project_codekey = ct.code_key
+                        and  ct.section = 'cashIncomeFamily'  and cah.project_type like 'familyIn_%'
+                        ） t
+            ) cash on cash.creditapplication_id = tab2.col_1 and  cash.rno = 1
+        ]]>
+	</sql>
+	<select id="selectBDByPagination" parameterClass="map"
+		resultMap="bdMap">
+		<include refid="selectbd" />
+	</select>
+	<select id="countBDByPage" parameterClass="map" resultClass="int">
+		SELECT COUNT(*) FROM (
+		<include refid="selectbd" />
+		)
+	</select>
+</sqlMap>

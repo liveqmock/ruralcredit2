@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RL_CUSTOMER_RETURN_VISIT">
+	<typeAlias alias="CustomerReturnVisitClass" type="com.creditease.rc.domain.CustomerReturnVisit" />
+	<typeAlias alias="CustomerReturnVisitVoClass" type="com.creditease.rc.vo.CustomerReturnVisitVo" />
+	<resultMap class="com.creditease.rc.domain.CustomerReturnVisit" id="CustomerReturnVisitMap">
+		<result property="customerReturnVisitId" column="CUSTOMER_RETURN_VISIT_ID" jdbcType="DECIMAL" />
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="DECIMAL" />
+		<result jdbcType="VARCHAR" property="operatorId" column="OPERATOR_ID" />
+		<result jdbcType="VARCHAR" property="operatorName" column="OPERATOR_NAME" />
+		<result property="visitDate" column="VISIT_DATE" jdbcType="DATE" />
+		<result jdbcType="VARCHAR" property="visitDurationTimes" column="VISIT_DURATION_TIMES" />
+		<result jdbcType="VARCHAR" property="visitDurationHours" column="VISIT_DURATION_HOURS" />
+		<result jdbcType="VARCHAR" property="visitDurationMinutes" column="VISIT_DURATION_MINUTES" />
+		<result property="operatorTime" column="OPERATOR_TIME" jdbcType="DATE" />
+		<result jdbcType="VARCHAR" property="visitWay" column="VISIT_WAY" />
+		<result jdbcType="VARCHAR" property="loanUse" column="LOAN_USE" />
+		<result jdbcType="VARCHAR" property="newLoanUse" column="NEW_LOAN_USE" />
+		<result jdbcType="VARCHAR" property="income" column="INCOME" />
+		<result jdbcType="VARCHAR" property="newIncome" column="NEW_INCOME" />
+		<result jdbcType="VARCHAR" property="familyIncome" column="FAMILY_INCOME" />
+		<result jdbcType="VARCHAR" property="newFamilyIncome" column="NEW_FAMILY_INCOME" />
+		<result jdbcType="VARCHAR" property="spending" column="SPENDING" />
+		<result jdbcType="VARCHAR" property="newSpending" column="NEW_SPENDING" />
+		<result jdbcType="VARCHAR" property="contactWay" column="CONTACT_WAY" />
+		<result jdbcType="VARCHAR" property="newContactWay" column="NEW_CONTACT_WAY" />
+		<result jdbcType="VARCHAR" property="newDebt" column="NEW_DEBT" />
+		<result property="newDebtMoney" column="NEW_DEBT_MONEY" jdbcType="DECIMAL" />
+		<result jdbcType="VARCHAR" property="customerAttitude" column="CUSTOMER_ATTITUDE" />
+		<result jdbcType="VARCHAR" property="familyNumberCondition" column="FAMILY_NUMBER_CONDITION" />
+		<result jdbcType="VARCHAR" property="otherFactor" column="OTHER_FACTOR" />
+		<result property="repaymentDate" column="REPAYMENT_DATE" jdbcType="DATE" />
+		<result jdbcType="VARCHAR" property="status" column="STATUS" />
+		<result jdbcType="VARCHAR" property="validateStatus" column="VALIDATE_STATUS" />
+
+	</resultMap>
+	<insert id="insert" parameterClass="CustomerReturnVisitClass">
+		<selectKey keyProperty="customerReturnVisitId" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into  RL_CUSTOMER_RETURN_VISIT
+			(CUSTOMER_RETURN_VISIT_ID,CREDITAPPLICATION_ID,OPERATOR_ID,OPERATOR_NAME,VISIT_DATE,
+			VISIT_DURATION_TIMES,OPERATOR_TIME,VISIT_WAY,
+			LOAN_USE,NEW_LOAN_USE,INCOME,NEW_INCOME,FAMILY_INCOME,NEW_FAMILY_INCOME,SPENDING,
+			NEW_SPENDING,CONTACT_WAY,NEW_CONTACT_WAY,NEW_DEBT,NEW_DEBT_MONEY,
+			CUSTOMER_ATTITUDE,FAMILY_NUMBER_CONDITION,OTHER_FACTOR,REPAYMENT_DATE,
+			STATUS,VISIT_DURATION_HOURS,VISIT_DURATION_MINUTES,VALIDATE_STATUS,ATTATCHMENT_ID,is_purpose_consistency,
+			reason_not_consistency,attitude_for_cutomermanager,attitude_for_repayment,high_danger_reason,is_high_danger,is_complete,reason_for_incomplete,
+			contract_change_type,change_borrower_phone,change_coborrower_phone,
+			change_guarantee_first_phone,change_guarantee_second_phone,source_income_changed_type,source_income_changed_content,SOURCE_INCOME_CHANGED_CNTSTR)
+		values
+			(#customerReturnVisitId#,#creditapplicationId#,#operatorId#,#operatorName#,#visitDate#,
+			#visitDurationTimes#,#operatorTime#,#visitWay#,
+			#loanUse#,#newLoanUse#,#income#,#newIncome#,#familyIncome#,#newFamilyIncome#,#spending#,
+			#newSpending#,#contactWay#,#newContactWay#,#newDebt#,#newDebtMoney#,
+			#customerAttitude#,#familyNumberCondition#,#otherFactor#,#repaymentDate#,
+			#status#,#visitDurationHours#,#visitDurationMinutes#,#validateStatus#,#attachmentId#,#isPurposeConsistency#,
+			#reasonNotConsistency#,#attitudeForCutomermanager#,#attitudeForRepayment#,#highDangerReason#,#highDangered#,
+			#isComplete#,#reasonForIncomplete#,#contractChangeType#,#changeBorrowerPhone#,#changeCoborrowerPhone#,
+			#changeGuaranteeFirstPhone#,#changeGuaranteeSecondPhone#,#sourceIncomeChangedType#,#sourceIncomeChangedContent#,#sourceIncomeChangedContentStr#)
+		]]>
+	</insert>
+	<sql id="selectMap_sql">
+		<![CDATA[
+			SELECT * FROM RL_CUSTOMER_RETURN_VISIT
+			WHERE 1=1
+		]]>
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property=""></isNotEmpty>
+			<isNotEmpty prepend="AND" property=""></isNotEmpty>
+			<isNotEmpty prepend="AND" property=""></isNotEmpty>
+			<isNotEmpty prepend="AND" property=""></isNotEmpty>
+			<isNotEmpty prepend="AND" property="">
+
+			</isNotEmpty>
+		</dynamic>
+
+	</sql>
+	<select id="selectMap" parameterClass="CustomerReturnVisitVoClass" resultMap="CustomerReturnVisitMap">
+		<include refid="selectMap_sql" />
+	</select>
+	<sql id="selectClass_sql">
+		<![CDATA[
+			SELECT distinct
+				   t.customer_return_visit_id as customerReturnVisitId,
+			       t.creditapplication_id     as creditapplicationId,
+			       t.operator_id              as operatorId,
+			       t.operator_name            as operatorName,
+			       t.visit_date               as visitDate,
+			       decode(t.VISIT_DURATION_MINUTES,'','',t.VISIT_DURATION_HOURS||'小时')|| decode(t.VISIT_DURATION_MINUTES,'','',t.VISIT_DURATION_MINUTES || '分钟') as visitDurationTimes,
+			       t.operator_time            as operatorTime,
+			       t.visit_way                as visitWay,
+			       t.loan_use                 as loanUse,
+			       t.new_loan_use             as newLoanUse,
+			       t.income                   as income,
+			       t.new_income               as newIncome,
+			       t.family_income            as familyIncome,
+			       t.new_family_income        as newFamilyIncome,
+			       t.spending                 as spending,
+			       t.new_spending             as newSpending,
+			       t.contact_way              as contactWay,
+			       t.new_contact_way          as newContactWay,
+			       t.new_debt                 as newDebt,
+			       t.new_debt_money           as newDebtMoney,
+			       t.customer_attitude        as customerAttitude,
+			       t.family_number_condition  as familyNumberCondition,
+				   t.other_factor             as otherFactor,
+				   t.repayment_date           as repaymentDate,
+				   t.status 				  as status,
+				   t.VISIT_DURATION_HOURS	  as visitDurationHours,
+				   t.VISIT_DURATION_MINUTES	  as visitDurationMinutes,
+			       ca.business_number         as businessNumber,
+			       ca.loan_officer_name       as loanOfficerName,
+			       BSA.NAME                   AS borrowerName,
+			       decode(t.is_purpose_consistency,1,'不一致','一致') as isPurposeConsistency,
+			       decode(t.is_complete,1,'不齐全','齐全') as isComplete,
+			       t.reason_not_consistency as  reasonNotConsistency,
+				   nvl(ct.code_value,'') as attitudeForRepayment,
+				   nvl(ctt.code_value,'') as attitudeForCutomermanager,
+				   nvl(ctx.code_value,'') as highDangered,
+				   nvl(ctxx.code_value,'') as highDangerReason,
+				    t.reason_for_incomplete  as reasonForIncomplete,
+				    t.source_income_changed_cntstr as sourceIncomeChangedContentStr,
+				    t.change_borrower_phone as changeBorrowerPhone,
+					t.change_coborrower_phone as changeCoborrowerPhone,
+					t.change_guarantee_first_phone as changeGuaranteeFirstPhone,
+					t.change_guarantee_second_phone as changeGuaranteeSecondPhone,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'industryCategory' and rc.code_key = t.new_loan_use) 		as newLoanUseShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'industryCategory' and rc.code_key = t.new_income) 		as newIncomeShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'cashIncomeFamily' and rc.code_key = t.new_family_income) 		as newFamilyIncomeShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'visit_way' and rc.code_key = t.visit_way) 		as visitWayShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'new_debt' and rc.code_key = t.new_debt) 		as newDebtShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'yesOrNo' and rc.code_key = t.loan_use) 		as loanUseShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'yesOrNo' and rc.code_key = t.income)			as incomeShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'yesOrNo' and rc.code_key = t.family_income) 	as familyIncomeShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'yesOrNo' and rc.code_key = t.spending)		as spendingShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'yesOrNo' and rc.code_key = t.contact_way) 	as contactWayShow,
+			      (select rc.code_value from rl_codetable rc where rc.section = 'sourceIncomeChangedType' and rc.code_key = trim(t.source_income_changed_type)) 	as sourceIncomeChangedType,
+			      t.ATTATCHMENT_ID as attatchmentId
+			  FROM RL_CUSTOMER_RETURN_VISIT t
+			  LEFT JOIN RL_CREDIT_APPLICATION CA
+			    ON CA.CREDITAPPLICATION_ID = T.CREDITAPPLICATION_ID
+				left join rl_codetable ct on ct.section = 'att_for_repayment' and ct.code_key =  trim(t.attitude_for_repayment)
+				left join rl_codetable ctt on ctt.section = 'att_for_cutomermanager' and ctt.code_key =  trim(t.attitude_for_cutomermanager)
+			    left join rl_codetable ctx on ctx.section = 'yesOrNo' and ctx.code_key =  trim(t.is_high_danger)
+			    left join rl_codetable ctxx on ctxx.section = 'highDangerCustomerCategory' and ctxx.code_key =  trim(t.high_danger_reason)
+			   LEFT JOIN RL_BORROWER_SERVICE_APP BSA
+			    ON BSA.CREDITAPPLICATION_ID = T.CREDITAPPLICATION_ID
+			   AND BSA.LEADER = '1'
+			   AND BSA.Valid_State = '1'
+			    ,sid_view v 
+			 WHERE 1 = 1
+		]]>
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="sqlsid">
+				( ca.creditapplication_id = v.object_id_identity
+				and v.class = 'com.creditease.rc.domain.CreditApplication'
+				and v.ace_sid in ($sqlsid$))
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="nowDate">
+				<![CDATA[  (t.repayment_date <= to_date('$nowDate$','yyyy-MM-dd') or t.status =  '1')]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerReturnVisitId">
+				t.customer_return_visit_id
+				= #customerReturnVisitId#</isNotEmpty>
+			<isNotEmpty prepend="AND" property="businessNumber">
+				ca.business_number =
+				#businessNumber#</isNotEmpty>
+			<isNotEmpty prepend="AND" property="borrowerName">
+				BSA.NAME =
+				#borrowerName#</isNotEmpty>
+			<isNotEmpty prepend="AND" property="creditapplicationId">
+				ca.CREDITAPPLICATION_ID
+				= #creditapplicationId#</isNotEmpty>
+			<isNotEmpty prepend="AND" property="loanOfficerName">
+				ca.loan_officer_name =
+				#loanOfficerName#</isNotEmpty>
+			<isNotEmpty prepend="AND" property="loanOfficerId">
+				ca.loan_officer_id =
+				#loanOfficerId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyId">
+				ca.COMPANY_ID in ($companyId$)
+			</isNotEmpty>
+			<isNotEmpty prepend=" AND" property="repaymentPlanName">
+				ca.REPAYMENT_PLAN_NAME = #repaymentPlanName#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="beginRepaymentDate"> <![CDATA[ t.repayment_date >= #beginRepaymentDate:Date#]]></isNotEmpty>
+			<isNotEmpty prepend="AND" property="endRepaymentDate"> <![CDATA[ t.repayment_date <= #endRepaymentDate:Date#]]></isNotEmpty>
+			<isNotEmpty prepend="AND" property="beginReturnVisitDate"> <![CDATA[ t.visit_date  >= #beginReturnVisitDate:Date#]]></isNotEmpty>
+			<isNotEmpty prepend="AND" property="endReturnVisitDate"> <![CDATA[ t.visit_date  <= #endReturnVisitDate:Date#]]></isNotEmpty>
+			<isEmpty prepend="AND" property="validateStatus">
+				t.VALIDATE_STATUS = '0'</isEmpty>
+		</dynamic>
+
+	</sql>
+	<select id="selectClass" parameterClass="CustomerReturnVisitVoClass" resultClass="CustomerReturnVisitVoClass">
+		<include refid="selectClass_sql" />
+		<![CDATA[
+			ORDER BY t.creditapplication_id DESC , t.repayment_date,t.CUSTOMER_RETURN_VISIT_ID 
+		]]>
+	</select>
+	<select id="countselectClass" parameterClass="CustomerReturnVisitVoClass" resultClass="int">
+		<![CDATA[select count(*) from (
+		]]>
+		<include refid="selectClass_sql" />
+		<![CDATA[
+		)
+		]]>
+	</select>
+	<select id="selectPresent" parameterClass="CustomerReturnVisitVoClass" resultClass="CustomerReturnVisitVoClass">
+		<include refid="selectClass_sql" />
+		<isNotEmpty prepend="AND" property="presentDate">
+				<![CDATA[
+					t.REPAYMENT_DATE > #presentDate:Date#
+					and t.REPAYMENT_DATE <=  add_natural_months(#presentDate:Date# , 1)
+				]]>
+		</isNotEmpty>
+	</select>
+
+	<select id="selectPresentAgain" parameterClass="CustomerReturnVisitVoClass" resultClass="CustomerReturnVisitVoClass">
+		<include refid="selectClass_sql" />
+		<isNotEmpty prepend="AND" property="presentDate">
+				<![CDATA[
+					t.REPAYMENT_DATE > #presentDate:Date#
+					and t.REPAYMENT_DATE <=  add_natural_months(#presentDate:Date# , 2)
+				]]>
+		</isNotEmpty>
+	</select>
+	<update id="update" parameterClass="CustomerReturnVisitClass">
+		<![CDATA[
+			update  RL_CUSTOMER_RETURN_VISIT
+		 	set customer_return_visit_id = #customerReturnVisitId#
+		]]>
+		<dynamic>
+			<isNotEmpty prepend=" ," property="creditapplicationId">
+				CREDITAPPLICATION_ID =
+				#creditapplicationId#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="operatorId">
+				OPERATOR_ID =
+				#operatorId#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="operatorName">
+				OPERATOR_NAME =
+				#operatorName#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="visitDate">
+				VISIT_DATE = #visitDate#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="visitDurationTimes">
+				VISIT_DURATION_TIMES =
+				#visitDurationTimes#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="operatorTime">
+				OPERATOR_TIME =
+				#operatorTime#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="visitWay">
+				VISIT_WAY = #visitWay#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="loanUse">
+				LOAN_USE = #loanUse#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newLoanUse">
+				NEW_LOAN_USE =
+				#newLoanUse#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="income">
+				INCOME = #income#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newIncome">
+				NEW_INCOME = #newIncome#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="familyIncome">
+				FAMILY_INCOME =
+				#familyIncome#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newFamilyIncome">
+				NEW_FAMILY_INCOME =
+				#newFamilyIncome#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="spending">
+				SPENDING = #spending#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newSpending">
+				NEW_SPENDING =
+				#newSpending#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="contactWay">
+				CONTACT_WAY =
+				#contactWay#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newContactWay">
+				NEW_CONTACT_WAY =
+				#newContactWay#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newDebt">
+				NEW_DEBT = #newDebt#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="newDebtMoney">
+				NEW_DEBT_MONEY =
+				#newDebtMoney#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="customerAttitude">
+				CUSTOMER_ATTITUDE =
+				#customerAttitude#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="familyNumberCondition">
+				FAMILY_NUMBER_CONDITION
+				= #familyNumberCondition#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="otherFactor">
+				OTHER_FACTOR =
+				#otherFactor#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="repaymentDate">
+				REPAYMENT_DATE =
+				#repaymentDate#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="status">
+				STATUS = #status#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="visitDurationHours">
+				VISIT_DURATION_HOURS =
+				#visitDurationHours#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="visitDurationMinutes">
+				VISIT_DURATION_MINUTES =
+				#visitDurationMinutes#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="validateStatus">
+				VALIDATE_STATUS =
+				#validateStatus#
+			</isNotEmpty>
+            <isNotEmpty prepend=" ," property="attachmentId">
+                ATTATCHMENT_ID =
+				#attachmentId#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="attitudeForCutomermanager">
+				attitude_for_cutomermanager =
+				#attitudeForCutomermanager#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="attitudeForRepayment">
+				attitude_for_repayment =
+				#attitudeForRepayment#
+			</isNotEmpty>
+
+			<isNotEmpty prepend=" ," property="isPurposeConsistency">
+				is_purpose_consistency =
+				#isPurposeConsistency#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="reasonNotConsistency">
+				reason_not_consistency =
+				#reasonNotConsistency#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="highDangerReason">
+				high_danger_reason =
+				#highDangerReason#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="highDangered">
+				is_high_danger =
+				#highDangered#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="isComplete">
+				is_complete =
+				#isComplete#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="reasonForIncomplete">
+				reason_for_incomplete =
+				#reasonForIncomplete#
+			</isNotEmpty>
+
+			<isNotEmpty prepend=" ," property="contractChangeType">
+				contract_change_type =
+				#contractChangeType#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="changeBorrowerPhone">
+				change_borrower_phone =
+				#changeBorrowerPhone#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="changeCoborrowerPhone">
+				change_coborrower_phone =
+				#changeCoborrowerPhone#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="changeGuaranteeFirstPhone">
+				change_guarantee_first_phone =
+				#changeGuaranteeFirstPhone#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="changeGuaranteeSecondPhone">
+				change_guarantee_second_phone =
+				#changeGuaranteeSecondPhone#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="sourceIncomeChangedType">
+				source_income_changed_type =
+				#sourceIncomeChangedType#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="sourceIncomeChangedContent">
+				source_income_changed_content =
+				#sourceIncomeChangedContent#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="sourceIncomeChangedContentStr">
+				SOURCE_INCOME_CHANGED_CNTSTR =
+				#sourceIncomeChangedContentStr#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			where customer_return_visit_id = #customerReturnVisitId#
+		]]>
+	</update>
+
+	<select id="selectDontCallBackOfThisMonth" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+      select distinct  ca.CREDITAPPLICATION_ID
+        from rl_customer_return_visit t, rl_credit_application ca,sid_view v
+       where
+         t.repayment_date <= to_date(#nowTime#,'yyyy-MM-dd') and t.repayment_date > add_months( t.repayment_date,-1)
+         and t.visit_date is null
+         and ca.creditapplication_id = t.creditapplication_id
+         and ca.audit_status in('15','29','30')
+    ]]>
+		<isNotEmpty prepend="AND" property="authList">
+			ca.CREDITAPPLICATION_ID
+			= v.object_id_identity
+			and
+			v.class='com.creditease.rc.domain.CreditApplication'
+			and
+			v.ace_sid IN
+			($authList$)
+		</isNotEmpty>
+	</select>
+	<!--查询上一期没有做过回访的所有信息-->
+	<select id="selectWarn" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		<![CDATA[
+			select distinct  ca.CREDITAPPLICATION_ID
+			  from rl_customer_return_visit t, rl_credit_application ca,sid_view v
+			 where t.repayment_date-1 >=  to_date(#beginDateString#,'yyyy-MM-dd')
+			   and t.repayment_date-1 <= to_date(#endDateString#,'yyyy-MM-dd')
+			   and t.visit_date is null
+			   and ca.creditapplication_id = t.creditapplication_id
+			   and ca.audit_status in('15','29','30')
+
+		]]>
+		<isNotEmpty prepend="AND" property="authList">
+			ca.CREDITAPPLICATION_ID
+			= v.object_id_identity
+			and
+			v.class='com.creditease.rc.domain.CreditApplication'
+			and
+			v.ace_sid IN
+			($authList$)
+		</isNotEmpty>
+	</select>
+
+	<select id="selectToday" resultMap="CustomerReturnVisitMap" parameterClass="CustomerReturnVisitVoClass">
+		<![CDATA[
+			SELECT T.* FROM rl_customer_return_visit T
+		      WHERE   T.CREDITAPPLICATION_ID = #creditapplicationId#
+		      AND  T.REPAYMENT_DATE  = to_date('$repayMentDateString$','yyyy-MM-dd')
+		]]>
+	</select>
+	<select id="selectReturnPlan" parameterClass="java.util.Date" resultClass="com.creditease.rc.domain.ReturnPlan">
+		select r.creditapplication_id as creditapplicationId,
+		r.repayment_date as repaymentDate
+		from rl_return_plan r, rl_credit_application c
+		where
+		c.creditapplication_id not in (select crv.creditapplication_id
+		from rl_customer_return_visit crv
+		group by crv.creditapplication_id)
+		and
+		r.creditapplication_id = c.creditapplication_id
+		and c.audit_status = '15'
+		and r.period != 1
+		<!-- and r.repayment_date > to_date(sysdate, 'YYYY-MM-dd') -->
+		and r.repayment_date>=#repaymentDates#
+	</select>
+	<sql id="haveNoVisitPlanList">
+		select ca.creditapplication_id as creditapplicationId,
+		ca.business_number as businessNumber
+		from rl_credit_application ca
+		where
+		ca.creditapplication_id not in
+		(select crv.creditapplication_id
+		from rl_customer_return_visit crv
+		group by crv.creditapplication_id)
+		and ca.audit_status
+		= '15'
+		order by ca.creditapplication_id asc
+	</sql>
+	<select id="haveNoVisitPlanListEntity" resultClass="com.creditease.rc.vo.HaveNoVisitPlanList" parameterClass="java.util.HashMap">
+		<include refid="haveNoVisitPlanList" />
+	</select>
+	<select id="haveNoVisitPlanListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="haveNoVisitPlanList" />
+		)
+	</select>
+	<update id="updateCusReViVSByCreIdNDat" parameterClass="java.util.HashMap">
+		update rl_customer_return_visit crv
+		set crv.validate_status = #type#
+		where crv.creditapplication_id = #creditapplicationId#
+		and crv.STATUS = '0'
+		and crv.repayment_date >= trunc(to_date(#date#, 'yyyy-MM-dd'), 'dd')
+	</update>
+</sqlMap>

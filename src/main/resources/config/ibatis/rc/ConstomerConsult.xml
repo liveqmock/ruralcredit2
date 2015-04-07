@@ -1,0 +1,981 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ContomerConsult">
+	<typeAlias alias="ContomerConsultClass" type="com.creditease.rc.domain.CustomerConsult" />
+	<typeAlias alias="ContomerConsultVoClass" type="com.creditease.rc.vo.CustomerConsultVo" />
+	<typeAlias alias="pagination"
+		type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<resultMap class="com.creditease.rc.domain.CustomerConsult"
+		id="CostomerConsultMap">
+		<result property="customerConsultId" column="CUSTOMER_CONSULT_ID"
+			jdbcType="LONG" />
+		<result property="departmentName" column="DEPARTMENT_NAME"
+			jdbcType="VARCHAT" />
+		<result property="consultDate" column="CONSULT_DATE" jdbcType="TIMESTAMP" />
+		<result property="consultWay" column="CONSULT_WAY" jdbcType="CHAT" />
+		<result property="customerName" column="CUSTOMER_NAME"
+			jdbcType="VARCHAT" />
+		<result property="address" column="ADDRESS" jdbcType="VARCHAT" />
+		<result property="telphone" column="TELPHONE" jdbcType="VARCHAT" />
+		<result property="borrowAmount" column="BORROW_AMOUNT"
+			jdbcType="DOUBLE" />
+		<result property="borrowUse" column="BORROW_USE" jdbcType="VARCHAT" />
+		<result property="infomationSource" column="INFOMATION_SOURCE"
+			jdbcType="VARCHAT" />
+		<result property="receptionist" column="RECEPTIONIST" jdbcType="VARCHAT" />
+		<result property="processResult" column="PROCESS_RESULT"
+			jdbcType="VARCHAT" />
+		<result property="processCauses" column="PROCESS_CAUSES"
+			jdbcType="VARCHAT" />
+		<result property="remark" column="REMARK" jdbcType="VARCHAT" />
+		<result property="operateTime" column="OPERATE_TIME" jdbcType="TIMESTAMP" />
+		<result property="receptionistId" column="RECEPTIONIST_ID" jdbcType="VARCHAT" />
+		<result property="departmentId" column="DEPARTMENT_ID" jdbcType="VARCHAT" />
+
+		<result property="history" column="HISTORYFLAG" jdbcType="char" />
+		<result property="gender" column="gender"
+			jdbcType="char" />
+		<result property="borrowUseDetail" column="BORROW_USE_DETAIL" jdbcType="VARCHAT" />
+		<result property="consultWayDetail" column="CONSULT_WAY_DETAIL"
+			jdbcType="VARCHAT" />
+		<result property="borrowAmountDetail" column="BORROW_AMOUNT_DETAIL" jdbcType="VARCHAT" />
+		<result property="infomationSourceDetail" column="INFOMATION_SOURCE_DETAIL"
+			jdbcType="VARCHAT" />
+		<result property="processResultDetail" column="PROCESS_RESULT_DETAIL"
+			jdbcType="VARCHAT" />
+		<result property="processCausesDetail" column="PROCESS_CAUSES_DETAIL" jdbcType="VARCHAT" />
+		<result property="genderDetail" column="GENDER_DETAIL" jdbcType="TIMESTAMP" />
+		<result property="industryCategory" column="INDUSTRY_CATEGORY" jdbcType="VARCHAT" />
+		<result property="industryCategoryDetail" column="INDUSTRY_CATEGORY_DETAIL" jdbcType="VARCHAT" />
+		
+		<result property="count" column="COUNT" jdbcType="VARCHAT" />
+		<result property="status" column="STATUS" jdbcType="VARCHAT" />
+		<result property="telphoneMd5" column="TELPHONE_MD5" jdbcType="VARCHAT" />
+		
+		<result property="createManagerId" column="CREATE_MANAGER_ID" jdbcType="VARCHAT" />
+		<result property="createManager" column="CREATE_MANAGER" jdbcType="VARCHAT" />
+	</resultMap>
+	
+	<!-- 查询借款用途 -->
+	<select id="queryBorrowUseBycreditapplicationId" resultClass="java.util.HashMap" parameterClass="string">
+		select x.borrow_use,x.borrow_use_detail from rl_customer_consult x where x.customer_consult_id=
+		(select t.customer_consult_id from rl_credit_application t where t.creditapplication_id=#creditapplicationId#)
+	</select>
+	
+	
+	<insert id="insert" parameterClass="ContomerConsultClass">
+		<selectKey keyProperty="customerConsultId" resultClass="java.lang.Long"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	INSERT INTO RL_CUSTOMER_CONSULT
+        		(CUSTOMER_CONSULT_ID,
+					DEPARTMENT_NAME,
+					CONSULT_DATE,
+					CONSULT_WAY,
+					CUSTOMER_NAME,
+					ADDRESS,
+					TELPHONE,
+					BORROW_AMOUNT,
+					BORROW_USE,
+					INFOMATION_SOURCE,
+					RECEPTIONIST,
+					PROCESS_RESULT,
+					PROCESS_CAUSES,
+					REMARK,
+					OPERATE_TIME,
+					DEPARTMENT_ID,
+					RECEPTIONIST_ID,
+					HISTORYFLAG,
+					gender,
+					GENDER_DETAIL,
+					INDUSTRY_CATEGORY,
+					COUNT,
+					STATUS,
+					TELPHONE_MD5
+					
+        		)
+        	VALUES
+        		(#customerConsultId:LONG#,
+					#departmentName:VARCHAT#,
+					#consultDate:TIMESTAMP#,
+					#consultWay:CHAT#,
+					#customerName:VARCHAT#,
+					#address:VARCHAT#,
+					#telphone:VARCHAT#,
+					#borrowAmount:DOUBLE#,
+					#borrowUse:VARCHAT#,
+					#infomationSource:VARCHAT#,
+					#receptionist:VARCHAT#,
+					#processResult:VARCHAT#,
+					#processCauses:VARCHAT#,
+					#remark:VARCHAT#,
+					#operateTime:TIMESTAMP#
+					#departmentId#,
+					#receptionistId#,
+					
+					#history#,
+					#gender#,
+					#genderDetail#,
+					#industryCategory#,
+					#count#,
+					#status#,
+					#telphoneMd5#
+        		)	
+        ]]>
+	</insert>
+
+	<insert id="dynamicInsert" parameterClass="ContomerConsultClass">
+		<selectKey keyProperty="customerConsultId" resultClass="java.lang.Long"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	INSERT INTO RL_CUSTOMER_CONSULT
+        		(CUSTOMER_CONSULT_ID
+        		
+        ]]>
+		<dynamic>
+			<isNotEmpty property="departmentName" prepend=",">
+				DEPARTMENT_NAME
+        	</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend=",">
+				CONSULT_DATE
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend=",">
+				CONSULT_WAY
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend=",">
+				CUSTOMER_NAME
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend=",">
+				ADDRESS
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend=",">
+				TELPHONE
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend=",">
+				BORROW_AMOUNT
+        	</isNotEmpty>
+			<isNotEmpty property="borrowUse" prepend=",">
+				BORROW_USE
+        	</isNotEmpty>
+			<isNotEmpty property="infomationSource" prepend=",">
+                SUB_INFO_SRC
+        	</isNotEmpty>
+			<isNotEmpty property="receptionist" prepend=",">
+				RECEPTIONIST
+        	</isNotEmpty>
+			<isNotEmpty property="processResult" prepend=",">
+				PROCESS_RESULT
+        	</isNotEmpty>
+			<isNotEmpty property="processCauses" prepend=",">
+				PROCESS_CAUSES
+        	</isNotEmpty>
+			<isNotEmpty property="remark" prepend=",">
+				REMARK
+        	</isNotEmpty>
+        	<isNotEmpty property="operateTime" prepend=",">
+				OPERATE_TIME
+        	</isNotEmpty>
+        	<isNotEmpty property="receptionistId" prepend=",">
+				RECEPTIONIST_ID
+        	</isNotEmpty>
+        	<isNotEmpty property="departmentId" prepend=",">
+				DEPARTMENT_ID
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="history" prepend=",">
+				HISTORYFLAG
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="gender" prepend=",">
+				gender
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="industryCategory" prepend=",">
+				INDUSTRY_CATEGORY
+        	</isNotEmpty>
+        	<isNotEmpty property="count" prepend=",">
+				COUNT
+        	</isNotEmpty>
+        	<isNotEmpty property="status" prepend=",">
+				STATUS
+        	</isNotEmpty>
+        	<isNotEmpty property="telphoneMd5" prepend=",">
+				TELPHONE_MD5
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="createManagerId"  prepend="," >
+				CREATE_MANAGER_ID 
+			</isNotEmpty>
+			<isNotEmpty  property="createManager"  prepend="," >
+				CREATE_MANAGER
+			</isNotEmpty>
+            <isNotEmpty  property="baseInfSrcKey"  prepend="," >
+                BASE_INFO_SRC
+			</isNotEmpty>
+            <isNotEmpty  property="baseInfSrcValue"  prepend="," >
+                BASE_INFO_SRC_VALUE
+			</isNotEmpty>
+            <isNotEmpty  property="infomationSourceDetail"  prepend="," >
+                SUB_INFO_SRC_VALUE
+			</isNotEmpty>
+		</dynamic>
+        	<![CDATA[
+				)VALUES
+        		(#customerConsultId:LONG#
+			]]>
+
+		<dynamic>
+			<isNotEmpty property="departmentName" prepend=",">
+				#departmentName:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend=",">
+				#consultDate:TIMESTAMP#
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend=",">
+				#consultWay:CHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend=",">
+				#customerName:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend=",">
+				#address:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend=",">
+				#telphone:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend=",">
+				#borrowAmount:DOUBLE#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowUse" prepend=",">
+				#borrowUse:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="infomationSource" prepend=",">
+				#infomationSource:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="receptionist" prepend=",">
+				#receptionist:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processResult" prepend=",">
+				#processResult:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processCauses" prepend=",">
+				#processCauses:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="remark" prepend=",">
+				#remark:VARCHAT#
+        	</isNotEmpty>
+        	<isNotEmpty property="operateTime" prepend=",">
+				#operateTime:TIMESTAMP#
+        	</isNotEmpty>
+        	<isNotEmpty property="receptionistId" prepend=",">
+				#receptionistId#
+        	</isNotEmpty>
+        	<isNotEmpty property="departmentId" prepend=",">
+				#departmentId#
+        	</isNotEmpty>
+        	<isNotEmpty property="history" prepend=",">
+				#history#
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="gender" prepend=",">
+				#gender#
+        	</isNotEmpty>
+        	 
+        	<isNotEmpty property="industryCategory" prepend=",">
+				#industryCategory#
+        	</isNotEmpty>
+        	<isNotEmpty property="count" prepend=",">
+				#count#
+        	</isNotEmpty>
+        	<isNotEmpty property="status" prepend=",">
+				#status#
+        	</isNotEmpty>
+        	<isNotEmpty property="telphoneMd5" prepend=",">
+				#telphoneMd5#
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="createManagerId" prepend="," >
+				#createManagerId#
+			</isNotEmpty>
+			<isNotEmpty  property="createManager" prepend=",">
+				#createManager:VARCHAT#
+			</isNotEmpty>
+            <isNotEmpty  property="baseInfSrcKey" prepend=",">
+				#baseInfSrcKey#
+			</isNotEmpty>
+            <isNotEmpty  property="baseInfSrcValue" prepend=",">
+				#baseInfSrcValue#
+			</isNotEmpty>
+            <isNotEmpty  property="infomationSourceDetail" prepend=",">
+				#infomationSourceDetail#
+			</isNotEmpty>
+		</dynamic>
+        	<![CDATA[
+				)
+			]]>
+	</insert>
+	<select id="selectPagnation" parameterClass="ContomerConsultClass"
+		resultClass="ContomerConsultClass">
+		<![CDATA[
+			SELECT 
+			c.CUSTOMER_CONSULT_ID as customerConsultId,
+       		c.DEPARTMENT_NAME as departmentName,
+			c.CONSULT_DATE as consultDate,
+          	c.CONSULT_WAY as consultWay,
+          	c.CUSTOMER_NAME as customerName,
+          	c.ADDRESS as address,
+          	c.TELPHONE as telphone,
+         	c.BORROW_AMOUNT as borrowAmount,
+         	c.BORROW_USE as borrowUse,
+          	c.INFOMATION_SOURCE as infomationSource,
+          	c.RECEPTIONIST as receptionist,
+          	c.PROCESS_RESULT as processResult,
+         	c.PROCESS_CAUSES as processCauses,
+         	c.REMARK as remark,
+         	c.OPERATE_TIME as operateTime,
+         	c.STATUS as optionFlag,
+         	c.STATUS as status,
+         	c.RECEPTIONIST_ID as	receptionistId,
+         	c.DEPARTMENT_ID as departmentId,
+         	
+         	c.HISTORYFLAG as history,
+          	c.gender as gender,
+          	c.BORROW_USE_DETAIL as borrowUseDetail,
+          	c.CONSULT_WAY_DETAIL as consultWayDetail,
+         	c.BORROW_AMOUNT_DETAIL as borrowAmountDetail,
+         	c.INFOMATION_SOURCE_DETAIL as infomationSourceDetail,
+         	c.PROCESS_RESULT_DETAIL as processResultDetail,
+         	c.PROCESS_CAUSES_DETAIL as processCausesDetail,
+         	c.GENDER_DETAIL as genderDetail,
+         		c.INDUSTRY_CATEGORY as industryCategory,
+         	c.INDUSTRY_CATEGORY_DETAIL as	industryCategoryDetail,
+         	c.COUNT as	count,
+         	c.TELPHONE_MD5 as telphoneMd5,
+         	c.CREATE_MANAGER as createManager,
+            c.CREATE_MANAGER_ID as createManagerId
+         	
+         FROM RL_CUSTOMER_CONSULT c  
+         where  c.historyflag = '0'
+		]]>
+		<dynamic prepend="and">
+			<isNotEmpty prepend="AND" property="departmentId">
+				c.DEPARTMENT_ID = #departmentId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend="AND">
+				c.CONSULT_DATE like  '%$consultDate$%'
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend="AND">
+				c.CONSULT_WAY like '%$consultWay$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend="AND">
+				c.CUSTOMER_NAME like '%$customerName$%'
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend="AND">
+				c.ADDRESS like '%$address$%'
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend="AND">
+				c.TELPHONE like '%$telphone$%'
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend="AND">
+				c.BORROW_AMOUNT like '%$borrowAmount$%'
+        	</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			ORDER BY c.CONSULT_DATE DESC
+		]]>
+	</select>
+	<sql id="selectMap_contions">
+		<dynamic prepend="and">
+		<isNotEmpty prepend="AND" property="fuzzyValue">
+					(c.DEPARTMENT_NAME like '%$fuzzyValue$%'
+					OR c.CUSTOMER_NAME like '%$fuzzyValue$%'
+					OR c.ADDRESS like '%$fuzzyValue$%'
+					OR c.TELPHONE like '%$fuzzyValue$%')
+		</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.processResult">
+				c.PROCESS_RESULT = #customerConsult.processResult:LONG#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.infomationSource">
+				c.INFOMATION_SOURCE = #customerConsult.infomationSource:LONG#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.processCauses">
+				c.PROCESS_CAUSES = #customerConsult.processCauses:LONG#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.borrowUse">
+				c.BORROW_USE = #customerConsult.borrowUse:LONG#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.consultDateBegin">
+				c.CREATE_DATE >= #customerConsult.consultDateBegin#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.consultDateEnd">
+				#customerConsult.consultDateEnd# >= c.CREATE_DATE
+			</isNotEmpty>
+            <isNotEmpty prepend="AND" property="customerConsult.operateDateBegin">
+                c.OPERATE_TIME >= #customerConsult.operateDateBegin#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.operateDateEnd">
+				#customerConsult.operateDateEnd# >= c.OPERATE_TIME
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.customerConsultId">
+				c.CUSTOMER_CONSULT_ID = #customerConsult.customerConsultId:LONG#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				c.CUSTOMER_CONSULT_ID
+				= v.object_id_identity
+            </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CustomerConsult'
+            </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="history">
+				c.HISTORYFLAG = #history:VARCHAT#
+            </isNotEmpty>
+			<!--<isNotEmpty prepend="AND" property="arearDepartmentId">
+				c.DEPARTMENT_ID = #arearDepartmentId:VARCHAT#
+			</isNotEmpty>
+			-->
+			<isNotEmpty prepend="AND" property="customerConsult.history">
+				c.HISTORYFLAG = #customerConsult.history:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.departmentId">
+				c.DEPARTMENT_ID in( $customerConsult.departmentId$)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.receptionistId">
+				c.RECEPTIONIST_ID = #customerConsult.receptionistId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerConsult.receptionist">
+				c.RECEPTIONIST = #customerConsult.receptionist:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty property="customerConsult.consultDate" prepend="AND">
+				c.CONSULT_DATE like  '%$customerConsult.consultDate$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerConsult.consultWay" prepend="AND">
+				c.CONSULT_WAY like '%$customerConsult.consultWay$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerConsult.customerName" prepend="AND">
+				c.CUSTOMER_NAME like '%$customerConsult.customerName$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerConsult.address" prepend="AND">
+				c.ADDRESS like '%$customerConsult.address$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerConsult.telphone" prepend="AND">
+				c.TELPHONE like '%$customerConsult.telphone$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerConsult.borrowAmount" prepend="AND">
+				c.BORROW_AMOUNT like '%$customerConsult.borrowAmount$%'
+        	</isNotEmpty>
+		</dynamic>
+	</sql>
+	<select id="selectMap" parameterClass="java.util.Map"
+		resultClass="ContomerConsultClass">
+		<![CDATA[
+			SELECT distinct 
+			c.CUSTOMER_CONSULT_ID 				as customerConsultId,
+       		c.DEPARTMENT_NAME 					as departmentName,
+			c.CONSULT_DATE 						as consultDate,
+          	c.CONSULT_WAY 						as consultWay,
+          	c.CUSTOMER_NAME 					as customerName,
+          	c.ADDRESS 							as address,
+          	c.TELPHONE 							as telphone,
+         	c.BORROW_AMOUNT as borrowAmount,
+         	c.BORROW_USE as borrowUse,
+          	c.INFOMATION_SOURCE as infomationSource,
+          	c.RECEPTIONIST as receptionist,
+          	c.PROCESS_RESULT as processResult,
+         	c.PROCESS_CAUSES as processCauses,
+         	c.REMARK as remark,
+         	c.OPERATE_TIME as operateTime,
+         	c.STATUS as optionFlag,
+         	c.STATUS as status,
+         	c.RECEPTIONIST_ID as	receptionistId,
+         	c.DEPARTMENT_ID as departmentId,
+         	c.HISTORYFLAG as history,
+          	c.gender as gender,
+         	c.BORROW_AMOUNT_DETAIL as borrowAmountDetail,
+         	c.INDUSTRY_CATEGORY as industryCategory,
+         	c.COUNT as	count,
+         	c.TELPHONE_MD5 as telphoneMd5,
+            ca.business_number as businessNumber,
+            c.CREATE_MANAGER as createManager,
+            c.CREATE_MANAGER_ID as createManagerId,
+            c.CREATE_DATE as createDate,
+            c.SUB_INFO_SRC as subInfSrcKey,
+            c.SUB_INFO_SRC_VALUE as subInfSrcValue,
+           (select ct.code_value  from rl_codetable ct where ct.code_key = c.borrow_use and ct.section='borroerUserConsult') as borrowUseDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.consult_way and ct.section='consultWay')as consultWayDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.infomation_source and ct.section='infomationSource')as infomationSourceDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.process_result and ct.section='processResult')as processResultDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.process_causes and ct.section='processCauses')as processCausesDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.gender and ct.section='gender')as genderDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.industry_category and ct.section='industryCategory')as industryCategoryDetail
+         FROM RL_CUSTOMER_CONSULT c left join rl_credit_application ca
+         on c.customer_consult_id = ca.customer_consult_id,sid_view v
+         where  1=1 
+		]]>
+		<include refid="selectMap_contions"/>
+        	<isEmpty prepend="ORDER BY" property="customerConsult.history">
+				c.CONSULT_DATE DESC
+            </isEmpty>
+            <isNotEmpty prepend=" " property="customerConsult.history">
+	            <isNotEmpty property="sort" prepend="ORDER BY" >
+	        		c.$sort$ $order$
+	        	</isNotEmpty>
+	            <isEmpty property="sort" prepend="ORDER BY" >
+	        		STATUS,CONSULT_DATE DESC
+	        	</isEmpty>
+            </isNotEmpty>
+        	
+	</select>
+	
+	
+	<select id="countMap" parameterClass="java.util.Map"
+		resultClass="int">
+		<![CDATA[
+			SELECT count(distinct c.CUSTOMER_CONSULT_ID)
+         FROM RL_CUSTOMER_CONSULT c,sid_view v
+         where  1=1
+		]]>
+		<include refid="selectMap_contions"/>
+	</select>
+	
+	
+	<select id="countPagnation" parameterClass="ContomerConsultClass"
+		resultClass="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM RL_CUSTOMER_CONSULT
+			
+			where 
+			    historyflag = '0'
+		]]>
+		<dynamic prepend="and">
+			<isNotEmpty prepend="AND" property="departmentId">
+				DEPARTMENT_ID = #departmentId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend="AND">
+				CONSULT_DATE like '%$consultDate$%'
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend="AND">
+				CONSULT_WAY like  '%$consultWay$%'
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend="AND">
+				CUSTOMER_NAME like  '%$customerName$%'
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend="AND">
+				ADDRESS like  '%$address$%'
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend="AND">
+				TELPHONE like  '%$telphone$%'
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend="AND">
+				BORROW_AMOUNT like  '%$borrowAmount$%'
+        	</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<select id="selectFuzzy" parameterClass="String" resultClass="ContomerConsultClass">
+		<![CDATA[
+			SELECT c.CUSTOMER_CONSULT_ID as customerConsultId,
+       		c.DEPARTMENT_NAME as departmentName,
+			c.CONSULT_DATE as consultDate,
+          	c.CONSULT_WAY as consultWay,
+          	c.CUSTOMER_NAME as customerName,
+          	c.ADDRESS as address,
+          	c.TELPHONE as telphone,
+         	c.BORROW_AMOUNT as borrowAmount,
+         	c.BORROW_USE as borrowUse,
+          	c.INFOMATION_SOURCE as infomationSource,
+          	c.RECEPTIONIST as receptionist,
+          	c.PROCESS_RESULT as processResult,
+         	c.PROCESS_CAUSES as processCauses,
+         	c.REMARK as remark,
+         	c.OPERATE_TIME as operateTime,
+         	c.STATUS as optionFlag,
+         	c.STATUS as status,
+         	c.RECEPTIONIST_ID as receptionistId,
+         	c.DEPARTMENT_ID as departmentId,
+         	
+         	c.HISTORYFLAG as history,
+          	c.gender as gender,
+          	c.BORROW_USE_DETAIL as borrowUseDetail,
+          	c.CONSULT_WAY_DETAIL as consultWayDetail,
+         	c.BORROW_AMOUNT_DETAIL as borrowAmountDetail,
+         	c.INFOMATION_SOURCE_DETAIL as infomationSourceDetail,
+         	c.PROCESS_RESULT_DETAIL as processResultDetail,
+         	c.PROCESS_CAUSES_DETAIL as processCausesDetail,
+         	c.GENDER_DETAIL as genderDetail,
+         	c.INDUSTRY_CATEGORY as industryCategory,
+         	c.INDUSTRY_CATEGORY_DETAIL as	industryCategoryDetail,
+         	c.COUNT as	count,
+   			c.CREATE_MANAGER as createManager,
+            c.CREATE_MANAGER_ID as createManagerId
+         FROM RL_CUSTOMER_CONSULT c  
+         where   c.historyflag = '0'
+				and (c.DEPARTMENT_NAME like '%$fuzzyValue$%'
+					OR c.CUSTOMER_NAME like '%$fuzzyValue$%'
+					OR c.ADDRESS like '%$fuzzyValue$%'
+					OR c.TELPHONE like '%$fuzzyValue$%')
+			ORDER BY c.CONSULT_DATE DESC
+		]]>
+	</select>
+	<select id="countFuzzy" parameterClass="String" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM RL_CUSTOMER_CONSULT
+			WHERE
+				
+			 (DEPARTMENT_NAME like '%$fuzzyValue$%'
+					OR CUSTOMER_NAME like '%$fuzzyValue$%'
+					OR ADDRESS like '%$fuzzyValue$%'
+					OR TELPHONE like '%$fuzzyValue$%')
+			and   historyflag = '0'
+				
+		]]>
+	</select>
+	<update id="dynamicUpdate" parameterClass="ContomerConsultClass">
+		<![CDATA[
+			UPDATE RL_CUSTOMER_CONSULT 
+		]]>
+		<dynamic prepend="SET">
+			<isNotEmpty prepend="," property="telphoneMd5">
+				TELPHONE_MD5=
+				#telphoneMd5:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentName">
+				DEPARTMENT_NAME=
+				#departmentName:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentId">
+				DEPARTMENT_ID=
+				#departmentId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend=",">
+				CONSULT_DATE=#consultDate:TIMESTAMP#
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend=",">
+				CONSULT_WAY=#consultWay:CHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend=",">
+				CUSTOMER_NAME=#customerName:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend=",">
+				ADDRESS=#address:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend=",">
+				TELPHONE=#telphone:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend=",">
+				BORROW_AMOUNT=#borrowAmount:DOUBLE#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowUse" prepend=",">
+				BORROW_USE=#borrowUse:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="infomationSource" prepend=",">
+                SUB_INFO_SRC=#infomationSource#
+        	</isNotEmpty>
+            <isNotEmpty property="infomationSourceDetail" prepend=",">
+                SUB_INFO_SRC_VALUE=#infomationSourceDetail#
+        	</isNotEmpty>
+            <isNotEmpty property="baseInfSrcKey" prepend=",">
+                BASE_INFO_SRC=#baseInfSrcKey#
+        	</isNotEmpty>
+            <isNotEmpty property="baseInfSrcValue" prepend=",">
+                BASE_INFO_SRC_VALUE=#baseInfSrcValue#
+        	</isNotEmpty>
+			<isNotEmpty property="industryCategory" prepend=",">
+				INDUSTRY_CATEGORY=#industryCategory:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processResult" prepend=",">
+				PROCESS_RESULT=#processResult:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processCauses" prepend=",">
+				PROCESS_CAUSES=#processCauses:VARCHAT#
+        	</isNotEmpty>
+        	<isEmpty property="processCauses" prepend=",">
+				PROCESS_CAUSES=#processCauses#
+        	</isEmpty>
+			<isNotEmpty property="remark" prepend=",">
+				REMARK = #remark:VARCHAT#
+        	</isNotEmpty>
+        	<isNotEmpty property="operateTime" prepend=",">
+				OPERATE_TIME=#operateTime:TIMESTAMP#
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="status" prepend=",">
+				STATUS=#status:VARCHAT#
+        	</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			WHERE CUSTOMER_CONSULT_ID = #customerConsultId:LONG#
+		]]>
+	</update>
+	
+	
+	<update id="dynamicUpdateAll" parameterClass="ContomerConsultClass">
+		<![CDATA[
+			UPDATE RL_CUSTOMER_CONSULT 
+		]]>
+		<dynamic prepend="SET">
+			<isNotEmpty prepend="," property="telphoneMd5">
+				TELPHONE_MD5=
+				#telphoneMd5:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentName">
+				DEPARTMENT_NAME=
+				#departmentName:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentId">
+				DEPARTMENT_ID=
+				#departmentId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="receptionist">
+				RECEPTIONIST=
+				#receptionist:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="receptionistId">
+				RECEPTIONIST_ID=
+				#receptionistId:VARCHAT#
+			</isNotEmpty>
+			<isNotEmpty property="consultDate" prepend=",">
+				CONSULT_DATE=#consultDate:TIMESTAMP#
+        	</isNotEmpty>
+			<isNotEmpty property="consultWay" prepend=",">
+				CONSULT_WAY=#consultWay:CHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="customerName" prepend=",">
+				CUSTOMER_NAME=#customerName:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="address" prepend=",">
+				ADDRESS=#address:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="telphone" prepend=",">
+				TELPHONE=#telphone:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowAmount" prepend=",">
+				BORROW_AMOUNT=#borrowAmount:DOUBLE#
+        	</isNotEmpty>
+			<isNotEmpty property="borrowUse" prepend=",">
+				BORROW_USE=#borrowUse:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="infomationSource" prepend=",">
+				INFOMATION_SOURCE=#infomationSource:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="industryCategory" prepend=",">
+				INDUSTRY_CATEGORY=#industryCategory:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processResult" prepend=",">
+				PROCESS_RESULT=#processResult:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="processCauses" prepend=",">
+				PROCESS_CAUSES=#processCauses:VARCHAT#
+        	</isNotEmpty>
+			<isNotEmpty property="remark" prepend=",">
+				REMARK = #remark:VARCHAT#
+        	</isNotEmpty>
+        	<isNotEmpty property="operateTime" prepend=",">
+				OPERATE_TIME=#operateTime:TIMESTAMP#
+        	</isNotEmpty>
+        	
+        	<isNotEmpty property="status" prepend=",">
+				STATUS=#status:VARCHAT#
+        	</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			WHERE CUSTOMER_CONSULT_ID = #customerConsultId:LONG#
+		]]>
+	</update>
+	<select id="selectCustomerConsultById" parameterClass="long"
+		resultMap="CostomerConsultMap">
+		select * from RL_CUSTOMER_CONSULT
+		WHERE CUSTOMER_CONSULT_ID = #customerConsultId:LONG#
+	</select>
+
+	<select id="selectCustomerConsult" parameterClass="ContomerConsultClass"
+		resultMap="CostomerConsultMap">
+  		<![CDATA[
+  			select * from RL_CUSTOMER_CONSULT  
+  		
+  			WHERE CUSTOMER_CONSULT_ID = #customerConsultId:LONG#
+  		
+  		]]>
+		<isNotEmpty prepend="AND" property="departmentName">
+			DEPARTMENT_NAME= #departmentName:VARCHAT#
+			</isNotEmpty>
+		<isNotEmpty property="consultDate" prepend="AND">
+			CONSULT_DATE=#consultDate:TIMESTAMP#
+        	</isNotEmpty>
+		<isNotEmpty property="consultWay" prepend="AND">
+			CONSULT_WAY=#consultWay:CHAT#
+        	</isNotEmpty>
+		<isNotEmpty property="customerName" prepend="AND">
+			CUSTOMER_NAME=#customerName:VARCHAT#
+        	</isNotEmpty>
+		<isNotEmpty property="address" prepend="AND">
+			ADDRESS=#address:VARCHAT#
+        	</isNotEmpty>
+		<isNotEmpty property="telphone" prepend="AND">
+			TELPHONE=#telphone:VARCHAT#
+        	</isNotEmpty>
+		<isNotEmpty property="borrowAmount" prepend="AND">
+			BORROW_AMOUNT=#borrowAmount:DOUBLE#
+        	</isNotEmpty>
+	</select>
+	
+	<select id="selectByNumber" parameterClass="String" resultMap="CostomerConsultMap">
+		SELECT * FROM RL_CUSTOMER_CONSULT   WHERE 
+		TELPHONE LIKE '%$telphone$%'
+	</select>
+	
+	
+	<update id="updateByNumber" parameterClass="String">
+		update   RL_CUSTOMER_CONSULT 
+		set HISTORYFLAG = '1'
+		WHERE 
+		TELPHONE LIKE '%$telphone$%'
+	</update>
+	
+	<update id="updateFlagCount" parameterClass="ContomerConsultClass">
+		update   RL_CUSTOMER_CONSULT 
+		set HISTORYFLAG = '1',
+			COUNT = #count#
+		WHERE 
+		TELPHONE LIKE '%$telphone$%'
+	</update>
+	<select id="selectCount" parameterClass="ContomerConsultClass" resultClass="long">
+		SELECT COUNT(*)
+		FROM  RL_CUSTOMER_CONSULT 
+		where TELPHONE LIKE '%$telphone$%'
+	</select>
+	<select id="selectHistory" parameterClass="String" resultClass="ContomerConsultClass">
+		select   distinct 
+			c.CUSTOMER_CONSULT_ID as customerConsultId,
+       		c.DEPARTMENT_NAME as departmentName,
+			c.CONSULT_DATE as consultDate,
+          	c.CONSULT_WAY as consultWay,
+          	c.CUSTOMER_NAME as customerName,
+          	c.ADDRESS as address,
+          	c.TELPHONE as telphone,
+         	c.BORROW_AMOUNT as borrowAmount,
+         	c.BORROW_USE as borrowUse,
+          	c.INFOMATION_SOURCE as infomationSource,
+          	c.RECEPTIONIST as receptionist,
+          	c.PROCESS_RESULT as processResult,
+         	c.PROCESS_CAUSES as processCauses,
+         	c.REMARK as remark,
+         	c.OPERATE_TIME as operateTime,
+         	c.STATUS as optionFlag,
+         	c.STATUS as status,
+         	c.RECEPTIONIST_ID as	receptionistId,
+         	c.DEPARTMENT_ID as departmentId,
+         	c.HISTORYFLAG as history,
+          	c.gender as gender,
+         	c.BORROW_AMOUNT_DETAIL as borrowAmountDetail,
+         	c.INDUSTRY_CATEGORY as industryCategory,
+         	c.COUNT as	count,
+         	c.TELPHONE_MD5 as telphoneMd5,
+         	c.CREATE_MANAGER as createManager,
+            c.CREATE_MANAGER_ID as createManagerId,
+            c.CREATE_DATE as createDate,
+            c.SUB_INFO_SRC as subInfSrcKey,
+            c.SUB_INFO_SRC_VALUE as subInfSrcValue,
+           (select ct.code_value  from rl_codetable ct where ct.code_key = c.borrow_use and ct.section='borroerUserConsult') as borrowUseDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.consult_way and ct.section='consultWay')as consultWayDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.infomation_source and ct.section='infomationSource')as infomationSourceDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.process_result and ct.section='processResult')as processResultDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.process_causes and ct.section='processCauses')as processCausesDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.gender and ct.section='gender')as genderDetail,
+           (select ct.code_value from rl_codetable ct where ct.code_key = c.industry_category and ct.section='industryCategory')as industryCategoryDetail
+			
+		from RL_CUSTOMER_CONSULT c
+		where c.TELPHONE LIKE '%$telphone$%'
+        ORDER BY c.STATUS,c.CONSULT_DATE DESC
+	</select>
+	
+	<!-- 根据借款人申请单id,查询咨询信息 -->
+	<select id="queryCustomerConsultByBorrowerServiceAppId" parameterClass="Integer" resultMap="CostomerConsultMap">
+		 select s.*
+		  from rl_borrower_service_app app,
+		       rl_credit_application   c,
+		       rl_customer_consult     s
+		 where 1 = 1
+		   and app.creditapplication_id = c.creditapplication_id
+		   and s.customer_consult_id = c.customer_consult_id
+		   and s.historyflag = '0'
+		   and app.BORROWER_SERVICE_APP_ID=#BorrowerServiceAppId#
+		
+	
+	</select>
+
+    <!-- 根据信贷申请id,查询咨询信息 -->
+	<select id="queryCustomerConsultByCreditApplicationId" parameterClass="Integer" resultMap="CostomerConsultMap">
+        SELECT T1.*
+        FROM RL_CUSTOMER_CONSULT T1
+        INNER JOIN RL_CREDIT_APPLICATION T2
+        ON T1.CUSTOMER_CONSULT_ID = T2.CUSTOMER_CONSULT_ID
+        WHERE T2.CREDITAPPLICATION_ID = #creditApplicationId#
+	</select>
+	
+	<!-- ******zhangman 按接待员 （信贷员 id 分组）******* -->
+	<select id="groupByreceptionistId" resultClass="ContomerConsultClass">
+		<![CDATA[select c.RECEPTIONIST_ID receptionistId from rl_customer_consult c group by c.RECEPTIONIST_ID
+		]]>
+	</select>
+	<!-- ******zhangman 按接待员 （信贷员 id 修改）******* -->
+	<update id="updateByreceptionistId" parameterClass="ContomerConsultClass">
+		<![CDATA[update rl_customer_consult 
+		]]>
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="departmentId">
+				DEPARTMENT_ID = #departmentId#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentName">
+				DEPARTMENT_NAME = #departmentName#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[where RECEPTIONIST_ID = #receptionistId#
+		]]>
+	</update>
+	
+	<!-- 查询加密的md5号码为空的 -->
+	<select id="selectCustomerConsultList" resultMap="CostomerConsultMap">
+		select * from rl_customer_consult c where c.telphone_md5 is null or c.telphone_md5 = ''
+	</select>
+
+	<select id="selectByReceptionist" parameterClass="String" resultMap="CostomerConsultMap">
+		<![CDATA[  SELECT * FROM RL_CUSTOMER_CONSULT  T WHERE T.RECEPTIONIST_ID = #receptionistId#  ]]>
+	</select>
+
+	
+	<!-- 点击新增咨询中的提交按钮后查询与该电话号有关的咨询次数 luohongjie -->
+	<select id="selectCustomerConsultListByTel" resultMap="CostomerConsultMap" parameterClass="String">
+	  <![CDATA[
+	     select * from rl_customer_consult c 
+	     WHERE c.telPHONE=#telphone#
+	  ]]>
+	</select>
+	<select id="selectByReceptionistnothistory" parameterClass="ContomerConsultClass" resultMap="CostomerConsultMap">
+		<![CDATA[  SELECT * FROM RL_CUSTOMER_CONSULT  T WHERE T.RECEPTIONIST_ID = #receptionistId# and T.historyflag = '0' ]]>
+	</select>
+	<select id="countByReceptionistnothistory" parameterClass="ContomerConsultClass" resultClass="int">
+		<![CDATA[  SELECT count(*) FROM RL_CUSTOMER_CONSULT  T WHERE T.RECEPTIONIST_ID = #receptionistId# and T.historyflag = '0' ]]>
+	</select>
+
+    <select id="getManagerPhone" parameterClass="java.lang.String" resultClass="java.lang.String">
+        SELECT phone FROM rl_manager_phone WHERE userName = #userName#
+    </select>
+    <insert id="saveManagerPhone" parameterClass="java.util.HashMap">
+        <selectKey keyProperty="mp_id" resultClass="java.lang.Long"
+                   type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        INSERT INTO rl_manager_phone values(#mp_id#, #userName#, #phone#)
+    </insert>
+    <update id="updateManagerPhone" parameterClass="java.util.HashMap">
+        UPDATE rl_manager_phone SET phone = #phone# WHERE userName = #userName#
+    </update>
+</sqlMap>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXQUESTION">
+	<resultMap id="wxQuestionMap" class="com.creditease.rc.domain.WxQuestion">
+		<result column="WX_QUESTION_ID" property="wxQuestionId" jdbcType="DECIMAL" />
+		<result column="TYPE" property="type" jdbcType="VARCHAR" />
+		<result column="QUESTION" property="question" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxQuestionMap" parameterClass="com.creditease.rc.domain.WxQuestion">
+		select WX_QUESTION_ID, TYPE, QUESTION
+		from
+		RL_WX_QUESTION
+		where WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxQuestion">
+		delete from RL_WX_QUESTION
+		where WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+	</delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxQuestion">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxQuestionId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_QUESTION (WX_QUESTION_ID, TYPE, QUESTION)
+		values (#wxQuestionId:DECIMAL#, #type:VARCHAR#, #question:VARCHAR#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxQuestion">
+		update RL_WX_QUESTION
+		set TYPE = #type:VARCHAR#,
+		QUESTION = #question:VARCHAR#
+		where WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxQuestion">
+		update RL_WX_QUESTION
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="type">
+				TYPE = #type:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="question">
+				QUESTION = #question:VARCHAR#
+      </isNotNull>
+		</dynamic>
+		where WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+	</update>
+	<select id="queryAll" resultMap="wxQuestionMap">
+		select * from rl_wx_question wq
+	</select>
+</sqlMap>

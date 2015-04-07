@@ -1,0 +1,90 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="ruralcredit2:Web exploded">
+    <output-path>$PROJECT_DIR$/classes/artifacts/ruralcredit2_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="ruralcredit2/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="ruralcredit2" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="module" name="junit4" module-name="ruralcredit2" />
+          <element id="library" level="module" name="ant.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="aopalliance-1.0.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="asm-3.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="asm-commons-3.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="asm-tree-3.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="aspectj-1.6.12.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="aspectjrt.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="aspectjweaver-1.6.5.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cglib-2.2.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-beanutils-1.8.0.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-collections-3.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-fileupload-1.2.2.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-io-2.0.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-lang-2.5.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="commons-logging-1.1.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="ezmorph-1.0.6.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="ibatis-2.3.4.726.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="jackson-all-1.8.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="javassist-3.11.0.GA.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="jaxb-api-2.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="json-lib-2.3-jdk15.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="junit.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="log4j-1.2.15.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="mysql-connector-java-5.1.20-bin.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="ojdbc6.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.hamcrest.core_1.1.0.v20090501071000.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.aop-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.asm-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.aspects-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.beans-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.context-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.context.support-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.core-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.expression-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.jdbc-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.orm-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.oxm-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.test-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.transaction-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.web-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="org.springframework.web.servlet-3.1.1.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="poi-3.7-20101029.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="poi-ooxml-3.7-20101029.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="poi-ooxml-schemas-3.7-20101029.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="XmlSchema-1.4.5.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cas-client-core-3.1.1.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-api-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-common-schemas-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-common-utilities-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-bindings-soap-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-bindings-xml-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-core-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-databinding-jaxb-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-frontend-jaxws-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-frontend-simple-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-transports-http-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-ws-addr-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-rt-ws-security-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="cxf-tools-common-2.2.9.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="ehcache-1.6.2.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="smp_core.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-acl-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-cas-client-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-config-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-core-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-ldap-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-openid-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-taglibs-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="spring-security-web-3.0.5.RELEASE.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="wsdl4j-1.6.2.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="wss4j-1.5.8.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="xmlsec-1.4.3.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="jstl.jar" module-name="ruralcredit2" />
+          <element id="library" level="module" name="standard.jar" module-name="ruralcredit2" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

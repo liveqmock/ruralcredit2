@@ -1,0 +1,899 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CUSTOMER">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="customerBasicInfo" type="com.creditease.rc.domain.CustomerBasicInfo" />
+	<typeAlias alias="customerBasicInfoVo" type="com.creditease.rc.vo.CustomerBasicInfoVo" />
+	<resultMap class="com.creditease.rc.domain.CustomerBasicInfo" id="customerBasicInfomap">
+		<result property="customerBasicId" jdbcType="INTEGER" column="CUSTOMER_BASIC_ID" />
+		<result property="name" jdbcType="VARCHAR" column="NAME" />
+		<result property="former" jdbcType="VARCHAR" column="FORMER" />
+		<result property="credentialsType" jdbcType="CHAR" column="CREDENTIALS_TYPE" />
+		<result property="credentialsNumber" jdbcType="VARCHAR" column="CREDENTIALS_NUMBER" />
+		<result property="gender" jdbcType="CHAR" column="GENDER" />
+		<result property="national" jdbcType="CHAR" column="NATIONAL" />
+		<result property="maritalStatus" jdbcType="CHAR" column="MARITAL_STATUS" />
+		<result property="mobilephone" jdbcType="VARCHAR" column="MOBILEPHONE" />
+		<result property="telephone" jdbcType="VARCHAR" column="TELEPHONE" />
+		<result property="personIncome" jdbcType="INTEGER" column="PERSON_INCOME" />
+		<result property="highestEducation" jdbcType="VARCHAR" column="HIGHEST_EDUCATION" />
+		<result property="presentAddress" jdbcType="VARCHAR" column="HOME_ADDRESS" />
+		<result property="residenceAddress" jdbcType="VARCHAR" column="RESIDENCE_ADDRESS" />
+		<result property="remark" jdbcType="VARCHAR" column="REMARK" />
+		<result property="createTime" jdbcType="DATE" column="CREATE_DATE" />
+		<result property="operateName" jdbcType="VARCHAR" column="OPERATOR_NAME" />
+		<result property="operateId" jdbcType="INTEGER" column="OPERATOR_ID" />
+		<result property="vallageId" jdbcType="INTEGER" column="VILLAGE_ID" />
+		<result property="customerType" jdbcType="VARCHAR" column="CUSTOMER_TYPE" />
+		<result property="guaranor" jdbcType="VARCHAR" column="GUARANOR" />
+	</resultMap>
+
+	<sql id="byCustomerBasicId">
+		<![CDATA[
+			CUSTOMER_BASIC_ID=#customerBasicId:INTEGER#
+		]]>
+	</sql>
+	<sql id="selectCustomerBasicInfo_condition">
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="customerBasicId">
+				c.CUSTOMER_BASIC_ID = #customerBasicId#
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				c.name like '%$name$%'
+				</isNotEmpty>
+			<isNotEmpty property="credentialsNumber" prepend="AND">
+				upper(c.CREDENTIALS_NUMBER) like upper('%$credentialsNumber$%')
+		        </isNotEmpty>
+			<isNotEmpty property="telephone" prepend="AND">
+				c.MOBILEPHONE like '%$telephone$%'
+		        </isNotEmpty>
+			<isNotEmpty property="presentAddress" prepend="AND">
+				c.HOME_ADDRESS like '%$presentAddress$%'
+		        </isNotEmpty>
+			<isNotEmpty property="customerType" prepend="AND">
+				<isEqual compareValue="0" property="customerType">
+					c.CUSTOMER_TYPE like '%$customerType$%'
+		        	</isEqual>
+				<isEqual compareValue="1" property="customerType">
+					c.guaranor like '0'
+		        	</isEqual>
+			</isNotEmpty>
+			<isNotEmpty property="guaranor" prepend="AND">
+				c.guaranor like '%$guaranor$%'
+		        </isNotEmpty>
+		</dynamic>
+	</sql>
+	<select id="selectCustomerBasicInfo" parameterClass="customerBasicInfo" resultClass="customerBasicInfoVo">
+        <![CDATA[
+	         select 
+			       c.customer_basic_id as customerBasicId,
+			       c.name,
+			       c.former,
+			       c.create_date as createTime,
+			       c.credentials_type as credentialsType,
+			       c.credentials_number as credentialsNumber,
+			       c.gender as gender,
+			       c.national as national,
+			       c.marital_status as maritalStatus,
+			       c.mobilephone as mobilephone,
+			       c.telephone as telephone,
+			       c.person_income as personIncome,
+			       c.highest_education as highestEducation,
+			       c.home_address as presentAddress,
+			       c.residence_address as residenceAddress,
+			       c.remark as remark,
+			       c.operator_name as operateName,
+			       c.operator_id as operateId,
+			       c.village_id as vallageId,
+			       c.CUSTOMER_TYPE as customerType,
+			       c.guaranor as guaranor,
+			       b.blacklist_id as blackFlag,
+              
+	              (select ct.code_value  from rl_codetable ct where ct.code_key = C.National and ct.section='national') as nationalDetail,
+	              (select ct.code_value  from rl_codetable ct where ct.code_key = C.Marital_Status and ct.section='maritalStatus') as maritalStatusDetail,
+	              (select ct.code_value  from rl_codetable ct where ct.code_key = C.Highest_Education and ct.section='highestEducation') as highestEducationDetail
+	        from RL_CUSTOMER_BASIC_INFO C
+	        left join  rl_blacklist b
+	        on upper(b.credentials_number) = upper(c.credentials_number)
+	        and b.history_flag = 'F'
+        ]]>
+		<include refid="selectCustomerBasicInfo_condition" />
+		<![CDATA[
+			order by c.customer_basic_id desc
+		]]>
+	</select>
+	<select id="countByPage" parameterClass="customerBasicInfo" resultClass="int">
+        <![CDATA[
+            SELECT COUNT(C.CUSTOMER_BASIC_ID) 
+			 from RL_CUSTOMER_BASIC_INFO C
+		 
+      	 ]]>
+		<include refid="selectCustomerBasicInfo_condition" />
+	</select>
+	<select id="selectFuzzy" parameterClass="String" resultClass="customerBasicInfoVo">
+        <![CDATA[
+	        select 
+			       C.customer_basic_id as customerBasicId,
+			       C.name,
+			       C.former,
+			       C.create_date as createTime,
+			       C.credentials_type as credentialsType,
+			       C.credentials_number as credentialsNumber,
+			       C.gender as gender,
+			       C.national as national,
+			       C.marital_status as maritalStatus,
+			       C.mobilephone as mobilephone,
+			       C.telephone as telephone,
+			       C.person_income as personIncome,
+			       C.highest_education as highestEducation,
+			       C.home_address as presentAddress,
+			       C.residence_address as residenceAddress,
+			       C.remark as remark,
+			       C.operator_name as operateName,
+			       C.operator_id as operateId,
+			       C.village_id as vallageId,
+			       c.CUSTOMER_TYPE as customerType,
+					c.guaranor as  guaranor,
+					 b.blacklist_id as blackFlag,
+			        (select ct.code_value  from rl_codetable ct where ct.code_key = C.National and ct.section='national') as nationalDetail,
+            		(select ct.code_value  from rl_codetable ct where ct.code_key = C.Marital_Status and ct.section='maritalStatus') as maritalStatusDetail,
+             		(select ct.code_value  from rl_codetable ct where ct.code_key = C.Highest_Education and ct.section='highestEducation') as highestEducationDetail
+			  from RL_CUSTOMER_BASIC_INFO C
+			  left join  rl_blacklist b
+	        on upper(b.credentials_number) = upper(c.credentials_number)
+	        and b.history_flag = 'F'
+				        where C.name like '%$fuzzyValue$%'
+				        or upper(C.CREDENTIALS_NUMBER) like upper('%$fuzzyValue$%')
+				        or C.MOBILEPHONE like '%$fuzzyValue$%'
+				        or C.HOME_ADDRESS like '%$fuzzyValue$%'
+				       order by c.customer_basic_id desc
+        ]]>
+	</select>
+	<select id="countFuzzy" parameterClass="String" resultClass="int">
+        <![CDATA[
+            SELECT COUNT(C.customer_basic_id) 
+			 from RL_CUSTOMER_BASIC_INFO C
+             where C.name like '%$fuzzyValue$%'
+	        or upper(C.CREDENTIALS_NUMBER) like upper('%$fuzzyValue$%')
+	        or C.MOBILEPHONE like '%$fuzzyValue$%'
+	        or C.HOME_ADDRESS like '%$fuzzyValue$%'
+        ]]>
+	</select>
+	<insert id="insert" parameterClass="com.creditease.rc.domain.CustomerBasicInfo">
+		<selectKey keyProperty="customerBasicId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+		<![CDATA[
+			insert into RL_CUSTOMER_BASIC_INFO
+				(CUSTOMER_BASIC_ID, name, former, CREDENTIALS_TYPE, CREDENTIALS_NUMBER,
+				GENDER, national, MARITAL_STATUS, mobilephone, telephone, PERSON_INCOME, HIGHEST_EDUCATION, HOME_ADDRESS,
+				RESIDENCE_ADDRESS, remark,  OPERATOR_NAME, 
+				OPERATOR_ID,VILLAGE_ID,CUSTOMER_TYPE,guaranor)
+			values
+				 (#customerBasicId#,#name:VARCHAR#, #former:VARCHAR#,
+				#credentialsType:CHAR#, #credentialsNumber:VARCHAR#,
+				#gender:CHAR#,#national:CHAR#,#maritalStatus:CHAR#,#mobilephone:VARCHAR#,#telephone:VARCHAR#,
+				#personIncome:INTEGER#,#highestEducation:VARCHAR#,#presentAddress:VARCHAR#,
+				#residenceAddress:VARCHAR#,#remark:VARCHAR#, #operateName:VARCHAR#,
+				#operateId:INTEGER#,#vallageId#,#customerType#,#guaranor#)
+		]]>
+	</insert>
+
+
+	<update id="updateByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerBasicInfo">
+		<![CDATA[
+			update 
+				RL_CUSTOMER_BASIC_INFO
+			set
+				name=#name:VARCHAR#, 
+				former=#former:VARCHAR#,
+				CREDENTIALS_TYPE=#credentialsType:CHAR#, 
+				gender=#gender:CHAR#,
+				national=#national:CHAR#,
+				MARITAL_STATUS=#maritalStatus:CHAR#,
+				mobilephone=#mobilephone:VARCHAR#,
+				telephone=#telephone:VARCHAR#,
+				PERSON_INCOME=#personIncome:INTEGER#,
+				HIGHEST_EDUCATION=#highestEducation:VARCHAR#,
+				HOME_ADDRESS=#presentAddress:VARCHAR#,
+				RESIDENCE_ADDRESS=#residenceAddress:VARCHAR#,
+				remark=#remark:VARCHAR#,
+				OPERATOR_NAME=#operateName:VARCHAR#,
+				OPERATOR_ID=#operateId:INTEGER#,
+				VILLAGE_ID=#vallageId#
+		]]>
+		<dynamic>
+			<isNotEmpty property="customerType" prepend=",">
+				CUSTOMER_TYPE=#customerType#
+			</isNotEmpty>
+			<isNotEmpty property="guaranor" prepend=",">
+				GUARANOR=#guaranor#
+			</isNotEmpty>
+		</dynamic>
+		<dynamic prepend="WHERE">
+			<include refid="byCustomerBasicId" />
+		</dynamic>
+
+	</update>
+
+	<delete id="deleteByPrimaryKey" parameterClass="int">
+		<![CDATA[
+			delete from RL_CUSTOMER_BASIC_INFO
+		]]>
+		<dynamic prepend="WHERE">
+			<include refid="byCustomerBasicId" />
+		</dynamic>
+	</delete>
+	<select id="selectByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerBasicInfo" resultMap="customerBasicInfomap">
+		<![CDATA[
+	        select *
+			from RL_CUSTOMER_BASIC_INFO
+		]]>
+		<dynamic prepend="WHERE">
+			<include refid="byCustomerBasicId" />
+		</dynamic>
+	</select>
+
+    <!--查询借款人黑名单信息-->
+    <select id="getCustomerBlackInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+             <![CDATA[
+                select distinct C.name as name,
+                       c.credentials_number as  credentialsNumber,
+                       'Y' as blackFlag ,
+                        r.audit_status as auditstatus ,
+                       (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = r.audit_status ) as auditStatusShow ,
+                       '9' as customerType,
+                       r.audit_status as flag,
+                       'false'      as canBorrow
+                from RL_CUSTOMER_BASIC_INFO C
+                    join rl_blacklist bl
+                    on upper(bl.credentials_number) =
+                       upper(c.credentials_number)
+                    left join ( select boo.credentials_number, cd.audit_status,
+                            decode(boo.leader,1,1,0) leader
+                             from (
+                     select bo.*,row_number() over(partition by bo.credentials_number order by  bo.borrower_service_app_id desc nulls last) rno
+                     from rl_borrower_service_app bo
+                     where bo.valid_state = '1'
+                     and upper(bo.credentials_number) like  upper('%$credentialsNumber$%') ) boo join
+                     (select *
+                                    from rl_credit_application cr
+                                   where cr.valid_state = '1') cd on  boo.creditapplication_id = cd.creditapplication_id
+                       where boo.rno = 1 ) r on upper(r.credentials_number) = upper(C.Credentials_Number)
+                where upper(C.credentials_number) LIKE
+                       upper('%$credentialsNumber$%')
+             ]]>
+    </select>
+    <!--查询借款人直系亲属信息-->
+    <select id="getConsanguinityInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+             <![CDATA[
+                 select   C.name as name,
+                           c.credentials_number as credentialsNumber,
+                           '6' as customerType,
+                           ca.Audit_Status as auditstatus,
+                           (select t.code_value
+                              from rl_codetable t
+                             where t.section = 'auditStatus'
+                               and t.code_key = ca.audit_status) as auditStatusShow,
+                           ca.Audit_Status as flag,
+                           ca.create_date as createDate,
+                           ca.creditapplication_id as creditApplicationId,
+                           ba.leader as leader,
+                           '' AS blacklistedreason,
+                           ba.borrower_service_app_id as borrowerServiceAppId,
+						   decode(ba.leader,1,1,0) credentialsType
+                  from rl_credit_application ca
+                  join rl_borrower_service_app ba
+                    on ca.creditapplication_id = ba.creditapplication_id
+                  join RL_CUSTOMER_BASIC_INFO C
+                    on c.customer_basic_id = ba.customer_basic_id
+                 where ca.audit_status not in ('16', '18', '20', '26', '27', '28') and ba.leader in (0,1) and
+                   ba.credentials_number in (
+                 select fm.idnumber from rl_borrower_service_app ba
+                 join rl_family_member fm on ba.borrower_service_app_id = fm.borrower_service_app_id
+                 where upper(ba.credentials_number)  LIKE upper('%$identityNumber$%')  and  fm.borrowerre_rationship in ('0','1','2','3','4','7','8')
+                 and ba.leader in (0,1)
+                 union
+                 select ba.credentials_number from
+                 rl_borrower_service_app ba
+                 join rl_family_member fm on ba.borrower_service_app_id = fm.borrower_service_app_id
+                 where upper(fm.idnumber) LIKE upper('%$identityNumber$%')  and fm.borrowerre_rationship  in ('0','1','2','3','4','7','8')
+                 and ba.leader in (0,1)
+                 )
+             ]]>
+    </select>
+    <!--查询借款人信息 add by ygx 2014-09-17-->
+    <select id="getCustomerInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+        <![CDATA[
+               select distinct customer.name as name,
+                       customer.credentialsNumber as credentialsNumber,
+                       customer.auditstatus as auditstatus,
+                       customer.auditStatusShow as auditStatusShow,
+                       customer.customerType as customerType,
+                       customer.flag as flag,
+                       customer.creditApplicationId as creditApplicationId,
+                       customer.leader as leader,
+                       customer.borrowerServiceAppId as borrowerServiceAppId
+                  from (select C.name as name,
+                               c.credentials_number as credentialsNumber,
+                               '1' as customerType,
+                               cd.Audit_Status as auditstatus,
+                               (select t.code_value
+                                  from rl_codetable t
+                                 where t.section = 'auditStatus'
+                                   and t.code_key = cd.audit_status) as auditStatusShow,
+                               cd.Audit_Status as flag,
+                               cd.create_date as createDate,
+                               cd.creditapplication_id as creditApplicationId,
+                               b.leader as leader,
+                               '' AS blacklistedreason,
+                               B.borrower_service_app_id as borrowerServiceAppId
+                          from RL_CUSTOMER_BASIC_INFO C
+                          JOIN (select *
+                                 from rl_borrower_service_app bo
+                                where bo.valid_state = '1') B
+                            ON upper(C.Credentials_Number) =
+                               upper(B.Credentials_Number)
+                          join (select *
+                                 from rl_credit_application cr
+                                where cr.valid_state = '1') cd
+                            on b.creditapplication_id = cd.creditapplication_id
+                           and b.leader = '1'
+                         where not exists(select 1 from  rl_blacklist bl
+                                   where upper(bl.credentials_number) =
+                                          upper(c.credentials_number) and bl.history_flag = 'F')
+                         and
+                              (upper(C.credentials_number) LIKE
+                               upper('%$identityNumber$%') or
+                               upper(B.credentials_number) LIKE
+                               upper('%$identityNumber$%'))) customer
+                 where customer.createDate =
+                       (select max(cd.create_date)
+                          from RL_CUSTOMER_BASIC_INFO C
+                          left JOIN (select *
+                                      from rl_borrower_service_app bo
+                                     where bo.valid_state = '1') B
+                            ON upper(C.Credentials_Number) =
+                               upper(B.Credentials_Number)
+                          left join (select *
+                                      from rl_credit_application cr
+                                     where cr.valid_state = '1') cd
+                            on b.creditapplication_id = cd.creditapplication_id
+                           and b.leader = '1'
+                         where (upper(C.credentials_number) LIKE
+                               upper('%$identityNumber$%') or
+                               upper(B.credentials_number) LIKE
+                               upper('%$identityNumber$%'))
+                        )
+        ]]>
+	</select>
+    <!--查询借款人共借人信息  add by ygx 2014-10-22-->
+    <select id="getCoBorrowerInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+        <![CDATA[
+            select  distinct customer.name as name,
+                        customer.credentialsNumber as credentialsNumber,
+                        customer.auditstatus as auditstatus,
+                        customer.auditStatusShow as auditStatusShow,
+                        customer.customerType as customerType,
+                        customer.flag as flag,
+                        customer.creditApplicationId as creditApplicationId,
+                        customer.borrowerServiceAppId as borrowerServiceAppId
+              from (select f.name as name,
+                        f.idnumber as credentialsNumber,
+                        '3' as customerType,
+                        cd.Audit_Status as auditstatus,
+                       (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+                        cd.Audit_Status as flag,
+                        cd.create_date as createDate,
+                        cd.creditapplication_id as creditApplicationId,
+                        b.borrower_service_app_id as borrowerServiceAppId
+                        from rl_credit_coborrower f
+                        INNER JOIN (select *
+                        from rl_borrower_service_app bo
+                        where bo.valid_state = '1'
+                        and bo.leader = '1') B
+                        ON f.borrower_service_app_id = b.borrower_service_app_id
+                        join (select *
+                        from rl_credit_application cr
+                        where cr.valid_state = '1') cd
+                        on
+                        b.creditapplication_id = cd.creditapplication_id
+                        where (upper(f.idnumber) LIKE upper('%$identityNumber$%') )) customer
+               where (customer.createDate =
+                        (select max(cd.create_date)
+                        from rl_credit_coborrower f
+                        left JOIN (select *
+                        from rl_borrower_service_app bo
+                        where bo.valid_state = '1'
+                        and bo.leader = '1') B
+                        ON f.borrower_service_app_id = b.borrower_service_app_id
+                        left join (select *
+                        from rl_credit_application cr
+                        where cr.valid_state = '1') cd
+                        on b.creditapplication_id = cd.creditapplication_id
+                        where (upper(f.idnumber) LIKE upper('%$identityNumber$%') )) or  customer.createDate is null)
+            ]]>
+    </select>
+
+    <!--查询借款人配偶信息  add by ygx 2014-09-17-->
+    <select id="getMateInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+        <![CDATA[
+              select  distinct customer.name as name,
+                        customer.credentialsNumber as credentialsNumber,
+                        customer.auditstatus as auditstatus,
+                        customer.auditStatusShow as auditStatusShow,
+                        customer.customerType as customerType,
+                        customer.flag as flag,
+                        customer.creditApplicationId as creditApplicationId,
+                        customer.borrowerServiceAppId as borrowerServiceAppId
+              from (select f.name as name,
+                        f.idnumber as credentialsNumber,
+                        '3' as customerType,
+                        cd.Audit_Status as auditstatus,
+                       (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+                        cd.Audit_Status as flag,
+                        cd.create_date as createDate,
+                        cd.creditapplication_id as creditApplicationId,
+                        b.borrower_service_app_id as borrowerServiceAppId
+                        from rl_family_member f
+                        INNER JOIN (select *
+                        from rl_borrower_service_app bo
+                        where bo.valid_state = '1'
+                        and bo.leader = '1') B
+                        ON f.borrower_service_app_id = b.borrower_service_app_id
+                        join (select *
+                        from rl_credit_application cr
+                        where cr.valid_state = '1') cd
+                        on
+                        b.creditapplication_id = cd.creditapplication_id
+                        where (upper(f.idnumber) LIKE upper('%$identityNumber$%') )) customer
+               where (customer.createDate =
+                        (select max(cd.create_date)
+                        from rl_family_member f
+                        left JOIN (select *
+                        from rl_borrower_service_app bo
+                        where bo.valid_state = '1'
+                        and bo.leader = '1') B
+                        ON f.borrower_service_app_id = b.borrower_service_app_id
+                        left join (select *
+                        from rl_credit_application cr
+                        where cr.valid_state = '1') cd
+                        on b.creditapplication_id = cd.creditapplication_id
+                        where (upper(f.idnumber) LIKE upper('%$identityNumber$%') )) or  customer.createDate is null)
+            ]]>
+    </select>
+    <!--查询借款人担保信息 add by ygx 2014-09-17-->
+    <select id="getGuaranorInfo" parameterClass="String" resultClass="customerBasicInfoVo">
+       <![CDATA[
+                 select distinct  customer.name           as name,
+                       customer.credentialsNumber as credentialsNumber,
+                       customer.auditstatus       as auditstatus,
+                       customer.auditStatusShow   as auditStatusShow,
+                       customer.customerType      as customerType,
+                       customer.flag              as flag,
+                       customer.creditApplicationId as creditApplicationId ,
+                       customer.leader as leader,
+                       customer.borrowerServiceAppId as borrowerServiceAppId
+                  from (select
+                             C.name               as name,
+                             c.credentials_number as credentialsNumber,
+                             0      as customerType,
+                             cd.Audit_Status      as auditstatus,
+                             (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+                             cd.Audit_Status      as flag,
+                             cd.create_date       as createDate,
+                             cd.creditapplication_id as creditApplicationId,
+                             0 as leader,
+                             B.borrower_service_app_id as borrowerServiceAppId
+                        from RL_CUSTOMER_BASIC_INFO C
+                        JOIN (select *
+                                    from rl_borrower_service_app bo
+                                   where bo.valid_state = '1'
+                                    and(bo.leader = '0'    or bo.leader is null) ) B
+                          ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+                        join (select *
+                                    from rl_credit_application cr
+                                   where cr.valid_state = '1') cd
+                          on  b.creditapplication_id = cd.creditapplication_id
+
+                       where (upper(C.credentials_number) LIKE upper('%$identityNumber$%') or
+                             upper(B.credentials_number) LIKE upper('%$identityNumber$%'))) customer
+                   where customer.createDate =
+                         (select max(cd.create_date)
+                            from RL_CUSTOMER_BASIC_INFO C
+                            left JOIN (select *
+                                        from rl_borrower_service_app bo
+                                       where bo.valid_state = '1'
+                                        and(bo.leader = '0'    or bo.leader is null) ) B
+                             ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+                            left join (select *
+                                        from rl_credit_application cr
+                                       where cr.valid_state = '1') cd
+                              on b.creditapplication_id = cd.creditapplication_id
+                           where (upper(C.credentials_number) LIKE upper('%$identityNumber$%') or
+                                 upper(B.credentials_number) LIKE upper('%$identityNumber$%')))
+        ]]>
+    </select>
+
+	<select id="selectByCredentialsNumber" parameterClass="String" resultClass="customerBasicInfoVo">
+		<![CDATA[
+	      select  customer.name              as name,
+             	customer.credentialsNumber as credentialsNumber,
+             	customer.auditstatus       as auditstatus,
+              	customer.auditStatusShow       as auditStatusShow,
+             	customer.customerType      as customerType,
+              	customer.guaranor           as guaranor,
+             	customer.flag              as flag,
+                  customer.creditApplicationId as creditApplicationId ,
+                  customer.leader as leader,
+                  customer.blackFlag as blackFlag,
+                  NVL2(customer.blackFlag,'是/'||customer.blacklistedreason,'否') blackFlagShow,
+                  customer.borrowerServiceAppId as borrowerServiceAppId
+          from (select C.name               as name,
+                     c.credentials_number as credentialsNumber,
+                     c.CUSTOMER_TYPE as customerType,
+                      c.guaranor as guaranor,
+                     cd.Audit_Status      as auditstatus,
+                     (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+                     cd.Audit_Status      as flag,
+                     cd.create_date       as createDate,
+                     cd.creditapplication_id as creditApplicationId,
+                     BL.BLACKLIST_ID AS blackFlag,
+                     b.leader as leader,
+             		 BL.BLACKLISTED_REASON AS blacklistedreason,
+             		 B.borrower_service_app_id as borrowerServiceAppId
+                from RL_CUSTOMER_BASIC_INFO C
+                left join rl_blacklist  bl
+                on upper(bl.credentials_number) = upper(c.credentials_number)
+                and bl.history_flag = 'F'
+			          left JOIN (select *
+			                      from rl_borrower_service_app bo
+			                     where bo.valid_state = '1') B
+			            ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+			          left join (select *
+			                      from rl_credit_application cr
+			                     where cr.valid_state = '1') cd
+			            on  b.creditapplication_id = cd.creditapplication_id
+			            and b.leader = '1'
+			         where (upper(C.credentials_number) LIKE upper('%$credentialsNumber$%') or
+			               upper(B.credentials_number) LIKE upper('%$credentialsNumber$%'))) customer
+					 where customer.createDate =
+					       (select max(cd.create_date)
+					          from RL_CUSTOMER_BASIC_INFO C
+					          left JOIN (select *
+					                      from rl_borrower_service_app bo
+					                     where bo.valid_state = '1') B
+					           ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+					          left join (select *
+					                      from rl_credit_application cr
+					                     where cr.valid_state = '1') cd
+					            on b.creditapplication_id = cd.creditapplication_id
+					            and b.leader = '1'
+					         where (upper(C.credentials_number) LIKE upper('%$credentialsNumber$%') or
+					               upper(B.credentials_number) LIKE upper('%$credentialsNumber$%')))
+   										
+       ]]>
+
+	</select>
+
+	<select id="selectGuaranorByCredentialsNumber" parameterClass="String" resultClass="customerBasicInfoVo">
+		<![CDATA[
+	      select  customer.name              as name,
+             	customer.credentialsNumber as credentialsNumber,
+             	customer.auditstatus       as auditstatus,
+              	customer.auditStatusShow       as auditStatusShow,
+             	customer.customerType      as customerType,
+              	customer.guaranor           as guaranor,
+             	customer.flag              as flag,
+                  customer.creditApplicationId as creditApplicationId ,
+                  customer.leader as leader,
+                  customer.blackFlag as blackFlag,
+                  NVL2(customer.blackFlag,'是/'||customer.blacklistedreason,'否') blackFlagShow,
+                  customer.borrowerServiceAppId as borrowerServiceAppId
+          from (select C.name               as name,
+                     c.credentials_number as credentialsNumber,
+                     c.CUSTOMER_TYPE as customerType,
+                      c.guaranor as guaranor,
+                     cd.Audit_Status      as auditstatus,
+                     (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+                     cd.Audit_Status      as flag,
+                     cd.create_date       as createDate,
+                     cd.creditapplication_id as creditApplicationId,
+                     BL.BLACKLIST_ID AS blackFlag,
+                     b.leader as leader,
+             		 BL.BLACKLISTED_REASON AS blacklistedreason,
+             		 B.borrower_service_app_id as borrowerServiceAppId
+                from RL_CUSTOMER_BASIC_INFO C
+                left join rl_blacklist  bl
+                on upper(bl.credentials_number) = upper(c.credentials_number)
+                and bl.history_flag = 'F'
+			          left JOIN (select *
+			                      from rl_borrower_service_app bo
+			                     where bo.valid_state = '1') B
+			            ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+			          left join (select *
+			                      from rl_credit_application cr
+			                     where cr.valid_state = '1') cd
+			            on  b.creditapplication_id = cd.creditapplication_id
+			            and b.leader = '0'
+			         where (upper(C.credentials_number) LIKE upper('%$credentialsNumber$%') or
+			               upper(B.credentials_number) LIKE upper('%$credentialsNumber$%'))) customer
+					 where customer.createDate =
+					       (select max(cd.create_date)
+					          from RL_CUSTOMER_BASIC_INFO C
+					          left JOIN (select *
+					                      from rl_borrower_service_app bo
+					                     where bo.valid_state = '1') B
+					           ON upper(C.Credentials_Number) = upper(B.Credentials_Number)
+					          left join (select *
+					                      from rl_credit_application cr
+					                     where cr.valid_state = '1') cd
+					            on b.creditapplication_id = cd.creditapplication_id
+					            and b.leader = '0'
+					         where (upper(C.credentials_number) LIKE upper('%$credentialsNumber$%') or
+					               upper(B.credentials_number) LIKE upper('%$credentialsNumber$%')))
+   										
+       ]]>
+
+	</select>
+
+	<select id="selectByNumber" parameterClass="String" resultMap="customerBasicInfomap">
+		<![CDATA[
+	        select *
+ 		 	from RL_CUSTOMER_BASIC_INFO  
+   			where upper(credentials_number) = upper(#credentialsNumber#)
+       ]]>
+	</select>
+	<select id="selectAuditStatus" parameterClass="int" resultClass="java.util.HashMap">
+			<![CDATA[
+				select R.AUDIT_STATUS AS auditStatus,
+					 (select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = R.audit_status ) as auditStatusShow
+              	
+                from rl_credit_application R,RL_BORROWER_SERVICE_APP B, RL_CUSTOMER_BASIC_INFO C
+                WHERE R.CREDITAPPLICATION_ID = B.CREDITAPPLICATION_ID
+                and R.valid_state = '1'
+                and B.valid_state = '1'
+                and b.leader = '1'
+                AND B.CUSTOMER_BASIC_ID = C.CUSTOMER_BASIC_ID
+                and C.CUSTOMER_BASIC_ID = #customerBasicId#
+                and R.CREATE_DATE =(
+                select MAX(R.CREATE_DATE)  
+                from rl_credit_application R,RL_BORROWER_SERVICE_APP B, RL_CUSTOMER_BASIC_INFO C
+                WHERE R.CREDITAPPLICATION_ID = B.CREDITAPPLICATION_ID
+                and R.valid_state = '1'
+                and B.valid_state = '1'
+                and b.leader = '1'
+                AND B.CUSTOMER_BASIC_ID = C.CUSTOMER_BASIC_ID
+                and C.CUSTOMER_BASIC_ID = #customerBasicId#)
+             ]]>
+	</select>
+
+	<select id="selectFamilyByCredentialsNumber" parameterClass="String" resultClass="customerBasicInfoVo">
+
+		select customer.name as name,
+		customer.credentialsNumber as credentialsNumber,
+		customer.auditstatus as auditstatus,
+		customer.auditStatusShow as auditStatusShow,
+		customer.customerType as customerType,
+		customer.flag as flag,
+		customer.creditApplicationId as creditApplicationId
+		from (select f.name as name,
+		f.idnumber as credentialsNumber,
+		'3' as customerType,
+		cd.Audit_Status as auditstatus,
+		(select t.code_value from rl_codetable t where t.section = 'auditStatus' and t.code_key = cd.audit_status ) as auditStatusShow,
+		cd.Audit_Status as flag,
+		cd.create_date as createDate,
+		cd.creditapplication_id as creditApplicationId,
+		b.borrower_service_app_id as borrowerServiceAppId
+		from rl_family_member f
+		INNER JOIN (select *
+		from rl_borrower_service_app bo
+		where bo.valid_state = '1'
+		and bo.leader = '1') B
+		ON f.borrower_service_app_id = b.borrower_service_app_id
+		left join (select *
+		from rl_credit_application cr
+		where cr.valid_state = '1') cd
+		on
+		b.creditapplication_id = cd.creditapplication_id
+
+		where (upper(f.idnumber) LIKE upper('%$credentialsNumber$%') )) customer
+
+		where (customer.createDate =
+		(select max(cd.create_date)
+		from rl_family_member f
+		left JOIN (select *
+		from rl_borrower_service_app bo
+		where bo.valid_state = '1') B
+		ON f.borrower_service_app_id = b.borrower_service_app_id
+		left join (select *
+		from rl_credit_application cr
+		where cr.valid_state = '1') cd
+		on b.creditapplication_id = cd.creditapplication_id
+
+		where (upper(f.idnumber) LIKE upper('%$credentialsNumber$%') )) or
+		customer.createDate is null)
+
+	</select>
+
+	<select id="selectGuanor" parameterClass="BorrowerServiceApp" resultClass="customerBasicInfoVo">
+		select b.name as name,
+		b.credentials_number as credentialsNumber,
+		'00' as auditstatus,
+		'4' as customerType,
+		'00' as flag,
+		b.creditapplication_id as creditApplicationId
+		from rl_borrower_service_app b
+
+		where b.leader = '0'
+		and upper(b.credentials_number) = upper(#credentialsNumber#)
+		and b.creditapplication_id = #creditapplicationId#
+
+	</select>
+	<update id="update_dynamic" parameterClass="customerBasicInfo">
+		<![CDATA[
+			update 
+				RL_CUSTOMER_BASIC_INFO
+			set
+				 CUSTOMER_BASIC_ID=#customerBasicId:INTEGER#
+				
+		]]>
+		<dynamic>
+			<isNotEmpty property="credentialsNumber" prepend=",">
+				CREDENTIALS_NUMBER=#credentialsNumber:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="personIncome" prepend=",">
+				PERSON_INCOME=#personIncome:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="highestEducation" prepend=",">
+				HIGHEST_EDUCATION=#highestEducation:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="presentAddress" prepend=",">
+				HOME_ADDRESS=#presentAddress:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="residenceAddress" prepend=",">
+				RESIDENCE_ADDRESS=#residenceAddress:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="remark" prepend=",">
+				remark=#remark:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateName" prepend=",">
+				OPERATOR_NAME=#operateName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateId" prepend=",">
+				OPERATOR_ID=#operateId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="vallageId" prepend=",">
+				VILLAGE_ID=#vallageId#
+			</isNotEmpty>
+			<isNotEmpty property="customerType" prepend=",">
+				CUSTOMER_TYPE=#customerType#
+			</isNotEmpty>
+			<isNotEmpty property="guaranor" prepend=",">
+				GUARANOR=#guaranor#
+			</isNotEmpty>
+		</dynamic>
+		where CUSTOMER_BASIC_ID=#customerBasicId:INTEGER#
+	</update>
+	<select id="checkForCredentialsNumber" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+		select bsa.leader as type,
+		upper(bsa.credentials_number) as credentialsNumber,
+		decode(bsa.leader,
+		'1',
+		'与借款人身份证相同',
+		'0',
+		'与担保人身份证相同') as reason
+		from rl_credit_application ca
+		left join rl_borrower_service_app bsa
+		on ca.creditapplication_id = bsa.creditapplication_id
+		and ca.valid_state = '1'
+		and bsa.valid_state = '1'
+		left join rl_family_member fm
+		on bsa.borrower_service_app_id = fm.borrower_service_app_id
+		and bsa.valid_state = '1'
+		and fm.borrowerre_rationship = '2'
+		where ca.creditapplication_id = #creditapplicationId#
+		union all
+		select decode(bsa.leader, '1', '3', '0', '4') as type,
+		upper(fm.idnumber) as credentialsNumber,
+		decode(bsa.leader,
+		'1',
+		'与共借人的身份证相同',
+		'0',
+		'与担保人配偶身份证相同') as reason
+		from rl_credit_application ca
+		left join rl_borrower_service_app bsa
+		on ca.creditapplication_id = bsa.creditapplication_id
+		and ca.valid_state = '1'
+		and bsa.valid_state = '1'
+		left join rl_family_member fm
+		on bsa.borrower_service_app_id = fm.borrower_service_app_id
+		and bsa.valid_state = '1'
+		and fm.borrowerre_rationship = '2'
+		where ca.creditapplication_id = #creditapplicationId#
+
+	</select>
+
+
+    <!-- 跑批任务 查询符合黑名单的客户信息 add by ygx 2014-09-26 -->
+
+    <select id="getBlackListCustomerInfoList"  resultClass="customerBasicInfo">
+       <![CDATA[   select    distinct
+			       c.customer_basic_id as customerBasicId,
+			       c.name,
+			       c.former,
+			       c.create_date as createTime,
+			       c.credentials_type as credentialsType,
+			       c.credentials_number as credentialsNumber,
+			       c.gender as gender,
+			       c.national as national,
+			       c.marital_status as maritalStatus,
+			       c.mobilephone as mobilephone,
+			       c.telephone as telephone,
+			       c.person_income as personIncome,
+			       c.highest_education as highestEducation,
+			       c.home_address as presentAddress,
+			       c.residence_address as residenceAddress,
+			       c.remark as remark,
+			       c.operator_name as operateName,
+			       c.operator_id as operateId,
+			       c.village_id as vallageId,
+			       c.CUSTOMER_TYPE as customerType,
+			       c.guaranor as guaranor
+          from rl_credit_application ca
+          join (select * from rl_borrower_service_app sa where sa.leader = 1) sa
+            on ca.creditapplication_id = sa.creditapplication_id
+          join rl_customer_basic_info c
+            on c.customer_basic_id = sa.customer_basic_id
+         where exists (select 1
+                  from rl_laon_balance_data bd
+                  join (select t.laon_balance_data_id
+                         from (select row_number() over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) rno,
+                                      od.laon_balance_data_id
+                                 from rl_overdue_data od
+                                where od.overdue_days > 180) t
+                        where t.rno = 1) ov
+                    on bd.laon_balance_data_id = ov.laon_balance_data_id
+                 where bd.sys_guid = ca.sys_guid)
+           and not exists
+         (select 1
+                  from rl_blacklist bl
+                 where bl.credentials_number = c.credentials_number)
+    ]]>
+    </select>
+    <select id="selBusinessNumberByUUID" parameterClass="String" resultClass="String">
+
+     		select ca.sys_guid from rl_credit_application ca 
+     			WHERE  ca.VALID_STATE = 1
+     			AND    ca.business_number=#businessNumber#
+     	
+    </select>
+    <!-- 根据员工id号更新 -->
+    <select id="getEmployeeListByDeparmentId" parameterClass="java.lang.String" resultClass="com.creditease.rc.domain.Employee">
+        select distinct e.comempid as comEmpId,e.name as name from rl_employee e where e.AREADEPARTMENTID = #departmentId# and  e.roledesc like '%客户经理%'
+    </select>
+
+
+    <!-- 根据员工id号更新 -->
+    <select id="getCustomerInfoListByCreditApplicationID" parameterClass="java.lang.Long" resultClass="com.creditease.rc.vo.CustomerInfoVO">
+                                    select ba.name name ,ba.mobilephone phone,'借款人' type
+                                     from rl_credit_application ca
+                                    join rl_borrower_service_app ba on ba.creditapplication_id = ca.creditapplication_id and ba.leader = 1 and ba.valid_state = 1
+                                    where ca.creditapplication_id = #creditapplicationId#
+                                    union
+                                      select baa.name name ,baa.mobilephone phone ,
+
+                                             decode(row_number() over(partition by baa.creditapplication_id order by baa.borrower_service_app_id asc nulls last),1,'担保人1',2,'担保人2') type
+                                      from rl_credit_application ca
+                                    join rl_borrower_service_app baa on baa.creditapplication_id = ca.creditapplication_id and baa.leader = 0 and baa.valid_state = 1
+                                    where ca.creditapplication_id = #creditapplicationId#
+                                    union
+                                      select cc.name name,cc.telphone phone,'共借人' type
+                                     from rl_credit_application ca
+                                      join rl_borrower_service_app ba on ba.creditapplication_id = ca.creditapplication_id and ba.leader = 1 and ba.valid_state = 1
+                                    join rl_credit_coborrower cc on cc.borrower_service_app_id = ba.borrower_service_app_id
+                                    where ca.creditapplication_id = #creditapplicationId#
+    </select>
+</sqlMap>
+

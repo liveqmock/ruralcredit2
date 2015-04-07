@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CUSTOMERCONSULTPOOLLOG">
+	<typeAlias alias="log" type="com.creditease.rc.domain.CustomerConsultPoolLog" />
+	<typeAlias alias="logVo" type="com.creditease.rc.vo.CustomerConsultPoolLogVo" />
+	<resultMap id="logMap" class="com.creditease.rc.domain.CustomerConsultPoolLog">
+		<!-- -->
+		<result column="POOL_LOG_ID" property="optLogId" jdbcType="DECIMAL" />
+		<result column="OPERATOR_ID" property="operatorId" jdbcType="DECIMAL" />
+		<result column="OPERATOR_NAME" property="operatorName" jdbcType="VARCHAR" />
+		<result column="OPERATE_DATE" property="optDate" jdbcType="TIMESTAMP" />
+		<result column="OPERATE_MODULE" property="optModule" jdbcType="VARCHAR" />
+		<result column="OPERATE_BUSSINESS_CONTENT" property="optBussinessContent" jdbcType="VARCHAR" />
+		<result column="CURR_STATUS" property="currStatus" jdbcType="VARCHAR" />
+		<result column="NEXT_STATUS" property="nextStatus" jdbcType="VARCHAR" />
+		<result column="CONNECTION_ID" property="connectionId" jdbcType="DECIMAL" />
+		<result column="CONNECTION_CATEGORY" property="connectionCetegory" jdbcType="VARCHAR" />
+		<result column="CURR_CONNECTION_DIC_SECTION" property="currConnectionDicSection" jdbcType="VARCHAR" />
+		<result column="NEXT_CONNECTION_DIC_SECTION" property="nextConnectionDicSection" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 新增 -->
+	<insert id="abatorgenerated_insert" parameterClass="log">
+		<selectKey type="pre" resultClass="java.lang.Long" keyProperty="optLogId">
+			select SEQ_BASIC_INFO.NEXTVAL as optLogId from dual
+        </selectKey>
+		insert into RL_CUSTOMER_CONSULT_POOL_LOG
+		(POOL_LOG_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATE_MODULE,
+		OPERATE_BUSSINESS_CONTENT,
+		CURR_STATUS,
+		NEXT_STATUS,
+		CONNECTION_ID,
+		CONNECTION_CATEGORY,
+		CURR_CONNECTION_DIC_SECTION,
+		NEXT_CONNECTION_DIC_SECTION)
+		values (#optLogId:DECIMAL#,
+		#operatorId:DECIMAL#,
+		#operatorName:VARCHAR#,
+		#optModule:VARCHAR#,
+		#optBussinessContent:VARCHAR#,
+		#currStatus:VARCHAR#,
+		#nextStatus:VARCHAR#,
+		#connectionId:DECIMAL#,
+		#connectionCetegory#,
+		#currConnectionDicSection#,
+		#nextConnectionDicSection#)
+	</insert>
+	<!-- 修改 -->
+	<update id="update_cunsult_dymic" parameterClass="log">
+		update RL_CUSTOMER_CONSULT_POOL_LOG
+		set POOL_LOG_ID = #optLogId:DECIMAL#
+		<dynamic prepend=" ,">
+			<isNotEmpty prepend="," property="operatorId">
+				OPERATOR_ID = #operatorId:DECIMAL#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="operatorName">
+				OPERATOR_NAME = #operatorName:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="optModule">
+				OPERATE_MODULE = #optModule:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="optBussinessContent">
+				OPERATE_BUSSINESS_CONTENT = #optBussinessContent:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="connectionId">
+				CONNECTION_ID = #connectionId:DECIMAL#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="connectionCetegory">
+				CONNECTION_CATEGORY = #connectionCetegory:VARCHAR#
+            </isNotEmpty>
+		</dynamic>
+		where POOL_LOG_ID = #optLogId:DECIMAL#
+	</update>
+
+	<!-- 查询 仅仅咨询的日志 -->
+	<!-- 用于公共查询的 sql 片段 -->
+	<sql id="select_sql">
+        <![CDATA[
+		  	      select distinct
+		  	      				 CCP.CUSTOMER_NAME  		customerName,
+		  	      				 log.LOAN_OFFICER_NAME		loanOfficerName,
+		  	      				 CCP.TEAMDEPARTMENT_NAME 	teamdepartmentName,
+		  	      				 ccp.TEAMDEPARTMENT_ID		teamdepartmentId,
+		  	      				 log.OPERATOR_NAME  		operatorName,
+				                 log.OPERATE_DATE 				optDate   ,
+				                (select cc.CODE_VALUE
+				                   from mfc_codetable cc
+				                  where cc.SECTION = 'functionCode'
+				                    and cc.CODE_KEY = case
+				                          when length(trim(log.OPERATE_MODULE)) = 6 then
+				                           substr(nvl(log.OPERATE_MODULE, ''), 0, 1)
+				                          else
+				                           substr(nvl(log.OPERATE_MODULE, ''), 0, 2)
+				                        end) as 			funCode,
+
+				                       (select cc.CODE_NOTE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.NEXT_STATUS)  discribeStatus,
+				                       (select cc.CODE_VALUE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.CURR_STATUS) currStatus,
+
+				                       (select cc.CODE_VALUE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.NEXT_STATUS) nextStatus,
+				                (select cc.CODE_VALUE
+				                   from mfc_codetable cc
+				                  where cc.SECTION = 'operateLogType'
+				                    and cc.CODE_KEY = log.OPERATE_MODULE) 	as 					optModule,
+				                log.OPERATE_BUSSINESS_CONTENT 				as 					optBussinessContent
+				  from RL_CUSTOMER_CONSULT_POOL_LOG log left join MFC_CUSTOMER_CONSULT_POOL CCP
+				  ON CCP.CONSULT_POOL_ID = LOG.CONNECTION_ID
+				  AND LOG.CONNECTION_CATEGORY = '1'
+				 where 1 = 1
+				 ]]>
+		<isNotEmpty prepend="AND" property="fuzzyValue">
+            <![CDATA[(
+				    			log.OPERATOR_NAME like '%$fuzzyValue$%'
+				    		or  CCP.CUSTOMER_NAME LIKE '%$fuzzyValue$%'
+				    		or  CCP.LOAN_OFFICER_NAME LIKE '%$fuzzyValue$%'
+				    		or  CCP.TEAMDEPARTMENT_NAME LIKE '%$fuzzyValue$%'
+				    		) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="functionCode">
+			substr(nvl(log.OPERATE_MODULE, ''), 0, 1) = #functionCode#
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="connectionId">
+			log.CONNECTION_ID = #connectionId#
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="customerName">
+			CCP.CUSTOMER_NAME like '%$customerName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="loanOfficerName">
+			log.LOAN_OFFICER_NAME like '%$loanOfficerName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="teamdepartmentName">
+			CCP.TEAMDEPARTMENT_NAME like '%$teamdepartmentName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="teamdepartmentId">
+			CCP.TEAMDEPARTMENT_ID = #teamdepartmentId#
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operatorName">
+			log.OPERATOR_NAME like '%$operatorName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="startDate">
+			log.OPERATE_DATE >= to_date('$startDate$ 00:00:00','yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+            <![CDATA[
+				           log.OPERATE_DATE <= to_date('$endDate$ 23:59:59','yyyy-mm-dd hh24:mi:ss')
+				     ]]>
+		</isNotEmpty>
+
+		<isNotEmpty prepend="order by" property="order">
+			$sort$ $order$ nulls last
+
+        </isNotEmpty>
+
+	</sql>
+	<select id="select_opt" parameterClass="logVo" resultClass="logVo">
+		<include refid="select_sql" />
+	</select>
+	<select id="count_opt" parameterClass="logVo" resultClass="int">
+        <![CDATA[select count(*) from (]]>
+		<include refid="select_sql" />
+        <![CDATA[)]]>
+	</select>
+
+
+
+
+	<!-- 用于公共查询的 sql 片段 -->
+	<sql id="select_map_sql">
+        <![CDATA[
+		  	      select distinct
+		  	      				 CCP.CUSTOMER_NAME  		customerName,
+		  	      				 log.LOAN_OFFICER_NAME		loanOfficerName,
+		  	      				 CCP.TEAMDEPARTMENT_NAME 	teamdepartmentName,
+		  	      				 ccp.TEAMDEPARTMENT_ID		teamdepartmentId,
+		  	      				 log.OPERATOR_NAME  		operatorName,
+				                 log.OPERATE_DATE 				optDate   ,
+				                (select cc.CODE_VALUE
+				                   from mfc_codetable cc
+				                  where cc.SECTION = 'functionCode'
+				                    and cc.CODE_KEY = case
+				                          when length(trim(log.OPERATE_MODULE)) = 6 then
+				                           substr(nvl(log.OPERATE_MODULE, ''), 0, 1)
+				                          else
+				                           substr(nvl(log.OPERATE_MODULE, ''), 0, 2)
+				                        end) as 			funCode,
+
+				                       (select cc.CODE_NOTE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.NEXT_STATUS)  discribeStatus,
+				                       (select cc.CODE_VALUE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.CURR_STATUS) currStatus,
+
+				                       (select cc.CODE_VALUE
+				                          from mfc_codetable cc
+				                         where cc.SECTION = LOG.CONNECTION_DICTIONARY_SECTION
+				                           and cc.CODE_KEY = log.NEXT_STATUS) nextStatus,
+				                (select cc.CODE_VALUE
+				                   from mfc_codetable cc
+				                  where cc.SECTION = 'operateLogType'
+				                    and cc.CODE_KEY = log.OPERATE_MODULE) 	as 					optModule,
+				                log.OPERATE_BUSSINESS_CONTENT 				as 					optBussinessContent
+				  from RL_CUSTOMER_CONSULT_POOL_LOG log left join MFC_CUSTOMER_CONSULT_POOL CCP
+				  ON CCP.CONSULT_POOL_ID = LOG.CONNECTION_ID
+				  AND LOG.CONNECTION_CATEGORY = '1'
+				 where 1 = 1
+				 ]]>
+		<isNotEmpty prepend="AND" property="operateLogVO.fuzzyValue">
+            <![CDATA[(
+				    			log.OPERATOR_NAME like '%$operateLogVO.fuzzyValue$%'
+				    		or  CCP.CUSTOMER_NAME LIKE '%$operateLogVO.fuzzyValue$%'
+				    		or  CCP.LOAN_OFFICER_NAME LIKE '%$operateLogVO.fuzzyValue$%'
+				    		or  CCP.TEAMDEPARTMENT_NAME LIKE '%$operateLogVO.fuzzyValue$%'
+				    		) ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.connectionId">
+			log.CONNECTION_ID = #operateLogVO.connectionId#
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.customerName">
+			CCP.CUSTOMER_NAME like '%$operateLogVO.customerName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.loanOfficerName">
+			log.LOAN_OFFICER_NAME like '%$loanOfficerName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.teamdepartmentName">
+			CCP.TEAMDEPARTMENT_NAME like '%$teamdepartmentName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.teamdepartmentId">
+			CCP.TEAMDEPARTMENT_ID = #operateLogVO.teamdepartmentId#
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.operatorName">
+			log.OPERATOR_NAME like '%$operateLogVO.operatorName$%'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.startDate">
+			log.OPERATE_DATE >= to_date('$operateLogVO.startDate$ 00:00:00','yyyy-mm-dd hh24:mi:ss')
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="operateLogVO.endDate">
+            <![CDATA[
+				           log.OPERATE_DATE <= to_date('$operateLogVO.endDate$ 23:59:59','yyyy-mm-dd hh24:mi:ss')
+				     ]]>
+		</isNotEmpty>
+
+		<isNotEmpty prepend="order by" property="operateLogVO.order">
+			$operateLogVO.sort$ $operateLogVO.order$ nulls last
+
+        </isNotEmpty>
+	</sql>
+	<select id="select_map" parameterClass="java.util.HashMap" resultClass="logVo">
+		<include refid="select_map_sql" />
+	</select>
+	<select id="count_map" parameterClass="java.util.HashMap" resultClass="int">
+        <![CDATA[select count(*) from (]]>
+		<include refid="select_map_sql" />
+        <![CDATA[)]]>
+	</select>
+	<!-- 查询 仅仅咨询的日志 -->
+</sqlMap>

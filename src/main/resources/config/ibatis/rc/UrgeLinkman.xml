@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="URGELINKMAN">
+	<typeAlias alias="urgeLinkman" type="com.creditease.rc.domain.UrgeLinkman" />
+	<resultMap id="urgeLinkmanMap" class="urgeLinkman">
+		<result column="URGE_LINKMAN_ID" property="urgeLinkmanId" jdbcType="DECIMAL" />
+		<result column="URGE_ID" property="urgeId" jdbcType="DECIMAL" />
+		<result column="URGE_LINK_NAME" property="urgeLinkName" jdbcType="VARCHAR" />
+		<result column="BORROWER_RELATION" property="borrowerRelation" jdbcType="VARCHAR" />
+		<result column="LINK_TELEPHONE" property="linkTelephone" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="select" resultMap="urgeLinkmanMap" parameterClass="urgeLinkman">
+		select URGE_LINKMAN_ID, URGE_ID, URGE_LINK_NAME, BORROWER_RELATION, LINK_TELEPHONE
+		from RL_URGE_LINKMAN
+		where URGE_LINKMAN_ID = #urgeLinkmanId:DECIMAL#
+  </select>
+	<delete id="delete" parameterClass="urgeLinkman">
+		delete from RL_URGE_LINKMAN
+		where URGE_LINKMAN_ID = #urgeLinkmanId:DECIMAL#
+  </delete>
+	<insert id="insert" parameterClass="urgeLinkman">
+		<selectKey resultClass="java.lang.Long" keyProperty="urgeLinkmanId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_URGE_LINKMAN (URGE_LINKMAN_ID,URGE_ID, URGE_LINK_NAME, BORROWER_RELATION, LINK_TELEPHONE)
+		values (#urgeLinkmanId:DECIMAL#,#urgeId:DECIMAL#, #urgeLinkName:VARCHAR#, #borrowerRelation:VARCHAR#,
+		#linkTelephone:VARCHAR#)
+	</insert>
+	<update id="update" parameterClass="urgeLinkman">
+		update RL_URGE_LINKMAN
+		set URGE_ID = #urgeId:DECIMAL#,
+		URGE_LINK_NAME = #urgeLinkName:VARCHAR#,
+		BORROWER_RELATION = #borrowerRelation:VARCHAR#,
+		LINK_TELEPHONE = #linkTelephone:VARCHAR#
+		where URGE_LINKMAN_ID = #urgeLinkmanId:DECIMAL#
+  </update>
+	<update id="dynamicUpdate" parameterClass="urgeLinkman">
+		update RL_URGE_LINKMAN
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="urgeId">
+				URGE_ID = #urgeId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeLinkName">
+				URGE_LINK_NAME = #urgeLinkName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="borrowerRelation">
+				BORROWER_RELATION = #borrowerRelation:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="linkTelephone">
+				LINK_TELEPHONE = #linkTelephone:VARCHAR#
+      </isNotNull>
+		</dynamic>
+		where URGE_LINKMAN_ID = #urgeLinkmanId:DECIMAL#
+	</update>
+	<!-- 根据催收主键表查询催收联系人表的数据 -->
+	<select id="selectByUrgeId" resultMap="urgeLinkmanMap" parameterClass="java.lang.Long">
+		select URGE_LINKMAN_ID, URGE_ID, URGE_LINK_NAME, BORROWER_RELATION, LINK_TELEPHONE
+		from RL_URGE_LINKMAN
+		where URGE_ID = #urgeId:DECIMAL#
+  </select>
+</sqlMap>

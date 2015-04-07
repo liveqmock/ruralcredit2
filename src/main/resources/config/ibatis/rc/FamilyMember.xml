@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="familymember">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="familymember" type="com.creditease.rc.domain.Familymember" />
+	<resultMap class="com.creditease.rc.domain.Familymember" id="familymemberMap">
+		<result column="FAMILY_MEMBER_ID" jdbcType="INTEGER" property="familyMemberId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="GENDER" jdbcType="CHAR" property="gender" />
+		<result column="AGE" jdbcType="INTEGER" property="age" />
+		<result column="TELPHONE" jdbcType="VARCHAR" property="telphone" />
+		<result column="BORROWERRE_RATIONSHIP" jdbcType="VARCHAR" property="borrowerreRationship" />
+		<result column="BORROWERRE_RATIONSHIP_VIEW" jdbcType="VARCHAR" property="borrowerreRationshipView" />
+		<result column="WORK_UNIT" jdbcType="VARCHAR" property="workUnit" />
+		<result column="YEAR_INCOME" jdbcType="DOUBLE" property="yearIncome" />
+		<result column="EDUCATION" jdbcType="CHAR" property="education" />
+		<result column="profession" jdbcType="VARCHAR" property="profession" />
+		<result column="PROFESSION_VIEW" jdbcType="VARCHAR" property="professionView" />
+		<result column="PROFESSION_DETAIL" jdbcType="VARCHAR" property="professionDetail" />
+		<result column="IDNUMBER" jdbcType="VARCHAR" property="idNumber" />
+		<result column="SEQ" property="seq" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- domain对象 禁止扩展属性 -->
+   <resultMap id="abatorgenerated_FamilymemberResult" class="com.creditease.rc.domain.Familymember" >
+	   <result column="FAMILY_MEMBER_ID" jdbcType="INTEGER" property="familyMemberId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="NAME" jdbcType="VARCHAR" property="name" />
+		<result column="GENDER" jdbcType="CHAR" property="gender" />
+		<result column="AGE" jdbcType="INTEGER" property="age" />
+		<result column="TELPHONE" jdbcType="VARCHAR" property="telphone" />
+		<result column="BORROWERRE_RATIONSHIP" jdbcType="VARCHAR" property="borrowerreRationship" />
+		<result column="WORK_UNIT" jdbcType="VARCHAR" property="workUnit" />
+		<result column="YEAR_INCOME" jdbcType="DOUBLE" property="yearIncome" />
+		<result column="EDUCATION" jdbcType="CHAR" property="education" />
+		<result column="PROFESSION" jdbcType="VARCHAR" property="profession" />
+		<result column="PROFESSION_DETAIL" jdbcType="VARCHAR" property="professionDetail" />
+		<result column="IDNUMBER" jdbcType="VARCHAR" property="idNumber" />
+  </resultMap>
+  
+  <!-- 根据借款服务申请ID查询家庭成员信息 -->
+  <select id="queryFamilyMemberInfo" parameterClass="int" resultClass="familymember">
+  	select * from rl_family_member t where t.borrower_service_app_id=#borrowerServiceAppId# and nvl(t.borrowerre_rationship,'-1') !=2
+  </select>
+	
+	<sql id="byfamilyMemberIdCondition">
+        <![CDATA[
+           FAMILY_MEMBER_ID as familyMemberId = #familyMemberId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertfamilymember" parameterClass="familymember">
+		<selectKey keyProperty="familyMemberId" resultClass="long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FAMILY_MEMBER 
+			(FAMILY_MEMBER_ID,BORROWER_SERVICE_APP_ID,NAME,GENDER,AGE,TELPHONE,BORROWERRE_RATIONSHIP,WORK_UNIT,YEAR_INCOME,EDUCATION,
+			profession,PROFESSION_DETAIL,SEQ
+		]]>
+		<dynamic prepend=",">
+			<isNotEmpty prepend=" " property="idNumber">
+				IDNUMBER
+			</isNotEmpty>
+		</dynamic>	
+		<![CDATA[	
+			)
+			values (#familyMemberId:INTEGER#, #borrowerServiceAppId:INTEGER#, #name:VARCHAR#,
+			#gender:CHAR#, #age:INTEGER#,
+			#telphone:VARCHAR#, #borrowerreRationship:VARCHAR#,
+			#workUnit:VARCHAR#, #yearIncome:DOUBLE#, #education:CHAR#,#profession#,#professionDetail:VARCHAR#,#seq#
+		]]>
+		<dynamic prepend=",">
+			<isNotEmpty prepend=" " property="idNumber">
+				#idNumber#
+			</isNotEmpty>
+		</dynamic>	
+		<![CDATA[		
+			)
+		]]>
+	</insert>
+
+	<insert id="insert" parameterClass="familymember">
+		<selectKey keyProperty="familyMemberId" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FAMILY_MEMBER (FAMILY_MEMBER_ID,BORROWER_SERVICE_APP_ID,NAME,GENDER,IDNUMBER,AGE,TELPHONE,BORROWERRE_RATIONSHIP,WORK_UNIT,YEAR_INCOME,EDUCATION,
+			profession,PROFESSION_DETAIL,SEQ)
+			values (#familyMemberId:INTEGER#, #borrowerServiceAppId:INTEGER#, #name:VARCHAR#,
+			#gender:CHAR#,#idNumber:VARCHAR#, #age:INTEGER#,
+			#telphone:VARCHAR#, #borrowerreRationship:VARCHAR#,
+			#workUnit:VARCHAR#, #yearIncome:DOUBLE#, #education:CHAR#,#profession#,#professionDetail:VARCHAR#,#seq#)
+		]]>
+	</insert>
+	<select id="selectfamilymemberByBorrowerServiceAppId" parameterClass="long" resultMap="familymemberMap">
+
+
+		<![CDATA[
+			select fm.*,ct.code_value BORROWERRE_RATIONSHIP_VIEW ,ct1.code_value PROFESSION_VIEW
+		      from RL_FAMILY_MEMBER fm 
+		      left join rl_codetable ct on (ct.code_key = fm.borrowerre_rationship and ct.section='borrowerreRationship')
+		      left join rl_codetable ct1 on (ct1.code_key = fm.profession and ct1.section='profession')
+		      where
+			fm.BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			order by fm.seq
+		]]>
+	</select>
+   <!--更加申请id 查询其他家庭成员信息 不包括配偶部分-->
+    <select id="queryFamilymembers" parameterClass="long" resultMap="familymemberMap">
+
+		<![CDATA[
+			select fm.*,
+             ct.code_value  BORROWERRE_RATIONSHIP_VIEW,
+             ct1.code_value PROFESSION_VIEW
+            from RL_FAMILY_MEMBER fm
+            left join rl_codetable ct
+              on (ct.code_key = fm.borrowerre_rationship and
+                 ct.section = 'borrowerreRationship')
+            left join rl_codetable ct1
+              on (ct1.code_key = fm.profession and ct1.section = 'profession')
+           where nvl(fm.borrowerre_rationship, 88) != 2    and
+           fm.BORROWER_SERVICE_APP_ID = #borrowerServiceAppId :INTEGER#
+           order by fm.seq
+		]]>
+	</select>
+
+	<update id="updatefamilymemberByPrimaryKey" parameterClass="familymember">
+		<![CDATA[
+			update RL_FAMILY_MEMBER
+			set 
+			NAME = #name:VARCHAR#,
+			GENDER = #gender:CHAR#,
+			AGE = #age:INTEGER#,
+			TELPHONE = #telphone:VARCHAR#,
+			BORROWERRE_RATIONSHIP = #borrowerreRationship:VARCHAR#,
+			WORK_UNIT = #workUnit:VARCHAR#,
+			YEAR_INCOME = #yearIncome:DOUBLE#,
+			EDUCATION = #education:CHAR#,
+			profession = #profession#,
+			PROFESSION_DETAIL = #professionDetail:VARCHAR#
+		]]>
+		<dynamic prepend=",">
+			<isNotEmpty prepend=" " property="idNumber">
+				IDNUMBER = #idNumber#
+			</isNotEmpty>
+		</dynamic>
+		
+		<![CDATA[
+			where
+			FAMILY_MEMBER_ID = #familyMemberId:INTEGER#
+		]]>
+	</update>
+	<update id="updatefamilymemberByborrowerreRationship" parameterClass="familymember">
+		<![CDATA[
+			update RL_FAMILY_MEMBER
+			set 
+			NAME = #name:VARCHAR#,
+			GENDER = #gender:CHAR#,
+			AGE = #age:INTEGER#,
+			TELPHONE = #telphone:VARCHAR#,
+			BORROWERRE_RATIONSHIP = #borrowerreRationship:VARCHAR#,
+			WORK_UNIT = #workUnit:VARCHAR#,
+			YEAR_INCOME = #yearIncome:DOUBLE#,
+			EDUCATION = #education:CHAR#,
+			profession = #profession#,
+			PROFESSION_DETAIL = #professionDetail:VARCHAR#
+			where
+			BORROWER_SERVICE_APP_ID= #borrowerServiceAppId:DECIMAL#
+		]]>
+	</update>
+	<delete id="deletefamilymemberByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_FAMILY_MEMBER
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			FAMILY_MEMBER_ID = #deleteFamilymemberList[]#
+		</iterate>
+	</delete>
+	
+	<!-- 根据 借款申请id 删除 -->
+	<delete id="deleteByBorrowerServiceAppId" parameterClass="long">
+	 delete from RL_FAMILY_MEMBER where borrower_service_app_id=#borrowerServiceAppId#
+	</delete>
+    <!-- 根据 借款申请id 删除 -->
+    <delete id="deleteByBorrowerServiceAppIdExceptMate" parameterClass="long">
+	   delete from RL_FAMILY_MEMBER where nvl(borrowerre_rationship,10) != 2 and   borrower_service_app_id=#borrowerServiceAppId#
+	</delete>
+	<!-- 查询配偶信息 -->
+	<select id="selectSpouseByBorrowerServiceAppId" parameterClass="Integer" resultMap="abatorgenerated_FamilymemberResult">
+	    select f.*
+		  from rl_borrower_service_app b, rl_family_member f  
+		 where 1 = 1
+		   and f.borrower_service_app_id = b.borrower_service_app_id
+		and f.borrowerre_rationship='2'
+		and b.borrower_service_app_id=#borrowerServiceAppId#
+	</select>
+	<!--<select id="selectByIdenty" parameterClass="" resultMap="">
+		select * from rl
+	</select>
+--></sqlMap>

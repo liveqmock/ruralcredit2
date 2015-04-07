@@ -1,0 +1,1917 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CUSTOMERCONSULTPOOL">
+	<typeAlias alias="CustomerConsultPoolVo" type="com.creditease.rc.vo.CustomerConsultPoolVo" />
+	<typeAlias alias="customerConsultPool"
+		type="com.creditease.rc.domain.CustomerConsultPool" />
+	<typeAlias alias="consultLog" type="com.creditease.rc.domain.ConsultPoolLog" />
+	<typeAlias alias="consultLogDetail"
+		type="com.creditease.rc.domain.ConsultPoolLogDetail" />
+	<resultMap class="com.creditease.rc.domain.CustomerConsultPool"
+		id="CustomerConsultPoolMap">
+		<result column="CONSULT_POOL_ID" jdbcType="DECIMAL" property="consultPoolId" />
+		<result column="CUSTOMER_NAME" jdbcType="VARCHAR" property="customerName" />
+		<result column="CON_SEX" jdbcType="VARCHAR" property="conSex" />
+		<result column="CON_AGE" jdbcType="DECIMAL" property="conAge" />
+		<result column="PROVINCE" jdbcType="VARCHAR" property="province" />
+		<result column="CITY" jdbcType="VARCHAR" property="city" />
+		<result column="AREA" jdbcType="VARCHAR" property="area" />
+		<result column="MOBILE_PHONE" jdbcType="VARCHAR" property="mobilePhone" />
+		<result column="CHANNEL" jdbcType="VARCHAR" property="channel" />
+		<result column="MARKET_CONSULT_REMARK" jdbcType="VARCHAR"
+			property="marketConsultRemark" />
+		<result column="REGIST_DATE" jdbcType="DATE" property="registDate" />
+		<result column="DISTRIBUTION_DATE" jdbcType="TIMESTAMP"
+			property="distributionDate" />
+		<result column="MARKET_CONSULT_STATE" jdbcType="VARCHAR"
+			property="marketConsultState" />
+		<result column="DISTRIBUTE_DEPARTMENT_ID" jdbcType="VARCHAR"
+			property="distributeDepartmentId" />
+		<result column="DISTRIBUTE_DEPARTMENT_NAME" jdbcType="VARCHAR"
+			property="distributeDepartmentName" />
+		<result column="MARKET_CONSULT_REGIST_TYPE" jdbcType="VARCHAR"
+			property="marketConsultRegistType" />
+		<result column="RECEIVE_DATE" jdbcType="TIMESTAMP" property="receiveDate" />
+		<result column="SENT_DATE" jdbcType="TIMESTAMP" property="sentDate" />
+		<result column="ACCEPT_CONSULT_STATE" jdbcType="VARCHAR" property="acceptConsultState" />
+		<result column="COMMUNICATION_RECORD" jdbcType="VARCHAR" property="communicationRecord" />
+		<result column="LOAN_OFFICER_NAME" jdbcType="VARCHAR" property="loanOfficerName" />
+		<result column="LOAN_OFFICER_ID" jdbcType="DECIMAL" property="loanOfficerId" />
+		<result column="CREATER" jdbcType="VARCHAR" property="creater" />
+		<result column="CREATE_DATE" jdbcType="DATE" property="createDate" />
+		<!--新增字段、属性zw -->
+		<result column="CONSULTWAY" property="consultWay" jdbcType="VARCHAR" />
+		<result column="BORROWING" property="borrowing" jdbcType="VARCHAR" />
+		<result column="CONSULTMONEY" property="consultMoney" jdbcType="DECIMAL" />
+		<result column="RESIDENCEADDRESS" property="residenceAddress" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_TAG" property="customerTag" jdbcType="VARCHAR" />
+		<!--新增字段、属性GYH -->
+		<result column="TRACE_STATUS" jdbcType="VARCHAR" property="traceStatus" />
+		<result column="BORROW_USE" property="borrowUse" jdbcType="VARCHAR" />
+
+		<!--新增字段、属性郝强 -->
+		<result column="DISTRIBUTE_DEPARTMENT_ID" property="distributeDepartmentId"
+			jdbcType="VARCHAR" />
+		<result column="DISTRIBUTE_DEPARTMENT_NAME" property="distributeDepartmentName"
+			jdbcType="VARCHAR" />
+		<result column="DISTRIBUTE_OPERATION_FLAG" property="distributeOperationFlag"
+			jdbcType="VARCHAR" />
+		<result column="COMPONENT_OPERATION_FLAG" property="componentOperationFlag"
+			jdbcType="VARCHAR" />
+
+	</resultMap>
+	<resultMap class="com.creditease.rc.vo.CustomerConsultPoolVo"
+		id="CustomerConsultPoolResult" extends="CustomerConsultPoolMap">
+		<result column="SCRAP_FLAG" property="scrapflag" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerConsultPool"
+		resultMap="CustomerConsultPoolMap">
+		select CONSULT_POOL_ID,CUSTOMER_NAME,
+		CON_SEX, CON_AGE,
+		PROVINCE, CITY,
+		AREA, MOBILE_PHONE,
+		IS_BUSINESS_LICENSE,
+		CHANNEL,
+		MARKET_CONSULT_REMARK, REGIST_DATE, DISTRIBUTION_DATE,
+		MARKET_CONSULT_STATE,
+		FEEDBACK_RESULT, DISTRIBUTE_DEPARTMENT_ID,
+		DISTRIBUTE_DEPARTMENT_NAME, MARKET_CONSULT_REGIST_TYPE,
+		RECEIVE_DATE,
+		SENT_DATE, ACCEPT_CONSULT_STATE,
+		COMMUNICATION_RECORD,
+		LOAN_OFFICER_NAME, LOAN_OFFICER_ID,
+		FEEDBACK_DATE, OPERATE_DATE, OPERATOR,
+		DEPARTMENT_ID,DEPARTMENT_NAME,AREA_DEPARTMENT_ID,AREA_DEPARTMENT_NAME,CITY_DEPARTMENT_ID,CITY_DEPARTMENT_NAME,
+		SALES_DEPARTMENT_MANAGER_ID,SALES_DEPARTMENT_MANAGER_NAME
+		from
+		RL_CUSTOMER_CONSULT_POOL
+		where CONSULT_POOL_ID =
+		#consultPoolId:DECIMAL#
+	</select>
+	<!--根据主键查询 -->
+	<select id="selectByPrimaryKeyZw" parameterClass="com.creditease.rc.domain.CustomerConsultPool"
+		resultClass="com.creditease.rc.domain.CustomerConsultPool">
+		SELECT T1.CONSULT_POOL_ID AS consultPoolId,
+		T1.REGIST_DATE
+		AS registDate,
+		T1.CUSTOMER_NAME AS customerName,
+		T1.CON_SEX AS conSex,
+		T1.CON_AGE AS conAge,
+		T1.MOBILE_PHONE AS mobilePhone,
+		T1.CONSULTWAY AS
+		consultWay,
+		T1.BORROWING AS borrowing,
+		T1.CONSULTMONEY AS consultMoney,
+		T1.CHANNEL AS channel,
+		T1.PROVINCE AS province,
+		T1.CITY AS city,
+		T1.AREA
+		AS area,
+		T1.RESIDENCEADDRESS AS residenceAddress,
+		T1.MARKET_CONSULT_REMARK AS marketConsultRemark,
+		(SELECT T2.CODE_VALUE
+		FROM RL_CODETABLE T2
+		WHERE T2.SECTION = 'marketConsultStatus'
+		AND
+		T2.CODE_KEY = T1.MARKET_CONSULT_STATE) AS invalidRegStatus,
+		T1.CUSTOMER_TAG AS customerTag,
+		T1.MARKET_CONSULT_STATE AS
+		marketConsultState,
+		T1.ACCEPT_CONSULT_STATE AS acceptConsultState,
+		T1.COMMUNICATION_RECORD AS communicationRecord,
+		T1.TRACE_STATUS AS
+		traceStatus,
+		T1.BORROW_USE AS borrowUse,
+        T1.CREATER AS creater
+		FROM RL_CUSTOMER_CONSULT_POOL T1
+		WHERE CONSULT_POOL_ID =
+		#consultPoolId:DECIMAL#
+	</select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		delete from RL_CUSTOMER_CONSULT_POOL
+		where CONSULT_POOL_ID =
+		#consultPoolId:DECIMAL#
+	</delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		<selectKey keyProperty="consultPoolId" resultClass="java.lang.Long">
+			select
+			SEQ_MFC_COMMON.NEXTVAL from dual
+        </selectKey>
+		insert into RL_CUSTOMER_CONSULT_POOL (CONSULT_POOL_ID,
+		CUSTOMER_NAME,
+		CON_SEX, CON_AGE,
+		PROVINCE, CITY,
+		AREA, MOBILE_PHONE,
+		IS_BUSINESS_LICENSE,
+		insertMarketConsultPool,
+		MARKET_CONSULT_REMARK,
+		REGIST_DATE, DISTRIBUTION_DATE,
+		MARKET_CONSULT_STATE, FEEDBACK_RESULT,
+		DISTRIBUTE_DEPARTMENT_ID,
+		DISTRIBUTE_DEPARTMENT_NAME,
+		MARKET_CONSULT_REGIST_TYPE, RECEIVE_DATE,
+		SENT_DATE,
+		ACCEPT_CONSULT_STATE,
+
+		COMMUNICATION_RECORD,
+		LOAN_OFFICER_NAME, LOAN_OFFICER_ID,
+		FEEDBACK_DATE, OPERATE_DATE,
+		OPERATOR, CREATER, CREATE_DATE,
+		DEPARTMENT_ID,DEPARTMENT_NAME,AREA_DEPARTMENT_ID,
+		AREA_DEPARTMENT_NAME,CITY_DEPARTMENT_ID,CITY_DEPARTMENT_NAME,
+		SALES_DEPARTMENT_MANAGER_ID,SALES_DEPARTMENT_MANAGER_NAME)
+		values
+		(#consultPoolId:DECIMAL#, #customerConsultId:DECIMAL#,
+		#customerName:VARCHAR#, #conSex:VARCHAR#,
+		#conAge:DECIMAL#,
+		#province:VARCHAR#, #city:VARCHAR#, #area:VARCHAR#,
+		#mobilePhone:VARCHAR#,
+
+		#businessPeriod:VARCHAR#,
+		#isBusinessLicense:VARCHAR#,
+		#borrowAmount:DECIMAL#, #channel:VARCHAR#,
+		#marketConsultRemark:VARCHAR#,
+		#registDate:TIMESTAMP#,
+		#distributionDate:TIMESTAMP#, #marketConsultState:VARCHAR#,
+		#feedbackResult:VARCHAR#, #distributeDepartmentId:VARCHAR#,
+		#distributeDepartmentName:VARCHAR#,
+		#marketConsultRegistType:VARCHAR#,
+		#receiveDate:TIMESTAMP#, #sentDate:TIMESTAMP#,
+		#acceptConsultState:VARCHAR#,
+		#communicationRecord:VARCHAR#,
+		#loanOfficerName:VARCHAR#,
+		#loanOfficerId:DECIMAL#, #feedbackDate:TIMESTAMP#,
+		#operateDate:TIMESTAMP#, #operator:VARCHAR#, #creater:VARCHAR#,
+		#createDate:TIMESTAMP#,
+		#departmentId:VARCHAR#,
+		#departmentName:VARCHAR#,#areaDepartmentId:VARCHAR#,
+		#areaDepartmentName:VARCHAR#,#cityDepartmentId:VARCHAR#,#cityDepartmentName:VARCHAR#,
+		#salesDepartmentManagerId:VARCHAR#,
+		#salesDepartmentManagerName:VARCHAR#)
+
+	</insert>
+
+	<!--批量导入-保存 -->
+	<insert id="abatorgenerated_insertZw" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		<selectKey keyProperty="consultPoolId" resultClass="java.lang.Long">
+			select
+			SEQ_BASIC_INFO.NEXTVAL AS value from dual
+        </selectKey>
+		insert into RL_CUSTOMER_CONSULT_POOL
+		(CONSULT_POOL_ID,
+		REGIST_DATE,
+		CUSTOMER_NAME,
+		CON_SEX,
+		PROVINCE,
+		CITY,
+		AREA,
+		RESIDENCEADDRESS,
+		MOBILE_PHONE,
+		CON_AGE,
+		BORROWING,
+		CONSULTMONEY,
+		CHANNEL,
+		CONSULTWAY,
+		MARKET_CONSULT_REMARK,
+		CREATER,
+		CREATE_DATE,
+		MARKET_CONSULT_REGIST_TYPE,
+		MARKET_CONSULT_STATE)
+		values
+		(#consultPoolId:DECIMAL#,
+		#registDate:TIMESTAMP#,
+		#customerName:VARCHAR#,
+		#conSex:VARCHAR#,
+		#province:VARCHAR#,
+		#city:VARCHAR#,
+		#area:VARCHAR#,
+		#residenceAddress:VARCHAR#,
+		#mobilePhone:VARCHAR#,
+		#conAge:DECIMAL#,
+		#borrowing:VARCHAR#,
+		#consultMoney:VARCHAR#,
+		#channel:VARCHAR#,
+		#consultWay:VARCHAR#,
+		#marketConsultRemark:VARCHAR#,
+		#creater:VARCHAR#,
+		#createDate:TIMESTAMP#,
+		#marketConsultRegistType:VARCHAR#,
+		#marketConsultState:VARCHAR#
+		)
+	</insert>
+	<!--登记客户咨询-保存 -->
+	<insert id="insertMarketConsultPool" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		<selectKey keyProperty="consultPoolId" resultClass="java.lang.Long"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+        </selectKey>
+		insert into RL_CUSTOMER_CONSULT_POOL
+		(CONSULT_POOL_ID,
+		CREATER,
+		MARKET_CONSULT_REGIST_TYPE,
+		REGIST_DATE,
+		CUSTOMER_NAME,
+		CON_SEX,
+		CON_AGE,
+		PROVINCE,
+		CITY,
+		AREA,
+		RESIDENCEADDRESS,
+		MOBILE_PHONE,
+		CONSULTMONEY,
+		BORROWING,
+		CHANNEL,
+		CONSULTWAY,
+		MARKET_CONSULT_REMARK,
+		MARKET_CONSULT_STATE)
+		values
+		(#consultPoolId#,
+		#creater#,
+		#marketConsultRegistType#,
+		#registDate:TIMESTAMP#,
+		#customerName#,
+		#conSex#,
+		#conAge#,
+		#province#,
+		#city#,
+		#area#,
+		#residenceAddress#,
+		#mobilePhone#,
+		#consultAmount#,
+		#borrowing#,
+		#channel#,
+		#consultWay#,
+		#marketConsultRemark#,
+		#marketConsultState#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		update RL_CUSTOMER_CONSULT_POOL
+		CUSTOMER_NAME = #customerName:VARCHAR#,
+		CON_SEX = #conSex:VARCHAR#,
+		CON_AGE = #conAge:DECIMAL#,
+		PROVINCE =
+		#province:VARCHAR#,
+		CITY = #city:VARCHAR#,
+		AREA = #area:VARCHAR#,
+		MOBILE_PHONE = #mobilePhone:VARCHAR#,
+		CHANNEL = #channel:VARCHAR#,
+		MARKET_CONSULT_REMARK = #marketConsultRemark:VARCHAR#,
+		REGIST_DATE =
+		#registDate:TIMESTAMP#,
+		DISTRIBUTION_DATE =
+		#distributionDate:TIMESTAMP#,
+		MARKET_CONSULT_STATE =
+		#marketConsultState:VARCHAR#,
+		FEEDBACK_RESULT =
+		#feedbackResult:VARCHAR#,
+		DISTRIBUTE_DEPARTMENT_ID =
+		#distributeDepartmentId:VARCHAR#,
+		DISTRIBUTE_DEPARTMENT_NAME =
+		#distributeDepartmentName:VARCHAR#,
+		MARKET_CONSULT_REGIST_TYPE =
+		#marketConsultRegistType:VARCHAR#,
+		RECEIVE_DATE =
+		#receiveDate:TIMESTAMP#,
+		SENT_DATE = #sentDate:TIMESTAMP#,
+		ACCEPT_CONSULT_STATE =
+		#acceptConsultState:VARCHAR#,
+
+		COMMUNICATION_RECORD =
+		#communicationRecord:VARCHAR#,
+		LOAN_OFFICER_NAME = #loanOfficerName:VARCHAR#,
+		LOAN_OFFICER_ID =
+		#loanOfficerId:DECIMAL#,
+		FEEDBACK_DATE = #feedbackDate:TIMESTAMP#,
+		OPERATE_DATE = #operateDate:TIMESTAMP#,
+		OPERATOR = #operator:VARCHAR#,
+		DEPARTMENT_ID=#departmentId:VARCHAR#,
+		DEPARTMENT_NAME=#departmentName:VARCHAR#,
+		AREA_DEPARTMENT_ID=#areaDepartmentId:VARCHAR#,
+		AREA_DEPARTMENT_NAME=#areaDepartmentName:VARCHAR#,
+		CITY_DEPARTMENT_ID=#cityDepartmentId:VARCHAR#,
+		CITY_DEPARTMENT_NAME=#cityDepartmentName:VARCHAR#,
+		SALES_DEPARTMENT_MANAGER_ID=#salesDepartmentManagerId:VARCHAR#,
+		SALES_DEPARTMENT_MANAGER_NAME=#salesDepartmentManagerName:VARCHAR#
+		where CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+	</update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective"
+		parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		update RL_CUSTOMER_CONSULT_POOL
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="customerName">
+				CUSTOMER_NAME =
+				#customerName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="conSex">
+				CON_SEX = #conSex:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="conAge">
+				CON_AGE = #conAge:DECIMAL#
+			</isNotNull>
+			<isNotNull prepend="," property="province">
+				PROVINCE =
+				#province:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="city">
+				CITY = #city:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="area">
+				AREA = #area:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="mobilePhone">
+				MOBILE_PHONE =
+				#mobilePhone:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="channel">
+				CHANNEL = #channel:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="marketConsultRemark">
+				MARKET_CONSULT_REMARK =
+				#marketConsultRemark:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="registDate">
+				REGIST_DATE =
+				#registDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="distributionDate">
+				DISTRIBUTION_DATE =
+				#distributionDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="marketConsultState">
+				MARKET_CONSULT_STATE =
+				#marketConsultState:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="feedbackResult">
+				FEEDBACK_RESULT =
+				#feedbackResult:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="distributeDepartmentId">
+				DISTRIBUTE_DEPARTMENT_ID =
+				#distributeDepartmentId:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="distributeDepartmentName">
+				DISTRIBUTE_DEPARTMENT_NAME
+				= #distributeDepartmentName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="marketConsultRegistType">
+				MARKET_CONSULT_REGIST_TYPE
+				= #marketConsultRegistType:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="receiveDate">
+				RECEIVE_DATE =
+				#receiveDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="sentDate">
+				SENT_DATE =
+				#sentDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="acceptConsultState">
+				ACCEPT_CONSULT_STATE =
+				#acceptConsultState:VARCHAR#
+            </isNotNull>
+
+			<isNotNull prepend="," property="communicationRecord">
+				COMMUNICATION_RECORD =
+				#communicationRecord:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="loanOfficerName">
+				LOAN_OFFICER_NAME =
+				#loanOfficerName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="loanOfficerId">
+				LOAN_OFFICER_ID =
+				#loanOfficerId:DECIMAL#
+            </isNotNull>
+			<isNotNull prepend="," property="feedbackDate">
+				FEEDBACK_DATE =
+				#feedbackDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="operateDate">
+				OPERATE_DATE =
+				#operateDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="operator">
+				OPERATOR =
+				#operator:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="creater">
+				CREATER=#creater:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="createDate">
+				CREATE_DATE =
+				#createDate:TIMESTAMP#
+            </isNotNull>
+			<isNotNull prepend="," property="departmentId">
+				DEPARTMENT_ID=#departmentId:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="departmentName">
+				DEPARTMENT_NAME=#departmentName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="areaDepartmentId">
+				AREA_DEPARTMENT_ID=#areaDepartmentId:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="areaDepartmentName">
+				AREA_DEPARTMENT_NAME=#areaDepartmentName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="cityDepartmentId">
+				CITY_DEPARTMENT_ID=#cityDepartmentId:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="cityDepartmentName">
+				CITY_DEPARTMENT_NAME=#cityDepartmentName:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="salesDepartmentManagerId">
+				SALES_DEPARTMENT_MANAGER_ID=#salesDepartmentManagerId:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="salesDepartmentManagerName">
+				SALES_DEPARTMENT_MANAGER_NAME=#salesDepartmentManagerName:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="borrowing">
+				BORROWING=#borrowing:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="traceStatus">
+				TRACE_STATUS=#traceStatus:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="consultWay">
+				CONSULTWAY=#consultWay:VARCHAR#
+            </isNotNull>
+			<isNotNull prepend="," property="customerTag">
+				CUSTOMER_TAG=#customerTag:VARCHAR#
+            </isNotNull>
+
+			<isNotNull prepend="," property="consultMoney">
+				CONSULTMONEY=#consultMoney:DECIMAL#
+            </isNotNull>
+
+			<isNotNull prepend="," property="borrowUse">
+				BORROW_USE=#borrowUse:VARCHAR#
+            </isNotNull>
+
+			<isNotNull prepend="," property="distributeOperationFlag">
+				DISTRIBUTE_OPERATION_FLAG=#distributeOperationFlag:VARCAHR#
+			</isNotNull>
+			<isNotNull prepend="," property="componentOperationFlag">
+				COMPONENT_OPERATION_FLAG=#componentOperationFlag:VARCHAR#
+			</isNotNull>
+
+		</dynamic>
+		where CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+	</update>
+	<!--受理咨询列表查询 luohongjie -->
+	<sql id="select_sql">
+		select distinct CCP.CONSULT_POOL_ID as consultPoolId,
+		CCP.CUSTOMER_NAME as
+		customerName,
+		CCP.Distribute_Department_Id as
+		distributeDepartmentId,
+		CCP.Distribute_Department_Name as
+		distributeDepartmentName,
+		CCP.Distribute_Operation_Flag as
+		distributeOperationFlag,
+		CCP.Component_Operation_Flag as
+		componentOperationFlag,
+		CCP.PROVINCE as province,
+		CCP.CITY as city,
+		CCP.AREA as area,
+		CCP.Residenceaddress as addRess,
+		CCP.MOBILE_PHONE as mobilePhone,	
+		CCP.Regist_Date as registDate,
+		CCP.Borrowing as borrowing,
+		(SELECT T3.CODE_VALUE FROM RL_CODETABLE T3
+		WHERE T3.SECTION =
+		'marketConsultBorrowing'
+		AND T3.CODE_KEY = CCP.BORROWING) borrowingShow,
+		CCP.Consultway as consultWay,
+		(SELECT T3.CODE_VALUE FROM RL_CODETABLE T3
+		WHERE T3.SECTION =
+		'inquirePoolConsultWay'
+		AND T3.CODE_KEY = CCP.CONSULTWAY) consultWayShow,
+		CCP.CHANNEL as channel,
+		(SELECT T3.CODE_VALUE FROM
+		RL_CODETABLE T3
+		WHERE
+		T3.SECTION =
+		'marketConsultInfoSource'
+		AND T3.CODE_KEY = CCP.CHANNEL)
+		channelShows,
+		CCP.Accept_Consult_State as acceptConsultState,
+		CCP.Loan_Officer_Id as loanOfficerId,
+		CCP.Loan_Officer_Name as
+		loanOfficerName,
+		CCP.Distribution_Date as distributionDate,
+		CCP.Sent_Date as sentDate,
+		CCP.RECEIVE_DATE as receiveDate,
+		CCP.Customer_Tag as customerTag,
+		(SELECT COUNT(T.CONSULT_POOL_ID)
+		FROM
+		RL_CUSTOMER_CONSULT_POOL T
+		WHERE T.MOBILE_PHONE = CCP.MOBILE_PHONE
+		GROUP
+		BY T.MOBILE_PHONE) consultTimes,
+		(SELECT C.CODE_VALUE
+		FROM rl_codetable
+		C
+		WHERE C.CODE_KEY = CCP.CHANNEL
+		AND C.SECTION = 'infoSource')
+		channelShow,
+		(SELECT C.CODE_VALUE
+		FROM rl_codetable C
+		WHERE C.CODE_KEY =
+		CCP.CON_SEX
+		AND C.SECTION = 'sex') conSexShow,
+		(SELECT C.CODE_VALUE
+		FROM
+		rl_codetable C
+		WHERE C.CODE_KEY =
+		CCP.ACCEPT_CONSULT_STATE
+		AND C.SECTION
+		=
+		'acceptConsultState') acceptConsultStateShow
+		FROM RL_CUSTOMER_CONSULT_POOL CCP
+		where 1 = 1
+		and CCP.MARKET_CONSULT_STATE = 3
+		and ccp.consult_pool_id in
+		(select
+		CCP.consult_pool_id
+		from (select
+		rank() over(partition by
+		CCP.mobile_phone order by CCP.create_date
+		desc, CCP.regist_date desc,
+		CCP.consult_pool_id desc) r,
+		CCP.*
+		from RL_CUSTOMER_CONSULT_POOL CCP,
+		sid_view v
+		where CCP.CONSULT_POOL_ID =
+		v.object_id_identity
+		and v.class
+		=
+		'com.creditease.rc.domain.CustomerConsultPool'
+		and v.ace_sid IN
+		($authList$)) CCP
+		where r = 1)
+		<dynamic>
+			<isNotEmpty property="consultPoolId" prepend="and">
+				CCP.CONSULT_POOL_ID = #consultPoolId#
+            </isNotEmpty>
+			<isNotEmpty property="customerName" prepend="and">
+				CCP.CUSTOMER_NAME LIKE '%$customerName$%'
+            </isNotEmpty>
+			<isNotEmpty property="mobilePhone" prepend="and">
+				CCP.MOBILE_PHONE =#mobilePhone#
+            </isNotEmpty>
+			<isNotEmpty property="consultWay" prepend="and">
+				CCP.CONSULTWAY
+				LIKE '%$consultWay$%'
+            </isNotEmpty>
+			<isNotEmpty property="acceptConsultState" prepend="and">
+				CCP.ACCEPT_CONSULT_STATE =#acceptConsultState#
+            </isNotEmpty>
+			<isNotEmpty property="beginDistributeDate" prepend="and">
+				CCP.Distribution_Date >=to_date(#beginDistributeDate#,'YYYY-MM-DD
+				HH24:MI:SS')
+            </isNotEmpty>
+			<isNotEmpty property="endDistributeDate" prepend="and">
+				to_date(#endDistributeDate#,'YYYY-MM-DD HH24:MI:SS') >=
+				CCP.Distribution_Date
+            </isNotEmpty>
+			<isNotEmpty property="beginSentDate" prepend="and">
+				CCP.SENT_DATE >= to_date(#beginSentDate#,'YYYY-MM-DD HH24:MI:SS')
+			</isNotEmpty>
+			<isNotEmpty property="endSentDate" prepend="and">
+				to_date(#endSentDate#,'YYYY-MM-DD HH24:MI:SS')
+				>= CCP.SENT_DATE
+			</isNotEmpty>
+			<isNotEmpty property="province" prepend="and">
+				#province# =
+				CCP.PROVINCE
+            </isNotEmpty>
+			<isNotEmpty property="city" prepend="and">
+				#city# = CCP.CITY
+			</isNotEmpty>
+			<isNotEmpty property="area" prepend="and">
+				#area# = CCP.AREA
+			</isNotEmpty>
+		</dynamic>
+		<dynamic>
+			<isEqual compareValue="ROLE_LOAN_OFFICER" property="role">
+				<isNotEmpty property="history">
+					<isEqual compareValue="0" property="history" prepend="and">
+						CCP.COMPONENT_OPERATION_FLAG = '0'
+					</isEqual>
+				</isNotEmpty>
+				<isEmpty property="history" prepend="and">
+					CCP.COMPONENT_OPERATION_FLAG = '0'
+				</isEmpty>
+			</isEqual>
+			<isEqual compareValue="ELSE" property="role">
+				<isNotEmpty property="history">
+					<isEqual compareValue="0" property="history" prepend="and">
+						CCP.DISTRIBUTE_OPERATION_FLAG = '0'
+					</isEqual>
+				</isNotEmpty>
+				<isEmpty property="history" prepend="and">
+					CCP.DISTRIBUTE_OPERATION_FLAG = '0'
+				</isEmpty>
+			</isEqual>
+		</dynamic>
+		<dynamic>
+			<isNotEmpty prepend="order by" property="order">
+				<isEqual property="sort" compareValue="receiveDate">
+					CCP.RECEIVE_DATE
+					$order$ nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="customerName">
+					CCP.CUSTOMER_NAME
+					$order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="cityShow">
+					CCP.PROVINCE $order$ ,
+					CCP.CITY $order$ nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="borrowing">
+					CCP.BORROWING $order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="channelShow">
+					CCP.CHANNEL $order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="consultWay">
+					CCP.CONSULTWAY $order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="acceptConsultStateShow">
+					CCP.ACCEPT_CONSULT_STATE $order$ nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="teamdepartmentName">
+					CCP.TEAMDEPARTMENT_ID
+					$order$ nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="loanOfficerName">
+					CCP.LOAN_OFFICER_NAME
+					$order$ nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="distributionDate">
+					CCP.DISTRIBUTION_DATE
+					$order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="sentDate">
+					CCP.SENT_DATE $order$
+					nulls last
+                </isEqual>
+				<isEqual property="sort" compareValue="receiveDate">
+					CCP.RECEIVE_DATE
+					$order$
+					nulls last
+                </isEqual>
+			</isNotEmpty>
+			<isEmpty prepend="order by" property="order">
+				CCP.regist_date desc
+				nulls last
+            </isEmpty>
+		</dynamic>
+	</sql>
+	<select id="selectList" parameterClass="java.util.HashMap"
+		resultClass="CustomerConsultPoolVo">
+		<include refid="select_sql" />
+	</select>
+	<select id="selectCount" parameterClass="java.util.HashMap"
+		resultClass="int">
+        <![CDATA[
+	  		select count(*) FROM (
+	  		]]>
+		<include refid="select_sql" />
+        <![CDATA[
+	  		)
+	  		]]>
+	</select>
+
+	<!-- 营销咨询查询 -->
+	<sql id="query_sale_inquire_list">
+        <![CDATA[
+			select CONSULT_POOL_ID,
+			       CUSTOMER_NAME,
+			       (select ct.code_value
+			          from MFC_CODETABLE ct
+			         where ct.code_key = CON_SEX
+			           and ct.section = 'sex') AS CON_SEX,
+			       CON_AGE,
+			       PROVINCE,
+
+	      			CASE
+			         WHEN PROVINCE IN ('500000', '310000', '110000', '120000') THEN
+			          (SELECT NS.CITY_NAME
+			             FROM MFC_NATIONAL_STANDARD NS
+			            WHERE NS.CITY_CODE = PROVINCE)
+			         ELSE
+			          (SELECT NS.CITY_NAME
+			             FROM MFC_NATIONAL_STANDARD NS
+			            WHERE NS.CITY_CODE = CITY)
+			       END CITY,
+			       AREA,
+			       MOBILE_PHONE,
+			       (select ct.code_value
+			          from MFC_CODETABLE ct
+			         where ct.code_key = IS_BUSINESS_LICENSE
+			           and ct.section = 'isBusinessLicense') AS IS_BUSINESS_LICENSE,
+			       (select ct.code_value
+			          from MFC_CODETABLE ct
+			         where ct.code_key = CHANNEL
+			           and ct.section = 'infoSource') AS CHANNEL,
+			       MARKET_CONSULT_REMARK,
+			       to_char(REGIST_DATE, 'YYYY-MM-DD') as REGIST_DATE,
+			       to_char(DISTRIBUTION_DATE, 'YYYY-MM-DD') as DISTRIBUTION_DATE,
+			       MARKET_CONSULT_STATE,
+			       (select ct.code_value
+			          from MFC_CODETABLE ct
+			         where ct.code_key = MARKET_CONSULT_STATE
+			           and ct.section = 'saleConsultStatus') AS MARKET_CONSULT_STATE_NOTE,
+			       FEEDBACK_RESULT,
+			       TEAMDEPARTMENT_ID,
+			       DISTRIBUTE_DEPARTMENT_NAME,
+			       MARKET_CONSULT_REGIST_TYPE,
+			       RECEIVE_DATE,
+			       SENT_DATE,
+			       ACCEPT_CONSULT_STATE,
+			      
+			       COMMUNICATION_RECORD,
+			       LOAN_OFFICER_NAME,
+			       LOAN_OFFICER_ID,
+			       FEEDBACK_DATE,
+			       to_char(OPERATE_DATE, 'YYYY-MM-DD hh24:mi:ss') as OPERATE_DATE,
+			       OPERATOR
+			  from RL_CUSTOMER_CONSULT_POOL
+			 where 1=1  and (SCRAP_FLAG='0' or SCRAP_FLAG is null)
+
+		]]>
+		<dynamic prepend="and">
+			<!-- 高级精确查询 -->
+			<isEmpty prepend="and" property="searchButton">
+				(MARKET_CONSULT_STATE = '0'
+				or MARKET_CONSULT_STATE = '1' or MARKET_CONSULT_STATE = '2')
+			</isEmpty>
+
+			<isNotEmpty prepend="and" property="mobilePhone">
+				(MOBILE_PHONE LIKE
+				'%$mobilePhone$%')
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="customerName">
+				CUSTOMER_NAME LIKE
+				'%$customerName$%'
+            </isNotEmpty>
+
+			<isNotEmpty prepend="and" property="channel">
+				CHANNEL =
+				#channel:VARCHAR#
+            </isNotEmpty>
+
+			<isNotEmpty prepend="and" property="marketConsultState">
+				MARKET_CONSULT_STATE =
+				#marketConsultState:VARCHAR#
+            </isNotEmpty>
+
+			<isNotEmpty prepend="and" property="province">
+				PROVINCE =
+				#province:VARCHAR#
+            </isNotEmpty>
+
+			<isNotEmpty prepend="and" property="city">
+				CITY = #city:VARCHAR#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="registDate1">
+                <![CDATA[
+				REGIST_DATE >= #registDate1:TIMESTAMP#
+				]]>
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="registDate2">
+                <![CDATA[
+				REGIST_DATE <= #registDate2:TIMESTAMP#
+				]]>
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="distributionDate1">
+                <![CDATA[
+				DISTRIBUTION_DATE >= #distributionDate1:TIMESTAMP#
+				]]>
+			</isNotEmpty>
+
+			<isNotEmpty prepend="and" property="distributionDate2">
+                <![CDATA[
+				DISTRIBUTION_DATE <= #distributionDate2:TIMESTAMP#
+				]]>
+			</isNotEmpty>
+
+		</dynamic>
+
+		<dynamic prepend="">
+			<!-- 按照给定列排序 -->
+			<isNotEmpty property="sort" prepend="ORDER BY">
+				<isEqual property="sort" compareValue="REGIST_DATE">
+					REGIST_DATE $order$
+				</isEqual>
+				<isEqual property="sort" compareValue="CON_SEX">
+					CON_SEX $order$
+				</isEqual>
+				<isEqual property="sort" compareValue="CON_AGE">
+					CON_AGE $order$
+				</isEqual>
+				<isEqual property="sort" compareValue="CITY">
+					CITY $order$
+                </isEqual>
+				<isEqual property="sort" compareValue="IS_BUSINESS_LICENSE">
+					IS_BUSINESS_LICENSE
+					$order$
+                </isEqual>
+				<isEqual property="sort" compareValue="CHANNEL">
+					CHANNEL $order$
+				</isEqual>
+				<isEqual property="sort" compareValue="MARKET_CONSULT_STATE_NOTE">
+					MARKET_CONSULT_STATE_NOTE $order$
+                </isEqual>
+				<isEqual property="sort" compareValue="OPERATE_DATE">
+					OPERATE_DATE $order$
+				</isEqual>
+				<isEqual property="sort" compareValue="DISTRIBUTION_DATE">
+					DISTRIBUTION_DATE
+					$order$
+                </isEqual>
+				<isEqual property="sort" compareValue="DISTRIBUTE_DEPARTMENT_NAME">
+					DISTRIBUTE_DEPARTMENT_NAME $order$
+                </isEqual>
+			</isNotEmpty>
+
+			<!-- 默认以登记日期倒序排列 -->
+			<isEmpty property="sort" prepend="ORDER BY">
+				REGIST_DATE DESC
+            </isEmpty>
+		</dynamic>
+	</sql>
+
+	<sql id="searchList">
+        <![CDATA[
+                select CONSULT_POOL_ID,
+                CUSTOMER_NAME,
+                CON_SEX,
+                CON_AGE,
+                MOBILE_PHONE
+                FROM RL_CUSTOMER_CONSULT_POOL
+        ]]>
+	</sql>
+	<!--营销管理咨询-菜单查询 -->
+	<sql id="searchListZw">
+		<isEqual property="history" compareValue="0">
+			SELECT *
+			FROM (
+			<include refid="searchListZwCurrent" />
+			) T4
+			WHERE 1 = 1
+		</isEqual>
+		<isEqual property="history" compareValue="1">
+			SELECT *
+			FROM (
+			<include refid="searchListZwAll" />
+			) T4
+			WHERE 1 = 1
+		</isEqual>
+		<dynamic>
+			<isEmpty property="viewType">
+				AND MARKET_CONSULT_STATE IN ('待分配', '已退回',
+				'无营业网点')
+            </isEmpty>
+			<isNotEmpty property="mobilePhone" prepend=" AND">
+				T4.MOBILE_PHONE LIKE '$mobilePhone$%'
+            </isNotEmpty>
+			<isNotEmpty property="customerName" prepend=" AND">
+				T4.CUSTOMER_NAME = #customerName#
+            </isNotEmpty>
+			<isNotEmpty property="channel" prepend=" AND">
+				T4.CONSULTWAYCODE =
+				#channel#
+            </isNotEmpty>
+			<isNotEmpty property="registDate1" prepend=" AND">
+                <![CDATA[TO_DATE(T4.REGIST_DATE,'YYYY-MM-DD') >= #registDate1:DATE#]]>
+			</isNotEmpty>
+			<isNotEmpty property="registDate2" prepend=" AND">
+                <![CDATA[TO_DATE(T4.REGIST_DATE,'YYYY-MM-DD') <= #registDate2:DATE#]]>
+			</isNotEmpty>
+			<isNotEmpty property="marketConsultState" prepend=" AND">
+				T4.MARKETCONSULTSTATECODE = #marketConsultState#
+            </isNotEmpty>
+			<isNotEmpty property="distributionDate1" prepend=" AND">
+                <![CDATA[TO_DATE(T4.DISTRIBUTEDATE,'YYYY-MM-DD') >= #distributionDate1:DATE#]]>
+			</isNotEmpty>
+			<isNotEmpty property="distributionDate2" prepend=" AND">
+                <![CDATA[TO_DATE(T4.DISTRIBUTEDATE,'YYYY-MM-DD') <= #distributionDate2:DATE#]]>
+			</isNotEmpty>
+			<isNotEmpty property="province" prepend=" AND">
+				T4.PROVINCE =
+				#province#
+            </isNotEmpty>
+			<isNotEmpty property="city" prepend=" AND">
+				T4.CITY = #city#
+			</isNotEmpty>
+			<isNotEmpty property="area" prepend=" AND">
+				T4.AREA = #area#
+			</isNotEmpty>
+			<isNotEmpty property="SORT" prepend=" ORDER BY">
+				T4.$SORT$
+				$ORDER$,T4.CONSULT_POOL_ID DESC
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<!--显示当前 -->
+	<sql id="searchListZwCurrent">
+        <![CDATA[
+            SELECT T1.CONSULT_POOL_ID,
+            TO_CHAR(T1.REGIST_DATE, 'YYYY-MM-DD') REGIST_DATE,
+            T1.CUSTOMER_NAME,
+            T1.RESIDENCEADDRESS,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultBorrowing'
+            AND T3.CODE_KEY = T1.BORROWING) BORROWING,
+            TO_CHAR(T1.CONSULTMONEY, '9990.00') CONSULTMONEY,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultInfoSource'
+            AND T3.CODE_KEY = T1.CHANNEL) CHANNEL,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'inquirePoolConsultWay'
+            AND T3.CODE_KEY = T1.CONSULTWAY) CONSULTWAY,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultStatus'
+            AND T3.CODE_KEY = T1.MARKET_CONSULT_STATE) MARKET_CONSULT_STATE,
+            T1.CREATER,
+            TO_CHAR(T1.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE,
+            T2.CONSULTtIMES,
+            T1.MOBILE_PHONE,
+            T1.CONSULTWAY CONSULTWAYCODE,
+            T1.MARKET_CONSULT_STATE MARKETCONSULTSTATECODE,
+            TO_CHAR(T1.DISTRIBUTION_DATE, 'YYYY-MM-DD') DISTRIBUTEDATE,
+            T1.PROVINCE,
+            T1.CITY,
+            T1.AREA,
+            T1.DISTRIBUTE_DEPARTMENT_NAME DISTRIBUTEDEPARTMENTNAME,
+            T1.MARKET_CONSULT_STATE STATECODE
+            FROM (SELECT *
+            FROM (SELECT RANK() OVER(PARTITION BY ccp.MOBILE_PHONE ORDER BY ccp.CREATE_DATE DESC, ccp.REGIST_DATE DESC, ccp.CONSULT_POOL_ID DESC) R,
+            ccp.*
+            FROM RL_CUSTOMER_CONSULT_POOL ccp) ccp
+            WHERE R = 1) T1
+            INNER JOIN (SELECT MAX(CONSULT_POOL_ID) POOLID, COUNT(*) CONSULTtIMES
+            FROM RL_CUSTOMER_CONSULT_POOL
+            GROUP BY MOBILE_PHONE) T2
+            ON T1.CONSULT_POOL_ID = T2.POOLID
+            WHERE 1 = 1
+        ]]>
+	</sql>
+
+	<!--显示所有 -->
+	<sql id="searchListZwAll">
+        <![CDATA[
+            SELECT T1.CONSULT_POOL_ID,
+            TO_CHAR(T1.REGIST_DATE, 'YYYY-MM-DD') REGIST_DATE,
+            T1.CUSTOMER_NAME,
+            T1.RESIDENCEADDRESS,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultBorrowing'
+            AND T3.CODE_KEY = T1.BORROWING) BORROWING,
+            TO_CHAR(T1.CONSULTMONEY, '9990.00') CONSULTMONEY,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultInfoSource'
+            AND T3.CODE_KEY = T1.CHANNEL) CHANNEL,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'inquirePoolConsultWay'
+            AND T3.CODE_KEY = T1.CONSULTWAY) CONSULTWAY,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'marketConsultStatus'
+            AND T3.CODE_KEY = T1.MARKET_CONSULT_STATE) MARKET_CONSULT_STATE,
+            T1.CREATER,
+            TO_CHAR(T1.CREATE_DATE, 'YYYY-MM-DD HH24:MI:SS') CREATE_DATE,
+            T1.MOBILE_PHONE,
+            T1.CONSULTWAY CONSULTWAYCODE,
+            T1.MARKET_CONSULT_STATE MARKETCONSULTSTATECODE,
+            TO_CHAR(T1.DISTRIBUTION_DATE, 'YYYY-MM-DD') DISTRIBUTEDATE,
+            T1.PROVINCE,
+            T1.CITY,
+            T1.AREA,
+            T1.DISTRIBUTE_DEPARTMENT_NAME DISTRIBUTEDEPARTMENTNAME,
+            (SELECT 1 FROM DUAL) CONSULTtIMES,
+            T1.MARKET_CONSULT_STATE STATECODE
+            FROM RL_CUSTOMER_CONSULT_POOL T1
+            WHERE 1 = 1
+        ]]>
+	</sql>
+
+	<!--查看详情 -->
+	<sql id="selectDetailSqlZw">
+        <![CDATA[
+          SELECT *
+  FROM (SELECT *
+          FROM (SELECT T1.CONSULT_POOL_ID,
+                       TO_CHAR(T1.REGIST_DATE, 'YYYY-MM-DD') REGIST_DATE,
+                       T1.CUSTOMER_NAME,
+                       (SELECT T2.CODE_VALUE
+                          FROM RL_CODETABLE T2
+                         WHERE T2.SECTION = 'marketConsultStatus'
+                           AND T2.CODE_KEY = T1.MARKET_CONSULT_STATE) MARKET_CONSULT_STATE,
+                       (SELECT T2.CODE_VALUE
+                          FROM RL_CODETABLE T2
+                         WHERE T2.SECTION = 'acceptConsultState'
+                           AND T2.CODE_KEY = T1.ACCEPT_CONSULT_STATE) ACCEPT_CONSULT_STATE,
+                       (SELECT T2.CODE_VALUE
+                          FROM RL_CODETABLE T2
+                         WHERE T2.SECTION = 'gender'
+                           AND T2.CODE_KEY = T1.CON_SEX) CON_SEX,
+                       T1.CON_AGE,
+                       T1.RESIDENCEADDRESS RESIDENCE_ADDRESS,
+                       TO_CHAR(T1.CONSULTMONEY, '9990.00') CONSULTMONEY,
+                       (SELECT T2.CODE_VALUE
+                          FROM RL_CODETABLE T2
+                         WHERE T2.SECTION = 'marketConsultBorrowing'
+                           AND T2.CODE_KEY = T1.BORROWING) BORROWING,
+                       (SELECT T2.CODE_VALUE
+                          FROM RL_CODETABLE T2
+                         WHERE T2.SECTION = 'marketConsultInfoSource'
+                           AND T2.CODE_KEY = T1.CHANNEL) INFOSRC,
+                       (SELECT T3.CODE_VALUE
+                          FROM RL_CODETABLE T3
+                         WHERE T3.SECTION = 'inquirePoolConsultWay'
+                           AND T3.CODE_KEY = T1.CONSULTWAY) CONSULTWAY,
+                       (SELECT T3.CODE_VALUE
+                          FROM RL_CODETABLE T3
+                         WHERE T3.SECTION = 'traceStatus'
+                           AND T3.CODE_KEY = T1.TRACE_STATUS) TRACESTATUS,
+                       (SELECT COUNT(T.CONSULT_POOL_ID)
+                          FROM RL_CUSTOMER_CONSULT_POOL T
+                         WHERE T.MOBILE_PHONE = T1.MOBILE_PHONE
+                         GROUP BY T.MOBILE_PHONE) CONSULTTIMES,
+                       T1.MARKET_CONSULT_REMARK,
+                       T4.OPERATOR,
+                       T4.ROLLBACK_REASON,
+                       T1.CUSTOMER_TAG,
+                       T1.MOBILE_PHONE,
+                       T1.COMMUNICATION_RECORD
+                  FROM RL_CUSTOMER_CONSULT_POOL T1
+                  LEFT JOIN (SELECT T7.CONSULT_POOL_ID AS CONSULT_POOL_ID,
+                                   T7.OPERATOR        AS OPERATOR,
+                                   T7.ROLLBACK_REASON AS ROLLBACK_REASON
+                              FROM RL_ACCEPT_CONSULT_ROLLBACK T7
+                             WHERE T7.ACCEPT_CONSULT_ROLLBACK_ID =
+                                   (SELECT MAX(ACR.ACCEPT_CONSULT_ROLLBACK_ID)
+                                      FROM RL_ACCEPT_CONSULT_ROLLBACK ACR
+                                     WHERE ACR.APPLY_OPERATOR = '0'
+                                       AND ACR.CONSULT_POOL_ID =
+                                           T7.CONSULT_POOL_ID
+                                     GROUP BY ACR.CONSULT_POOL_ID)) T4
+                  ON T1.CONSULT_POOL_ID = T4.CONSULT_POOL_ID ORDER BY T1.CONSULT_POOL_ID DESC)) T1
+         WHERE 1 = 1
+       ]]>
+	</sql>
+	<select id="selectDetailZw" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		<include refid="selectDetailSqlZw" />
+		<dynamic prepend=" AND">
+			<isEqual property="type" compareValue="phone">
+				T1.MOBILE_PHONE =
+				#objId#
+            </isEqual>
+			<isEqual property="type" compareValue="primaryKeyId">
+				T1.CONSULT_POOL_ID =
+				#objId#
+            </isEqual>
+			<isNotEmpty property="SORT" prepend=" ORDER BY">
+				T1.$SORT$ $ORDER$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="selectDetailCountZw" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		select count (*) from (
+		<include refid="selectDetailSqlZw" />
+		<dynamic prepend=" AND">
+			<isEqual property="type" compareValue="phone">
+				T1.MOBILE_PHONE =
+				#objId#
+            </isEqual>
+			<isEqual property="type" compareValue="primaryKeyId">
+				T1.CONSULT_POOL_ID =
+				#objId#
+            </isEqual>
+			<isNotEmpty property="SORT" prepend=" ORDER BY">
+				T1.$SORT$ $ORDER$
+			</isNotEmpty>
+		</dynamic>
+		)
+	</select>
+
+	<select id="selectPagnationList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		<include refid="query_sale_inquire_list" />
+	</select>
+	<select id="selectPagnationListCount" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		select count (*) from (
+		<include refid="query_sale_inquire_list" />
+		)
+	</select>
+
+	<select id="SelectPagnationListZw" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		<include refid="searchListZw" />
+	</select>
+	<select id="SelectPagnationListCountZw" parameterClass="java.util.HashMap"
+		resultClass="java.lang.Integer">
+		select count (*) from (
+		<include refid="searchListZw" />
+		)
+	</select>
+
+
+	<resultMap class="com.creditease.rc.domain.CustomerConsultPool"
+		id="selectTeamDepartmentResult">
+		<result column="DISTRIBUTE_DEPARTMENT_ID" jdbcType="VARCHAR"
+			property="distributeDepartmentId" />
+		<result column="CITY" jdbcType="VARCHAR" property="city" />
+	</resultMap>
+	<select id="selectTeamDepartment" parameterClass="long"
+		resultMap="selectTeamDepartmentResult">
+		select mcrp.team_department_id as TEAMDEPARTMENT_ID,
+		mcrp.city as CITY
+		from MFC_COMPACT_RULE_PREFIX mcrp
+		where mcrp.on_off =
+		'Y'
+		and mcrp.city = (select mccp.city
+		from mfc_customer_consult_pool
+		mccp
+		where mccp.consult_pool_id = #consult_pool_id:DECIMAL#)
+	</select>
+
+	<select id="selectDistributeCity" parameterClass="String"
+		resultClass="String">
+		select city
+		from MFC_COMPACT_RULE_PREFIX
+		where on_off = 'Y'
+		and team_department_id = #distributeDepartmentId:VARCHAR#
+	</select>
+
+	<select id="selectTeamDepartmentId" parameterClass="String"
+		resultClass="String">
+		select t.team_department_id
+		from MFC_COMPACT_RULE_PREFIX t
+		where t.on_off = 'Y'
+		and t.team_department_id =
+		#distributeDepartmentId:VARCHAR#
+	</select>
+
+	<!-- 查询 -->
+	<select id="selectCustomerConsultPoolVo" parameterClass="CustomerConsultPoolVo"
+		resultClass="CustomerConsultPoolVo">
+		select
+		CCP.CONSULT_POOL_ID as consultPoolId,
+		CCP.CUSTOMER_NAME as
+		customerName,
+		CCP.CON_SEX as
+		conSex,
+		CCP.CON_AGE as conAge,
+		CCP.PROVINCE
+		as province,
+		CCP.CITY as
+		city,
+		CCP.AREA as area,
+		CCP.MOBILE_PHONE as mobilePhone,
+		CCP.IS_BUSINESS_LICENSE as isBusinessLicense,
+		CCP.CHANNEL
+		as channel,
+		CCP.MARKET_CONSULT_REMARK as marketConsultRemark,
+		CCP.REGIST_DATE as
+		registDate,
+		CCP.DISTRIBUTION_DATE as
+		distributionDate,
+		CCP.MARKET_CONSULT_STATE as marketConsultState,
+		CCP.FEEDBACK_RESULT as
+		feedbackResult,
+		CCP.DISTRIBUTE_DEPARTMENT_ID as
+		distributeDepartmentId,
+		CCP.DISTRIBUTE_DEPARTMENT_NAME as
+		distributeDepartmentName,
+		CCP.RECEIVE_DATE as receiveDate,
+		CCP.SENT_DATE as sentDate,
+		CCP.ACCEPT_CONSULT_STATE as
+		acceptConsultState,
+
+		CCP.COMMUNICATION_RECORD as communicationRecord,
+		CCP.LOAN_OFFICER_NAME
+		as
+		loanOfficerName,
+		CCP.LOAN_OFFICER_ID as
+		loanOfficerId,
+		CCP.FEEDBACK_DATE as feedbackDate,
+		CCP.OPERATE_DATE as operateDate,
+		CCP.OPERATOR as operator
+
+		/*decode(CCP.MARKET_CONSULT_STATE,'1',ACR.OPERATOR,'') as
+		operatorReturn,
+		decode(CCP.MARKET_CONSULT_STATE,'1',ACR.ROLLBACK_REASON,'') as
+		rollbackReason,
+
+		(SELECT NS.CITY_NAME FROM MFC_NATIONAL_STANDARD NS
+		WHERE NS.CITY_CODE = CCP.CITY ) cityShow,
+		(SELECT NS.CITY_NAME FROM
+		MFC_NATIONAL_STANDARD NS WHERE NS.CITY_CODE = CCP.PROVINCE ) || ' ' ||
+		(SELECT NS.CITY_NAME FROM MFC_NATIONAL_STANDARD NS WHERE NS.CITY_CODE
+		= CCP.CITY ) || ' ' ||
+		(SELECT NS.CITY_NAME FROM MFC_NATIONAL_STANDARD
+		NS WHERE NS.CITY_CODE = CCP.AREA ) cityAllShow,
+		(SELECT C.CODE_VALUE
+		FROM MFC_CODETABLE C WHERE C.CODE_KEY = CCP.CHANNEL AND C.SECTION =
+		'infoSource')
+		channelShow,
+		(SELECT C.CODE_VALUE FROM MFC_CODETABLE C
+		WHERE C.CODE_KEY = CCP.CON_SEX AND C.SECTION = 'sex') conSexShow,
+		(SELECT
+		C.CODE_VALUE FROM MFC_CODETABLE C WHERE
+		C.CODE_KEY =
+		CCP.IS_BUSINESS_LICENSE AND C.SECTION =
+		'isBusinessLicense')
+		isBusinessLicenseShow,
+		(SELECT C.CODE_VALUE FROM
+		MFC_CODETABLE C WHERE
+		C.CODE_KEY =
+		CCP.ACCEPT_CONSULT_STATE AND
+		C.SECTION =
+		'acceptConsultStatus') acceptConsultStateShow,
+		CASE WHEN
+		CCP.MARKET_CONSULT_STATE IN ('4', '5','6','7') THEN (SELECT
+		C.CODE_VALUE FROM MFC_CODETABLE C WHERE
+		C.CODE_KEY =
+		CCP.MARKET_CONSULT_STATE AND C.SECTION = 'saleConsultStatus')
+		ELSE ('')
+		END saleConsultStatusShowUnless,
+		(SELECT C.CODE_VALUE FROM
+		MFC_CODETABLE C WHERE C.CODE_KEY = CCP.FEEDBACK_RESULT AND C.SECTION =
+		'acceptConsultStatus_'||CCP.MARKET_CONSULT_STATE) feedbackResultShow*/
+
+		FROM RL_CUSTOMER_CONSULT_POOL CCP
+		/*LEFT JOIN
+		MFC_ACCEPT_CONSULT_ROLLBACK ACR
+		ON ACR.CONSULT_POOL_ID =
+		CCP.CONSULT_POOL_ID
+		and ACR.HISTORY_FLAG = '0'*/
+		WHERE 1=1
+		<dynamic prepend="and">
+			<isNotEmpty property="consultPoolId" prepend="and">
+				CCP.CONSULT_POOL_ID = #consultPoolId#
+            </isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 查询还没有自动分配的客户咨询 -->
+	<select id="selectNotAutoDistributeConsult" parameterClass="com.creditease.rc.domain.CustomerConsultPool"
+		resultMap="CustomerConsultPoolMap">
+		select CONSULT_POOL_ID, CUSTOMER_NAME,
+		CON_SEX, CON_AGE,
+		PROVINCE, CITY,
+		AREA, MOBILE_PHONE,
+		IS_BUSINESS_LICENSE,
+		CHANNEL,
+		MARKET_CONSULT_REMARK, REGIST_DATE, DISTRIBUTION_DATE,
+		MARKET_CONSULT_STATE,
+		FEEDBACK_RESULT, DISTRIBUTE_DEPARTMENT_ID,
+		DISTRIBUTE_DEPARTMENT_NAME, MARKET_CONSULT_REGIST_TYPE,
+		RECEIVE_DATE,
+		SENT_DATE, ACCEPT_CONSULT_STATE,
+		COMMUNICATION_RECORD,
+		LOAN_OFFICER_NAME, LOAN_OFFICER_ID,
+		FEEDBACK_DATE, OPERATE_DATE, OPERATOR,
+		DEPARTMENT_ID,DEPARTMENT_NAME,AREA_DEPARTMENT_ID,AREA_DEPARTMENT_NAME,CITY_DEPARTMENT_ID,CITY_DEPARTMENT_NAME,
+		SALES_DEPARTMENT_MANAGER_ID,SALES_DEPARTMENT_MANAGER_NAME
+		from
+		RL_CUSTOMER_CONSULT_POOL
+		where MARKET_CONSULT_STATE in ( '0' , '1' )
+	</select>
+
+	<select id="selectTeamDepartmentIdByCity" parameterClass="String"
+		resultClass="String">
+		select t.team_department_id
+		from MFC_COMPACT_RULE_PREFIX t
+		where t.on_off = 'Y'
+		and t.city = #city:VARCHAR#
+	</select>
+
+	<!-- 咨询池 where 条件 -->
+	<select id="selectCustomerConsultPool" parameterClass="customerConsultPool"
+		resultMap="CustomerConsultPoolMap">
+		select * from RL_CUSTOMER_CONSULT_POOL co
+
+		WHERE
+		co.consult_pool_id= #consultPoolId:LONG#
+  		</select>
+
+	<resultMap id="selectTeamDepartmentByAreaResult" class="com.creditease.rc.domain.CompactRulePrefix">
+		<result column="TEAM_DEPARTMENT_ID" property="teamDepartmentId"
+			jdbcType="VARCHAR" />
+		<result column="TEAM_DEPARTMENT_NAME" property="teamDepartmentName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectTeamDepartmentByArea" parameterClass="String"
+		resultMap="selectTeamDepartmentByAreaResult">
+		select t.team_department_id as TEAM_DEPARTMENT_ID,
+		t.team_department_name as TEAM_DEPARTMENT_NAME
+		from
+		MFC_COMPACT_RULE_PREFIX t
+		where t.on_off = 'Y'
+		and t.area =
+		#area:VARCHAR#
+	</select>
+
+	<resultMap id="selectTeamDepartmentByCityResult" class="com.creditease.rc.domain.CompactRulePrefix">
+		<result column="TEAM_DEPARTMENT_ID" property="teamDepartmentId"
+			jdbcType="VARCHAR" />
+		<result column="TEAM_DEPARTMENT_NAME" property="teamDepartmentName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectTeamDepartmentByCity" parameterClass="String"
+		resultMap="selectTeamDepartmentByCityResult">
+		select t.team_department_id as TEAM_DEPARTMENT_ID,
+		t.team_department_name as TEAM_DEPARTMENT_NAME
+		from
+		MFC_COMPACT_RULE_PREFIX t
+		where t.on_off = 'Y'
+		and t.city =
+		#city:VARCHAR#
+	</select>
+
+	<resultMap class="com.creditease.rc.domain.CustomerConsultPool"
+		id="selectSequenceTeamDepartmentListResult">
+		<result column="DISTRIBUTE_DEPARTMENT_ID" jdbcType="VARCHAR"
+			property="distributeDepartmentId" />
+		<result column="DISTRIBUTE_DEPARTMENT_NAME" jdbcType="VARCHAR"
+			property="distributeDepartmentName" />
+	</resultMap>
+	<select id="selectSequenceTeamDepartmentListByArea"
+		parameterClass="String" resultMap="selectSequenceTeamDepartmentListResult">
+		select
+		t.teamdepartment_id as
+		teamdepartment_id,
+		t.teamdepartment_name as teamdepartment_name
+		from
+		RL_CUSTOMER_CONSULT_POOL t
+		where t.area = #area:VARCHAR#
+		group by
+		t.distributeDepartmentId, t.distributeDepartmentName
+		order by
+		count(t.teamdepartment_id) asc
+	</select>
+
+	<!-- 罗红杰 更新营销咨询状态 为“已退回” -->
+	<update id="updateMarkintStatus" parameterClass="java.lang.Long">
+		update
+		RL_CUSTOMER_CONSULT_POOL set MARKET_CONSULT_STATE='1' where
+		CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+  </update>
+	<!-- 更新受理咨询状态 为“待退回确认” -->
+	<update id="updateAcceptConsultState" parameterClass="java.lang.Long">
+		update
+		RL_CUSTOMER_CONSULT_POOL set ACCEPT_CONSULT_STATE='3' where
+		CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+  </update>
+	<!-- 更新受理咨询状态 为“待分件” -->
+	<update id="updateAcceptConsultStatusCancel" parameterClass="java.lang.Long">
+		update RL_CUSTOMER_CONSULT_POOL set ACCEPT_CONSULT_STATE='0' where
+		CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+  </update>
+	<!-- 受理咨询信息查看 -->
+	<select id="showAcceptAdviceInfo" parameterClass="customerConsultPool"
+		resultClass="customerConsultPool">
+		select ccp.consult_pool_id as consultPoolId,
+		ccp.customer_name as customerName,
+		ccp.mobile_phone as mobilePhone
+		from
+		RL_CUSTOMER_CONSULT_POOL ccp
+		where ccp.consult_pool_id = #consultPoolId#
+
+	</select>
+
+	<!-- 查询咨询池所有的属性 -->
+	<sql id="select-pool">
+		select CONSULT_POOL_ID, CUSTOMER_NAME,
+		CON_SEX,
+		CON_AGE,
+		PROVINCE, CITY,
+		AREA, MOBILE_PHONE,
+		IS_BUSINESS_LICENSE,
+		CHANNEL,
+		MARKET_CONSULT_REMARK, REGIST_DATE, DISTRIBUTION_DATE,
+		MARKET_CONSULT_STATE,
+		FEEDBACK_RESULT, DISTRIBUTE_DEPARTMENT_ID,
+		DISTRIBUTE_DEPARTMENT_NAME, MARKET_CONSULT_REGIST_TYPE,
+		RECEIVE_DATE,
+		SENT_DATE, ACCEPT_CONSULT_STATE,
+		COMMUNICATION_RECORD,
+		LOAN_OFFICER_NAME, LOAN_OFFICER_ID,
+		FEEDBACK_DATE, OPERATE_DATE, OPERATOR ,CREATER,CREATE_DATE,
+		DEPARTMENT_ID,DEPARTMENT_NAME,AREA_DEPARTMENT_ID,AREA_DEPARTMENT_NAME,CITY_DEPARTMENT_ID,CITY_DEPARTMENT_NAME,
+		SALES_DEPARTMENT_MANAGER_ID,SALES_DEPARTMENT_MANAGER_NAME
+		from
+		RL_CUSTOMER_CONSULT_POOL
+	</sql>
+
+
+	<!-- 查询一个月之前的所有手机号 -->
+	<select id="selectMoilePhonebyDate" resultClass="String"
+		parameterClass="String">
+
+
+
+		select distinct mobile_phone from
+		RL_CUSTOMER_CONSULT_POOL where
+		CREATE_DATE
+		between
+		to_date(#serviceTime#,'yyyy-mm-dd hh24:mi:ss')-30 and
+		to_date(#serviceTime#,'yyyy-mm-dd hh24:mi:ss') and SCRAP_FLAG='0'
+	</select>
+	<!-- 自动分配的客户咨询 状态=0：待分配，2：无营业网点 规则 -->
+	<!-- 查询无城市网点的所有咨询池数据 -->
+	<select id="selectConsultPoolByNoTeamDepartmentId" resultMap="CustomerConsultPoolMap">
+		<include refid="select-pool" />
+		P
+		where 1=1 and P.MARKET_CONSULT_STATE in('0','2')
+		and P.CITY is not
+		null AND P.CITY NOT IN (SELECT c.city from mfc_compact_rule_prefix c
+		where c.on_off = 'Y'
+		group by c.city)
+	</select>
+
+	<!-- 咨询池中 选择了“区/县”， -->
+	<select id="selectByAreaIsNotNull" resultMap="CustomerConsultPoolMap"
+		parameterClass="java.lang.String">
+		<include refid="select-pool" />
+		P
+		where 1=1 and P.MARKET_CONSULT_STATE in('0','2') AND P.CITY is not
+		null and P.AREA is not null
+		and P.AREA =#area:VARCHAR#
+
+	</select>
+
+	<!-- 没有选择“区/县”，选择城市 -->
+	<select id="selectByCityIsNotNull" resultMap="CustomerConsultPoolMap"
+		parameterClass="java.lang.String">
+		<include refid="select-pool" />
+		P
+		where 1=1 and P.MARKET_CONSULT_STATE in('0','2') and P.AREA is null
+		AND P.CITY is not null
+		and P.CITY =#city:VARCHAR#
+	</select>
+	<!-- 根据咨询id，查询咨询池信息 -->
+	<select id="selectByForeignKey" parameterClass="com.creditease.rc.domain.CustomerConsultPool"
+		resultMap="CustomerConsultPoolMap">
+		select CONSULT_POOL_ID, CUSTOMER_NAME,
+		CON_SEX, CON_AGE,
+		PROVINCE, CITY,
+		AREA, MOBILE_PHONE,
+		IS_BUSINESS_LICENSE,
+		CHANNEL,
+		MARKET_CONSULT_REMARK, REGIST_DATE, DISTRIBUTION_DATE,
+		MARKET_CONSULT_STATE,
+		FEEDBACK_RESULT, DISTRIBUTE_DEPARTMENT_ID,
+		DISTRIBUTE_DEPARTMENT_NAME, MARKET_CONSULT_REGIST_TYPE,
+		RECEIVE_DATE,
+		SENT_DATE, ACCEPT_CONSULT_STATE,
+		COMMUNICATION_RECORD,
+		LOAN_OFFICER_NAME, LOAN_OFFICER_ID,
+		FEEDBACK_DATE, OPERATE_DATE, OPERATOR,
+		DEPARTMENT_ID,DEPARTMENT_NAME,AREA_DEPARTMENT_ID,AREA_DEPARTMENT_NAME,CITY_DEPARTMENT_ID,CITY_DEPARTMENT_NAME,
+		SALES_DEPARTMENT_MANAGER_ID,SALES_DEPARTMENT_MANAGER_NAME
+		from
+		RL_CUSTOMER_CONSULT_POOL
+  </select>
+
+	<!-- 根据区县进行分组 -->
+	<select id="selectGroupByArea" resultClass="java.lang.String">
+		select p.area
+		from
+		RL_CUSTOMER_CONSULT_POOL P
+		where 1=1 and P.MARKET_CONSULT_STATE
+		in('0','2') and P.AREA is not null
+		group by p.area
+	</select>
+
+	<!-- 根据城市进行分组 -->
+	<select id="selectGroupByCity" resultClass="java.lang.String">
+		select p.city
+		from
+		RL_CUSTOMER_CONSULT_POOL P
+		where 1=1 and P.MARKET_CONSULT_STATE
+		in('0','2') and P.AREA is null AND P.CITY is not null
+		group by p.city
+	</select>
+
+	<!-- 根据状态的id查询中文名称 -->
+	<select id="selectValueByStatus" parameterClass="java.util.HashMap"
+		resultClass="string">
+		select ct.code_value
+		from MFC_CODETABLE ct
+		where ct.code_key
+		= #marketConsultState:VARCHAR# AND ct.SECTION = #section:VARCHAR#
+	</select>
+
+	<update id="updateByPrimaryKey" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		update
+		RL_CUSTOMER_CONSULT_POOL
+		CUSTOMER_NAME = #customerName:VARCHAR#,
+		CON_SEX = #conSex:VARCHAR#,
+		CON_AGE = #conAge:DECIMAL#,
+		PROVINCE =
+		#province:VARCHAR#,
+		CITY = #city:VARCHAR#,
+		AREA = #area:VARCHAR#,
+		MOBILE_PHONE = #mobilePhone:VARCHAR#,
+		IS_BUSINESS_LICENSE =
+		#isBusinessLicense:VARCHAR#,
+		CHANNEL = #channel:VARCHAR#,
+		MARKET_CONSULT_REMARK = #marketConsultRemark:VARCHAR#,
+		REGIST_DATE =
+		#registDate:TIMESTAMP#,
+		DISTRIBUTION_DATE =
+		#distributionDate:TIMESTAMP#,
+		MARKET_CONSULT_STATE =
+		#marketConsultState:VARCHAR#,
+		FEEDBACK_RESULT =
+		#feedbackResult:VARCHAR#,
+		DISTRIBUTE_DEPARTMENT_ID =
+		#distributeDepartmentId:VARCHAR#,
+		DISTRIBUTE_DEPARTMENT_NAME =
+		#distributeDepartmentName:VARCHAR#,
+		MARKET_CONSULT_REGIST_TYPE =
+		#marketConsultRegistType:VARCHAR#,
+		RECEIVE_DATE =
+		#receiveDate:TIMESTAMP#,
+		SENT_DATE = #sentDate:TIMESTAMP#,
+		ACCEPT_CONSULT_STATE = #acceptConsultState:VARCHAR#,
+		COMMUNICATION_RECORD = #communicationRecord:VARCHAR#,
+		LOAN_OFFICER_NAME = #loanOfficerName:VARCHAR#,
+		LOAN_OFFICER_ID =
+		#loanOfficerId:DECIMAL#,
+		FEEDBACK_DATE = #feedbackDate:TIMESTAMP#,
+		OPERATE_DATE = #operateDate:TIMESTAMP#,
+		OPERATOR = #operator:VARCHAR#,
+		DEPARTMENT_ID=#departmentId:VARCHAR#,
+		DEPARTMENT_NAME=#departmentName:VARCHAR#,
+		AREA_DEPARTMENT_ID=#areaDepartmentId:VARCHAR#,
+		AREA_DEPARTMENT_NAME=#areaDepartmentName:VARCHAR#,
+		CITY_DEPARTMENT_ID=#cityDepartmentId:VARCHAR#,
+		CITY_DEPARTMENT_NAME=#cityDepartmentName:VARCHAR#,
+		SALES_DEPARTMENT_MANAGER_ID=#salesDepartmentManagerId:VARCHAR#,
+		SALES_DEPARTMENT_MANAGER_NAME=#salesDepartmentManagerName:VARCHAR#
+		where CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+  </update>
+
+	<!--编辑营销咨询-保存 -->
+	<update id="updateByPrimaryKeyZw" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		update RL_CUSTOMER_CONSULT_POOL
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="registDate">
+				REGIST_DATE =
+				#registDate:DATE#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="customerName">
+				CUSTOMER_NAME =
+				#customerName:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="conSex">
+				CON_SEX =
+				#conSex:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="conAge">
+				CON_AGE =
+				#conAge:DECIMAL#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="mobilePhone">
+				MOBILE_PHONE =
+				#mobilePhone:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="consultWay">
+				CONSULTWAY =
+				#consultWay:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="borrowing">
+				BORROWING =
+				#borrowing:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="consultMoney">
+				CONSULTMONEY =
+				#consultMoney:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="channel">
+				CHANNEL =
+				#channel:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="province">
+				PROVINCE =
+				#province:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="city">
+				CITY = #city:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="area">
+				AREA = #area:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="residenceAddress">
+				RESIDENCEADDRESS =
+				#residenceAddress:VARCHAR#
+            </isNotEmpty>
+			<isNotNull prepend="," property="marketConsultRemark">
+				MARKET_CONSULT_REMARK =
+				#marketConsultRemark:VARCHAR#
+            </isNotNull>
+			<isNotEmpty prepend="," property="marketConsultState">
+				MARKET_CONSULT_STATE =
+				#marketConsultState:VARCHAR#
+            </isNotEmpty>
+			<isNotEmpty prepend="," property="customerTag">
+				CUSTOMER_TAG =
+				#customerTag:VARCHAR#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="creater">
+                CREATER =
+				#creater:VARCHAR#
+            </isNotEmpty>
+                <![CDATA[
+                ,CREATE_DATE = sysdate
+                ]]>
+
+		</dynamic>
+		where CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+	</update>
+
+	<resultMap class="com.creditease.rc.domain.CustomerConsultPool"
+		id="needResult">
+		<result column="CONSULT_POOL_ID" jdbcType="DECIMAL" property="consultPoolId" />
+		<result column="ACCEPT_CONSULT_STATE" jdbcType="VARCHAR"
+			property="acceptConsultState" />
+		<result column="APPLICATION_STATUS" jdbcType="VARCHAR"
+			property="applicationStatus" />
+	</resultMap>
+	<select id="selectNeedData" resultMap="needResult">
+		select
+		mccp.CONSULT_POOL_ID,
+		mccp.ACCEPT_CONSULT_STATE,
+		ma.application_status
+		from RL_CUSTOMER_CONSULT_POOL mccp,
+		RL_CUSTOMER_CONSULT mcc,
+		RL_APPLICATION ma
+		and mccp.scrap_flag = '0'
+		and mcc.historyflag =
+		'0'
+
+	</select>
+	<!-- 更新营销咨询状态 为“已废弃” -->
+	<update id="updateScrapFlag" parameterClass="java.lang.Long">
+		update
+		RL_CUSTOMER_CONSULT_POOL set SCRAP_FLAG=1 where CONSULT_POOL_ID =
+		#consultPoolId:DECIMAL#
+  </update>
+
+	<!--根据营销咨询主键ID查询对应城市下营业部信息 -->
+	<select id="selectDepartmentInfoById" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+		SELECT T1.BRANCHOFFICE_ID,
+		T1.BRANCHOFFICE_NAME,
+		T1.PROVINCEHOME,
+		T1.CITYHOME,
+		T1.COUNTYHOME
+		FROM RL_PROTOCOL_PREFIX_MAPPING T1
+		WHERE T1.ON_OFF = 'Y'
+		AND T1.COUNTYHOME IN
+		(SELECT T2.AREA
+		FROM RL_CUSTOMER_CONSULT_POOL T2
+		WHERE T2.CONSULT_POOL_ID = #poolId#)
+    </select>
+
+	<!--分配营销咨询 -->
+	<update id="updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		UPDATE
+		RL_CUSTOMER_CONSULT_POOL
+		SET MARKET_CONSULT_STATE =
+		#marketConsultState:VARCHAR#,
+		DISTRIBUTION_DATE =
+		#distributionDate:TIMESTAMP#,
+		DISTRIBUTE_DEPARTMENT_ID =
+		#distributeDepartmentId:VARCHAR#,
+		DISTRIBUTE_DEPARTMENT_NAME =
+		#distributeDepartmentName:VARCHAR#,
+		DISTRIBUTE_OPERATION_FLAG =
+		#distributeOperationFlag:VARCHAR#,
+		ACCEPT_CONSULT_STATE = '0'
+        <isNotEmpty prepend="," property="creater">
+            CREATER =
+            #creater:VARCHAR#
+        </isNotEmpty>
+		WHERE
+		CONSULT_POOL_ID = #consultPoolId:DECIMAL#
+    </update>
+
+	<!--更新营销咨询操作权限标识 操作权限标识：0 可操作 1 禁止操作 -->
+	<update id="updateOperationFlag" parameterClass="com.creditease.rc.domain.CustomerConsultPool">
+		UPDATE
+		RL_CUSTOMER_CONSULT_POOL
+		SET DISTRIBUTE_OPERATION_FLAG = '1',
+		COMPONENT_OPERATION_FLAG = '1'
+		WHERE
+		MOBILE_PHONE IN
+		(SELECT
+		T1.MOBILE_PHONE
+		FROM RL_CUSTOMER_CONSULT_POOL T1
+		WHERE T1.CONSULT_POOL_ID
+		= #consultPoolId:DECIMAL#)
+    </update>
+
+	<!-- 以下为郝强上传 -->
+	<!-- 自动分配查询所有待分配和无营业网点的数据 -->
+	<select id="queryCustomerConsultPoolNeedDistribute" resultClass="customerConsultPool">
+		select ccp.consult_pool_id as consultPoolId,
+		ccp.area as area,
+		ccp.mobile_phone as mobilePhone,
+		ccp.market_consult_state as marketConsultState
+		from RL_CUSTOMER_CONSULT_POOL ccp
+		where
+		ccp.consult_pool_id in (select ccp.consult_pool_id
+		from (select rank()
+		over(partition by ccp.mobile_phone order by ccp.create_date desc,
+		ccp.regist_date desc, ccp.consult_pool_id desc) r,
+		ccp.*
+		from
+		RL_CUSTOMER_CONSULT_POOL ccp) ccp
+		where r = 1)
+		and
+		ccp.market_consult_state in ('0', '2')
+    </select>
+	<select id="queryDepartmentIdandCountMap" parameterClass="java.lang.String"
+		resultClass="java.util.HashMap">
+		select to_char(cp.distribute_department_id) as ID,
+		to_char(sum(cp.count)) as COUNT
+		from (select ccp.distribute_department_id as distribute_department_id,
+		1 as count
+		from RL_CUSTOMER_CONSULT_POOL ccp
+		where ccp.market_consult_state != '1'
+		and ccp.distribute_department_id is not null) cp
+		group by cp.distribute_department_id, cp.count
+    	
+    </select>
+	<update id="updateOperationFlagByPhone" parameterClass="java.lang.String">
+		update
+		RL_CUSTOMER_CONSULT_POOL ccp set ccp.distribute_operation_flag = '1'
+		where ccp.mobile_phone = #mobilePhone#
+    </update>
+	<select id="queryCustomerConsultPoolListByConsultPoolIds"
+		parameterClass="java.lang.String" resultMap="CustomerConsultPoolMap">
+		select * from
+		RL_CUSTOMER_CONSULT_POOL ccp where ccp.consult_pool_id in ($value$)
+	</select>
+	<update id="updateCustomerConsultPoolByListForDistributeOrders"
+		parameterClass="customerConsultPool">
+		update RL_CUSTOMER_CONSULT_POOL ccp
+		set
+		ccp.accept_consult_state = #acceptConsultState#,
+		ccp.component_operation_flag = #componentOperationFlag#,
+		ccp.sent_date = #sentDate#,
+		ccp.loan_officer_name = #loanOfficerName#,
+		ccp.loan_officer_id = #loanOfficerId#
+		where ccp.consult_pool_id = #consultPoolId#
+    </update>
+	<update id="updateComponentOperationFlagByPhone" parameterClass="java.lang.String">
+		update RL_CUSTOMER_CONSULT_POOL ccp set ccp.component_operation_flag =
+		'1' where ccp.mobile_phone = #mobilePhone#
+    </update>
+
+	<!--营销咨询-业务操作日志-保存 -->
+	<insert id="insertConsultPoolLog" parameterClass="consultLog">
+		<selectKey keyProperty="consultPoolDistributeId"
+			resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS
+			value from dual
+        </selectKey>
+		INSERT INTO RL_CONSULT_POOL_DISTRIBUTE
+		(CONSULT_POOL_DISTRIBUTE_ID,
+		BUSINESS_TYPE,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATE_DATE,
+		REMARK,
+		DISTRIBUTE_TYPE)
+		values
+		(#consultPoolDistributeId#,
+		#businessType#,
+		#operatorId#,
+		#operatorName#,
+		#operateDate#,
+		#remark#,
+		#distributeType#
+		)
+	</insert>
+
+	<!--营销咨询-业务操作日志详情-保存 -->
+	<insert id="insertConsultPoolLogDetail" parameterClass="consultLogDetail">
+		<selectKey keyProperty="consultPoolDisDetailId" resultClass="java.lang.Long"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+        </selectKey>
+		INSERT INTO RL_CONSULT_POOL_DIS_DETAIL
+		(CONSULT_POOL_DIS_DETAIL_ID,
+		CONSULT_POOL_DISTRIBUTE_ID,
+		DISTRIBUTE_DEPARMENT_ID,
+		DISTRIBUTE_DEPARMENT_NAME,
+		DISTRIBUTE_LOANOFFICER_ID,
+		DISTRIBUTE_LOANOFFICER_NAME,
+		CONSULT_POOL_ID)
+		values
+		(#consultPoolDisDetailId#,
+		#consultPoolDistributeId#,
+		#distributeDepartmentId#,
+		#distributeDepartmentName#,
+		#distributeLoanOfficerId#,
+		#distributeLoanOfficerName#,
+		#consultPoolId#
+		)
+	</insert>
+	<!-- 通过BorrowerServiceAppId查看咨询池 -->
+	<select id="queryCustomerConsultPoolByBorrowerServiceAppId"
+		parameterClass="java.lang.Integer" resultMap="CustomerConsultPoolMap">
+		select ccp.*
+		from RL_CUSTOMER_CONSULT_POOL ccp,
+		rl_credit_application ca,
+		rl_borrower_service_app bsa
+		where bsa.creditapplication_id =
+		ca.creditapplication_id
+		and ca.consult_pool_id = ccp.consult_pool_id
+		and bsa.borrower_service_app_id = #value#
+	</select>
+	<!-- 通过CreditapplicationId查看咨询池 -->
+	<select id="queryCustomerConsultPoolByCreditapplicationId"
+		parameterClass="java.lang.Long" resultMap="CustomerConsultPoolMap">
+		select ccp.*
+		from RL_CUSTOMER_CONSULT_POOL ccp, rl_credit_application ca
+		where ccp.consult_pool_id = ca.consult_pool_id
+		and ca.creditapplication_id = #value#
+	</select>
+	<!-- 将手里咨询状态改为已放款通过 CreditApplicationId -->
+	<update id="updateAcceptConsultStateByCreditApplicationId" parameterClass="java.lang.Integer">
+		update RL_CUSTOMER_CONSULT_POOL ccp set ccp.accept_consult_state = '7'
+		where ccp.consult_pool_id in
+		(select ccp.consult_pool_id
+		from RL_CUSTOMER_CONSULT_POOL ccp, rl_credit_application ca
+		where ccp.consult_pool_id = ca.consult_pool_id
+		and ca.creditapplication_id = #value#)
+	</update>
+</sqlMap>

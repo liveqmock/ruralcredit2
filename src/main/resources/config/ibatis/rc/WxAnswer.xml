@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXANSWER">
+	<resultMap id="wxAnswerMap" class="com.creditease.rc.domain.WxAnswer">
+		<result column="WX_ANSWER_ID" property="wxAnswerId" jdbcType="DECIMAL" />
+		<result column="WX_QUESTION_ID" property="wxQuestionId" jdbcType="DECIMAL" />
+		<result column="ANSWER" property="answer" jdbcType="VARCHAR" />
+		<result column="TRUE_FLAG" property="trueFlag" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxAnswerMap" parameterClass="com.creditease.rc.domain.WxAnswer">
+
+		from RL_WX_ANSWER
+		where WX_ANSWER_ID =
+		#wxAnswerId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxAnswer">
+		delete from RL_WX_ANSWER
+		where WX_ANSWER_ID = #wxAnswerId:DECIMAL#
+  </delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxAnswer">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxAnswerId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_ANSWER (WX_ANSWER_ID, WX_QUESTION_ID, ANSWER, TRUE_FLAG)
+		values (#wxAnswerId:DECIMAL#, #wxQuestionId:DECIMAL#, #answer:VARCHAR#,
+		#trueFlag:VARCHAR#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxAnswer">
+		update RL_WX_ANSWER
+		set WX_QUESTION_ID = #wxQuestionId:DECIMAL#,
+		ANSWER =
+		#answer:VARCHAR#,
+		TRUE_FLAG = #trueFlag:VARCHAR#
+		where WX_ANSWER_ID = #wxAnswerId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxAnswer">
+		update RL_WX_ANSWER
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="wxQuestionId">
+				WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="answer">
+				ANSWER = #answer:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="trueFlag">
+				TRUE_FLAG = #trueFlag:VARCHAR#
+      </isNotNull>
+		</dynamic>
+		where WX_ANSWER_ID = #wxAnswerId:DECIMAL#
+	</update>
+	<select id="queryAll" resultMap="wxAnswerMap">
+		select * from rl_wx_answer wa
+	</select>
+</sqlMap>

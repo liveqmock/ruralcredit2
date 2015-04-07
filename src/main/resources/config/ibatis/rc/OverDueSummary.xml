@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="overDueSummary">
+    <typeAlias alias="overDueSummaryDomain" type="com.creditease.rc.domain.OverDueSummary" />
+	<delete id="overDueSummary_truncate" parameterClass="overDueSummaryDomain">
+		     truncate table rl_overdue_summary
+    </delete>
+	<insert id="overDueSummary_insert" parameterClass="overDueSummaryDomain">
+		<selectKey resultClass="java.lang.Long" keyProperty="overDueSummaryId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+        </selectKey>
+        insert into rl_overdue_summary r (r.overdue_summaryid,r.creditapplication_id,r.aoverdue_count,
+        r.aoverdue_money,r.aoverdue_start,r.overdue_daycount,r.create_date,r.create_user,r.historyMax_OverDays)
+        values (#overDueSummaryId#,#creditApplicationId#,#aOverdueCount#,#aOverdueMoney#,#aOverdueStart#,#overdueDayCount#,#createDate#,#createUser#,#historyMaxOverDays#)
+	</insert>
+    <select id="getOverDueInfoByCreidtApplicationId" parameterClass="overDueSummaryDomain"    resultClass="overDueSummaryDomain">
+        select distinct  ca.creditapplication_id creditApplicationId,
+                          ov.aOverdueCount aOverdueCount,
+                          ov.aOverdueMoney aOverdueMoney,
+                          ov.aOverdueStart aOverdueStart
+                   from rl_credit_application ca
+                   join rl_laon_balance_data bd on ca.sys_guid = bd.sys_guid
+                 left  join (
+                        select odd.* from (
+                         select row_number() over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) rno,
+                          sum(decode(od.laon_balance_data_id,'','100',1)) over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) aOverdueCount,
+                          od.laon_balance_data_id,
+                          sum(od.odf_corpus+od.odf_interest+od.odf_overhead+od.odf_forfeit+od.odf_latefee)
+                          over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) aOverdueMoney,
+                          od.overduestart aOverdueStart
+                           from rl_overdue_data od ) odd where odd.rno = 1
+                   ) ov on ov.laon_balance_data_id = bd.laon_balance_data_id
+                   where ca.creditapplication_id =  #creditApplicationId#
+    </select>
+
+    <select id="getOverDueInfoBySysUUID" parameterClass="java.lang.String"    resultClass="overDueSummaryDomain">
+        select distinct  ca.creditapplication_id creditApplicationId,
+                          ov.aOverdueCount aOverdueCount,
+                          ov.aOverdueMoney aOverdueMoney,
+                          ov.aOverdueStart aOverdueStart
+                   from rl_credit_application ca
+                  left join rl_laon_balance_data bd on ca.sys_guid = bd.sys_guid
+                  left join (
+                        select odd.* from (
+                         select row_number() over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) rno,
+                          sum(decode(od.laon_balance_data_id,'','100',1)) over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) aOverdueCount,
+                          od.laon_balance_data_id,
+                          sum(od.odf_corpus+od.odf_interest+od.odf_overhead+od.odf_forfeit+od.odf_latefee)
+                          over(partition by od.laon_balance_data_id order by od.overdue_days desc nulls last) aOverdueMoney,
+                          od.overduestart aOverdueStart
+                           from rl_overdue_data od ) odd where odd.rno = 1
+                   ) ov on ov.laon_balance_data_id = bd.laon_balance_data_id
+                   where  ca.sys_guid = #sysUUID#
+    </select>
+
+    <select id="checkOverDueById" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+        SELECT count(1)
+        FROM RL_OVERDUE_SUMMARY
+        WHERE CREDITAPPLICATION_ID = #cid#
+    </select>
+</sqlMap>

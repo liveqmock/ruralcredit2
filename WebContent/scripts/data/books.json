@@ -1,0 +1,15 @@
+[{
+    "bookId":"1",
+    "bookName":"Struts2开发详解",
+    "author":"孙鑫",
+    "price":"79",
+    "press":"清华出版社",
+    "category":"计算机"                     
+},{
+    "bookId":"2",
+    "bookName":"Java Web 开发详解",
+    "author":"孙鑫",
+    "price":"55",
+    "press":"长江出版社",
+    "category":"计算机"      
+}]

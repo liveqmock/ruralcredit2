@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="familyotherincome">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="familyotherincome" type="com.creditease.rc.domain.Familyotherincome" />
+	<resultMap class="com.creditease.rc.domain.Familyotherincome" id="familyotherincomeMap">
+		<result column="FAMILY_OTHER_INCOME_ID" jdbcType="INTEGER" property="familyOtherIncomeId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="OTHER_INCOME_TYPE" jdbcType="CHAR" property="otherIncomeType" />
+		<result column="AMOUNT" jdbcType="DOUBLE" property="amount" />
+		<result column="QULITILY" jdbcType="VARCHAR" property="qulitily" />
+		<result column="PRICE" jdbcType="VARCHAR" property="price" />
+	</resultMap>
+	<sql id="byfamilyOtherIncomeIdCondition">
+        <![CDATA[
+           FAMILY_OTHER_INCOME_ID  = #familyOtherIncomeId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertfamilyotherincome" parameterClass="familyotherincome">
+		<selectKey keyProperty="familyOtherIncomeId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FAMILY_OTHER_INCOME (FAMILY_OTHER_INCOME_ID,BORROWER_SERVICE_APP_ID,OTHER_INCOME_TYPE,AMOUNT,QULITILY,PRICE)
+			values (#familyOtherIncomeId:INTEGER#, #borrowerServiceAppId:INTEGER#, #otherIncomeType:CHAR#, #amount:DOUBLE#, #qulitily:VARCHAR#, #price:VARCHAR#)
+		]]>
+	</insert>
+	<select id="selectfamilyotherincomeByBorrowerServiceAppId" parameterClass="int" resultMap="familyotherincomeMap">
+		<![CDATA[
+			select * 
+			from RL_FAMILY_OTHER_INCOME
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<update id="updatefamilyotherincomeByPrimaryKey" parameterClass="familyotherincome">
+		<![CDATA[
+			update RL_FAMILY_OTHER_INCOME
+			set 
+			OTHER_INCOME_TYPE = #otherIncomeType:CHAR#,
+			AMOUNT = #amount:DOUBLE#,
+			QULITILY = #qulitily:VARCHAR#,
+			PRICE = #price:VARCHAR#
+			where
+			FAMILY_OTHER_INCOME_ID = #familyOtherIncomeId:INTEGER#
+		]]>
+	</update>
+	<delete id="deletefamilyotherincomeByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_FAMILY_OTHER_INCOME
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			FAMILY_OTHER_INCOME_ID = #deleteFamilyotherincomeList[]#
+		</iterate>
+	</delete>
+</sqlMap>

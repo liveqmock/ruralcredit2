@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="IcpDerateServiceWSService" targetNamespace="http://service.server.ws.icp.creditease.com/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://service.server.ws.icp.creditease.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://service.server.ws.icp.creditease.com/" version="1.0" xmlns:tns="http://service.server.ws.icp.creditease.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="changeProposerIdNotice" type="tns:changeProposerIdNotice"/>
+<xs:element name="changeProposerIdNoticeResponse" type="tns:changeProposerIdNoticeResponse"/>
+<xs:complexType name="changeProposerIdNotice">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:derateProposerIdInfoNoticeReq"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="derateProposerIdInfoNoticeReq">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="derateProposerIdInfoNoticeDTOList" nillable="true" type="tns:derateProposerIdInfoNoticeDTO"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="derateProposerIdInfoNoticeDTO">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="afterPropId" type="xs:string"/>
+      <xs:element minOccurs="0" name="beforePropId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="changeProposerIdNoticeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:derateProposerIdInfoNoticeRes"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="derateProposerIdInfoNoticeRes">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codeInfo" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="changeProposerIdNotice">
+    <wsdl:part element="tns:changeProposerIdNotice" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeProposerIdNoticeResponse">
+    <wsdl:part element="tns:changeProposerIdNoticeResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IcpDerateServiceWS">
+    <wsdl:operation name="changeProposerIdNotice">
+      <wsdl:input message="tns:changeProposerIdNotice" name="changeProposerIdNotice">
+    </wsdl:input>
+      <wsdl:output message="tns:changeProposerIdNoticeResponse" name="changeProposerIdNoticeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="IcpDerateServiceWSServiceSoapBinding" type="tns:IcpDerateServiceWS">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="changeProposerIdNotice">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="changeProposerIdNotice">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="changeProposerIdNoticeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IcpDerateServiceWSService">
+    <wsdl:port binding="tns:IcpDerateServiceWSServiceSoapBinding" name="IcpDerateServiceWSPort">
+      <soap:address location="http://10.100.31.65:8080/ICPlatform/services/icpDerateServiceWS"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

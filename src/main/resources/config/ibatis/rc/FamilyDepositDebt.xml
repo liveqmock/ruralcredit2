@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="familydepositdebt">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="familydepositdebt" type="com.creditease.rc.domain.Familydepositdebt" />
+	<resultMap class="com.creditease.rc.domain.Familydepositdebt" id="familydepositdebtMap">
+		<result column="FAMILY_DEPOSIT_DEBT_ID" jdbcType="INTEGER" property="familyDepositDebtId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="DEPOSIT_DEBT_TYPE" jdbcType="CHAR" property="depositDebtType" />
+		<result column="BANK" jdbcType="VARCHAR" property="bank" />
+		<result column="AMOUNT" jdbcType="DOUBLE" property="amount" />
+	</resultMap>
+	<sql id="byfamilyDepositDebtIdCondition">
+        <![CDATA[
+           FAMILY_DEPOSIT_DEBT_ID  = #familyDepositDebtId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertIntofamilydepositdebt" parameterClass="familydepositdebt">
+		<selectKey keyProperty="familyDepositDebtId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FAMILY_DEPOSIT_DEBT (FAMILY_DEPOSIT_DEBT_ID,BORROWER_SERVICE_APP_ID,DEPOSIT_DEBT_TYPE,BANK,AMOUNT)
+			values (#familyDepositDebtId:INTEGER#, #borrowerServiceAppId:INTEGER#, #depositDebtType:CHAR#, #bank:VARCHAR#,#amount:DOUBLE#)
+		]]>
+	</insert>
+	<select id="selectfamilydepositdebtByBorrowerServiceAppId" parameterClass="int" resultMap="familydepositdebtMap">
+		<![CDATA[
+			select * 
+			from RL_FAMILY_DEPOSIT_DEBT
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<update id="updatefamilydepositdebtByPrimaryKey" parameterClass="familydepositdebt">
+		<![CDATA[
+			update RL_FAMILY_DEPOSIT_DEBT
+			set 
+			DEPOSIT_DEBT_TYPE = #depositDebtType:CHAR#,
+			BANK = #bank:VARCHAR#,
+			AMOUNT = #amount:DOUBLE#
+			where
+			FAMILY_DEPOSIT_DEBT_ID = #familyDepositDebtId:INTEGER#
+		]]>
+	</update>
+	<delete id="deletefamilydepositdebtByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_FAMILY_DEPOSIT_DEBT
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			FAMILY_DEPOSIT_DEBT_ID = #deleteFamilydepositdebtList[]#
+		</iterate>
+	</delete>
+</sqlMap>

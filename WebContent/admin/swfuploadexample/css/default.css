@@ -1,0 +1,58 @@
+﻿/* -----------------------------------------------
+	www.swfupload.org
+	Description: Common Screen Stylesheet for SWFUpload Demos
+	Updated on:  May 1, 2008
+----------------------------------------------- */
+
+
+/* ----------------------------------------------- 
+	GLOBAL RESET 
+   ----------------------------------------------- */
+
+.ziti{
+	margin:0;
+	padding:0;
+	line-height:1.5em;
+	font-family:"Times New Roman",Times,serif;
+	font-size:14px;
+	color:#000000;
+	font-weight:700
+}
+.uploadBar {
+	display:block;
+	width: 0px;
+	height: 5px;
+	border: solid 1px #445566;
+	background-color: blue;
+	overflow:hidden;
+}
+
+TR.uploadTR{color:#234245;height:22px;}
+TD.uploadTD{border-top: 1px dotted #CCCCCC}
+
+.uploadCancel {
+	border-bottom: solid 1px blue;
+	cursor:pointer;
+}
+.uploadFileList {
+	width: 90%;
+	height: 5px;
+	border: solid 1px #999999;
+}
+TR.uploadTitle{vertical-align: middle;font-weight:700;background-color: #CCCDDD;height:22px;color:#000000}
+
+.btn {
+	border-right: #7b9ebd 1px solid; 
+	padding-right: 2px; 
+	border-top: #7b9ebd 1px solid; 
+	padding-left: 2px; 
+	margin:2px;
+	font-size: 11px; 
+	
+	border-left: #7b9ebd 1px solid; 
+	cursor: pointer; 
+	color: #111; 
+	padding-top: 2px; 
+	border-bottom: #7b9ebd 1px solid;
+}
+

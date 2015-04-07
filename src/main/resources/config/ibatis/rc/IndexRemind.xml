@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="INDEXREMIND">
+	<typeAlias alias="auditRemind" type="com.creditease.rc.vo.AuditRemindVo" />
+	<typeAlias alias="countInfo" type="com.creditease.rc.vo.CountInfo" />
+	<typeAlias alias="creditapplicationView" type="com.creditease.rc.vo.CreditapplicationView" />
+	<typeAlias alias="investigation" type="com.creditease.rc.vo.InvestigationVo" />
+	<typeAlias alias="departmentCountInfo" type="com.creditease.rc.vo.DepartmentCountInfo" />
+	<!--查询审批提醒 -->
+	<select id="selectAuditRemind" resultClass="auditRemind"
+		parameterClass="creditApplication">
+		SELECT COUNT(AUDIT_STATUS) auditCount, AUDIT_STATUS auditStatus FROM (
+		SELECT DISTINCT T.CREDITAPPLICATION_ID,T.AUDIT_STATUS
+		FROM
+		RL_CREDIT_APPLICATION T, SID_VIEW V
+		WHERE T.VALID_STATE = '1'
+		<isNotEmpty prepend="AND" property="authList">
+			T.CREDITAPPLICATION_ID =
+			V.OBJECT_ID_IDENTITY
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN
+			($authList$)
+        </isNotEmpty>
+		)
+		GROUP BY AUDIT_STATUS
+		ORDER BY auditStatus
+	</select>
+	<!--查询风险单提醒 -->
+	<select id="selectInvestigatioRemind" resultClass="investigation"
+		parameterClass="creditApplication">
+		SELECT COUNT(CREDITAPPLICATION_ID) addFxCount
+		FROM (SELECT DISTINCT
+		C.CREDITAPPLICATION_ID
+		FROM RL_CREDIT_APPLICATION C, SID_VIEW V
+		WHERE
+		C.VALID_STATE = '1'
+		AND C.CREDITAPPLICATION_ID NOT IN
+		(SELECT
+		CI.CREDITAPPLICATION_ID FROM RL_CREDIT_INVESTIGATIO CI WHERE
+		CI.CREDITAPPLICATION_ID IS NOT NULL)
+		AND C.AUDIT_STATUS!='27'AND C.AUDIT_STATUS!='28'
+		<isNotEmpty prepend="AND" property="authList">
+			C.CREDITAPPLICATION_ID =
+			V.OBJECT_ID_IDENTITY
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN
+			($authList$)
+        </isNotEmpty>
+		)
+	</select>
+    <!--查询等待上传合同提醒 -->
+    <select id="selectUploadingContractRemind" parameterClass="creditApplication" resultClass="java.lang.Integer">
+        SELECT COUNT(1) AS remindCount
+        FROM RL_CREDIT_APPLICATION C, SID_VIEW V
+        WHERE C.VALID_STATE = '1'
+        AND C.AUDIT_STATUS='33'
+        <isNotEmpty prepend="AND" property="authList">
+            C.CREDITAPPLICATION_ID = V.OBJECT_ID_IDENTITY
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="authList">
+            V.CLASS='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="authList">
+            V.ACE_SID IN ($authList$)
+        </isNotEmpty>
+    </select>
+	<!--查询放款登记提醒 -->
+	<select id="selectLoanRegister" resultClass="auditRemind"
+		parameterClass="creditApplication">
+		SELECT COUNT(DISTINCT C.CREDITAPPLICATION_ID) auditCount
+		FROM RL_CREDIT_APPLICATION C, SID_VIEW
+		V
+		WHERE C.VALID_STATE = '1' 
+		AND ((C.AUDIT_STATUS = '10' AND C.BUSINESS_TYPE ='0')
+		OR (C.AUDIT_STATUS = '21' AND C.BUSINESS_TYPE =	'1'))
+		<isNotEmpty prepend="AND" property="authList">
+			C.CREDITAPPLICATION_ID =
+			V.OBJECT_ID_IDENTITY
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN
+			($authList$)
+        </isNotEmpty>
+		GROUP BY C.BUSINESS_TYPE,C.AUDIT_STATUS
+	</select>
+	<!--查询当天收款登记提醒 -->
+	<select id="selectReceiptRegisterRemind1" resultClass="HashMap"
+		parameterClass="creditApplication">
+		SELECT COUNT(DISTINCT R.RETURN_PLAN_ID)
+		auditCount,R.CREDITAPPLICATION_ID creditapplicationId,'3' auditStatus
+		FROM RL_RETURN_PLAN R,
+		SID_VIEW V
+		WHERE R.Repayment_Date=TRUNC(SYSDATE) 
+		AND (R.COLLECTION_STATUS='0'OR R.COLLECTION_STATUS='3')
+		<isNotEmpty prepend="AND" property="authList">
+			R.CREDITAPPLICATION_ID =V.OBJECT_ID_IDENTITY
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN($authList$)
+	        </isNotEmpty>
+		GROUP BY R.CREDITAPPLICATION_ID
+	</select>
+	<!-- 收款登记3日 -->
+	<select id="selectReceiptRegisterRemind3" resultClass="HashMap"
+		parameterClass="creditApplication">
+		SELECT COUNT(DISTINCT R.RETURN_PLAN_ID)
+		auditCount,R.CREDITAPPLICATION_ID creditapplicationId,'3' auditStatus
+		FROM RL_RETURN_PLAN R,
+		SID_VIEW V
+		WHERE TO_NUMBER(R.Repayment_Date-SYSDATE) BETWEEN 0 AND 3 AND
+		(R.COLLECTION_STATUS='0'OR R.COLLECTION_STATUS='3')
+		<isNotEmpty prepend="AND" property="authList">
+			R.CREDITAPPLICATION_ID =V.OBJECT_ID_IDENTITY
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN($authList$)
+	        </isNotEmpty>
+		GROUP BY R.CREDITAPPLICATION_ID
+	</select>
+	<!-- 收款登记 7日 -->
+	<select id="selectReceiptRegisterRemind7" resultClass="HashMap"
+		parameterClass="creditApplication">
+		SELECT COUNT(DISTINCT R.RETURN_PLAN_ID)
+		auditCount,R.CREDITAPPLICATION_ID creditapplicationId,'3' auditStatus
+		FROM RL_RETURN_PLAN R,
+		SID_VIEW V
+		WHERE TO_NUMBER(R.Repayment_Date-SYSDATE) BETWEEN 0 AND 7 AND
+		(R.COLLECTION_STATUS='0'OR R.COLLECTION_STATUS='3')
+		<isNotEmpty prepend="AND" property="authList">
+			R.CREDITAPPLICATION_ID =V.OBJECT_ID_IDENTITY
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+	        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN($authList$)
+	        </isNotEmpty>
+		GROUP BY R.CREDITAPPLICATION_ID
+	</select>
+	<!-- 信贷员放款统计 -->
+	<select id="selectCountInfo" resultClass="countInfo"
+		parameterClass="creditApplication">
+		SELECT COUNT(R.RECEIVED_RECORD_ID) remindCount,NVL(SUM(R.RECEIVED_AMOUNT),0)
+		remindSum
+		FROM RL_RECEIVED_RECORD R, RL_CREDIT_APPLICATION C
+		WHERE R.CREDITAPPLICATION_ID = C.CREDITAPPLICATION_ID
+		AND R.RECEIVED_STATUS = '1' AND R.HISTORY_FLAG='F'
+		AND TO_CHAR(R.RECEIVED_TIME,'yyyymm')= TO_CHAR(Sysdate,'yyyymm')
+		<isNotEmpty property="loanOfficerId" prepend="AND">
+			C.LOAN_OFFICER_ID = #loanOfficerId#
+        </isNotEmpty>
+	</select>
+	<!-- 对公放款 -->
+	<select id="toPublic" resultClass="countInfo" parameterClass="creditApplication">
+		SELECT COUNT(C.CREDITAPPLICATION_ID) remindCount, NVL(SUM(G.LOAN_AMOUNT),0)
+		remindSum
+		FROM RL_CREDIT_APPLICATION C,RL_GROUP_LOAN_REGIST G
+		WHERE C.CREDITAPPLICATION_ID = G.CREDITAPPLICATION_ID
+		AND C.BUSINESS_TYPE = '0' AND G.REGIST_STATUS!='2' AND C.VALID_STATE='1'
+		<isNotEmpty property="operateFlag" prepend="AND">
+			TO_CHAR(G.LOAN_REGIST_DATE,'yyyymm')= TO_CHAR(Sysdate,'yyyymm')
+	    </isNotEmpty>
+		<isNotEmpty property="loanOfficerId" prepend="AND">
+			C.LOAN_OFFICER_ID = #loanOfficerId#
+         </isNotEmpty>
+	</select>
+	<!-- 对私放款 -->
+	<select id="toPrivate" resultClass="countInfo" parameterClass="creditApplication">
+		SELECT COUNT(C.CREDITAPPLICATION_ID) remindCount, NVL(SUM(G.LOAN_AMOUNT),0)
+		remindSum
+		FROM RL_CREDIT_APPLICATION C, RL_GROUP_LOAN_REGIST G
+		WHERE C.CREDITAPPLICATION_ID = G.CREDITAPPLICATION_ID
+		AND C.VALID_STATE='1' AND C.BUSINESS_TYPE='1'
+		AND G.REGIST_STATUS!='2'
+		AND C.AUDIT_STATUS IN ('15','16','19','20')
+		<isNotEmpty property="operateFlag" prepend="AND">
+			TO_CHAR(G.LOAN_REGIST_DATE,'yyyymm')= TO_CHAR(Sysdate,'yyyymm')
+	    </isNotEmpty>
+		<isNotEmpty property="loanOfficerId" prepend="AND">
+			C.LOAN_OFFICER_ID = #loanOfficerId#
+         </isNotEmpty>
+	</select>
+	<!-- 营业部经理业绩统计 -->
+	<select id="selectDepartmentCountInfo" parameterClass="int" resultClass="departmentCountInfo">
+		SELECT COUNT(C.CREDITAPPLICATION_ID) PAYMENTBUSINESSCOUNT,
+		       NVL(SUM(G.LOAN_AMOUNT), 0) PAYMENTBUSINESSSUM,
+		       TO_CHAR(G.LOAN_TIME, 'yyyy-MM') MONTHNAME
+		  FROM RL_CREDIT_APPLICATION C, RL_GROUP_LOAN_REGIST G
+		 WHERE C.CREDITAPPLICATION_ID = G.CREDITAPPLICATION_ID
+		   AND G.REGIST_STATUS = '1'
+		   AND C.AUDIT_STATUS = '13'
+		   AND to_char(G.LOAN_TIME, 'YYYY') = to_char(sysdate, 'YYYY')
+    	   AND C.COMPANY_ID  = #value# 
+		 GROUP BY TO_CHAR(G.LOAN_TIME, 'yyyy-MM')
+		 ORDER BY MONTHNAME
+	</select>
+	<!-- 从视图中查提醒  -->
+	<select id="selectRemindFromView" parameterClass="creditApplication" resultClass="creditapplicationView">
+		SELECT DISTINCT CV.* FROM CREDITAPPLICATION_VIEW CV,
+		SID_VIEW V
+		WHERE CV.CREDITAPPLICATION_ID = V.OBJECT_ID_IDENTITY
+		<isNotEmpty prepend="AND" property="authList">
+			V.CLASS='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			V.ACE_SID IN($authList$)
+        </isNotEmpty>
+	</select>
+</sqlMap>

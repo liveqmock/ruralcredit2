@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CUSTOMERHISTORY">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="customerHistoryInfo" type="com.creditease.rc.domain.CustomerHistoryInfo"/>
+	
+	
+			<resultMap class="com.creditease.rc.domain.CustomerHistoryInfo" id="customerHistoryInfoMap">
+			<result property="customerHistoryId" jdbcType="INTEGER" column="CUSTOMER_HISTORY_ID" />
+				<result property="customerBasicId" jdbcType="INTEGER" column="CUSTOMER_BASIC_ID" />
+				<result property="name" jdbcType="VARCHAR" column="NAME" />
+				<result property="former" jdbcType="VARCHAR" column="FORMER" />
+				<result property="credentialsType" jdbcType="CHAR" column="CREDENTIALS_TYPE" />
+				<result property="credentialsNumber" jdbcType="VARCHAR" column="CREDENTIALS_NUMBER" />
+				<result property="gender" jdbcType="CHAR" column="GENDER" />
+				<result property="national" jdbcType="CHAR" column="NATIONAL" />
+				<result property="maritalStatus" jdbcType="CHAR" column="MARITAL_STATUS" />
+				<result property="mobilephone" jdbcType="VARCHAR" column="MOBILEPHONE" />
+				<result property="telephone" jdbcType="VARCHAR" column="TELEPHONE" />
+				<result property="personIncome" jdbcType="INTEGER" column="PERSON_INCOME" />
+				<result property="highestEducation" jdbcType="VARCHAR" column="HIGHEST_EDUCATION" />
+				<result property="presentAddress" jdbcType="VARCHAR" column="HOME_ADDRESS" />
+				<result property="residenceAddress" jdbcType="VARCHAR" column="RESIDENCE_ADDRESS" />
+				<result property="remark" jdbcType="VARCHAR" column="REMARK" />
+				<result property="changeTime" jdbcType="DATE" column="CHANGE_TIME" />
+				<result property="operateName" jdbcType="VARCHAR" column="OPERATOR_NAME" />
+				<result property="operateId" jdbcType="INTEGER" column="OPERATOR_ID" />
+			</resultMap>
+ 
+	 
+	<insert id="insert" parameterClass="com.creditease.rc.domain.CustomerHistoryInfo">
+		 <selectKey keyProperty="customerHistoryId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+		<![CDATA[
+			insert into RL_CUSTOMER_HISTORY_INFO
+				(CUSTOMER_HISTORY_ID, CUSTOMER_BASIC_ID, name, former, CREDENTIALS_TYPE, CREDENTIALS_NUMBER,
+				gender, national, MARITAL_STATUS, mobilephone, telephone, PERSON_INCOME, HIGHEST_EDUCATION, HOME_ADDRESS,
+				RESIDENCE_ADDRESS, remark, CHANGE_TIME, OPERATOR_NAME, OPERATOR_ID)
+			values
+				(#customerHistoryId:INTEGER#,#customerBasicId:INTEGER#,#name:VARCHAR#, #former:VARCHAR#,#credentialsType:CHAR#,
+				 #credentialsNumber:VARCHAR#,#gender:CHAR#,#national:CHAR#,#maritalStatus:CHAR#,#mobilephone:VARCHAR#,
+				 #telephone:VARCHAR#,#personIncome:INTEGER#,#highestEducation:VARCHAR#,#presentAddress:VARCHAR#,
+				#residenceAddress:VARCHAR#,#remark:VARCHAR#,#changeTime:DATE#,#operateName:VARCHAR#,#operateId:INTEGER#)
+		]]>
+	</insert>
+	 
+	<delete id="deleteBycustomerId" parameterClass="Integer">
+		delete from rl_customer_history_info ch where ch.customer_basic_id = #customerBasicInfoId#
+	</delete>
+</sqlMap>

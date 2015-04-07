@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="GROUPLOANREGIST">
+
+	<typeAlias alias="GroupLoanRegist" type="com.creditease.rc.domain.GroupLoanRegist"/>
+	<typeAlias alias="GroupLoanRegistVo" type="com.creditease.rc.vo.GroupLoanRegistVo"/>
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	
+	<resultMap class="com.creditease.rc.domain.GroupLoanRegist" id="GroupLoanRegistMap">
+		<result property="groupLoanRegistId" column="GROUP_LOAN_REGIST_ID" jdbcType="INTEGER" />
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="INTEGER" />
+		<result property="groupNumber" column="GROUP_NO" jdbcType="VARCHAR" />
+		<result property="loanOfficerId" column="LOAN_OFFICER_ID" jdbcType="VARCHAR" />
+		<result property="loanOfficerName" column="LOAN_OFFICER_NAME" jdbcType="VARCHAR" />
+		<result property="loanTime" column="LOAN_TIME" jdbcType="TIMESTAMP" />
+		<result property="protocolFile" column="PROTOCOL_FILE" jdbcType="VARCHAR" />
+		<result property="loanPerson" column="LOAN_PERSON" jdbcType="VARCHAR" />
+		<result property="loanConfirmTime" column="LOAN_CONFIRM_TIME" jdbcType="TIMESTAMP" />
+		<result property="remarkComment" column="REMARK_COMMENT" jdbcType="VARCHAR" />
+		<result property="loanRegistDate" column="LOAN_REGIST_DATE" jdbcType="DATE" />
+		<result property="registStatus" column="REGIST_STATUS" jdbcType="VARCHAR" />
+		<result property="protocolID" column="PROTOCOL_ID" jdbcType="VARCHAR" />
+		<result property="loanAmount" column="LOAN_AMOUNT" jdbcType="DOUBLE" />
+		<result property="realAmount" column="REAL_AMOUNT" jdbcType="DOUBLE" />
+		<result property="contractSignedTime" column="CONTRACT_SIGNED_TIME" jdbcType="DATE" />
+		<result property="historyFlag" column="HISTORY_FLAG" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- icp回退 -->
+	<update id="updateIcp" parameterClass="string">
+		UPDATE  RL_GROUP_LOAN_REGIST t
+			set t.HISTORY_FLAG='T' where t.CREDITAPPLICATION_ID=#creditapplicationId#
+			    
+	</update>
+	
+	<!-- 根据uuid 查询主键id为财务预约记录表提供数据 -->
+	<select id="selectGroupLoanRegistId" parameterClass="string" resultClass="string">
+		select t.group_loan_regist_id from rl_group_loan_regist t where 
+			t.creditapplication_id=(select r.creditapplication_id from rl_credit_application r where r.sys_guid =#uuid#) 
+				and t.history_flag='F' and t.regist_status='1'
+	</select>
+	
+	
+	<insert id="insert" parameterClass="GroupLoanRegist">
+		<selectKey keyProperty="groupLoanRegistId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+		<![CDATA[
+			INSERT INTO RL_GROUP_LOAN_REGIST
+				(GROUP_LOAN_REGIST_ID,
+				CREDITAPPLICATION_ID,
+				GROUP_NO,
+				LOAN_OFFICER_ID,
+				LOAN_OFFICER_NAME,
+				LOAN_TIME,
+				PROTOCOL_FILE,
+				LOAN_PERSON,
+				LOAN_CONFIRM_TIME,
+				REMARK_COMMENT,
+				LOAN_REGIST_DATE,
+				REGIST_STATUS,
+				PROTOCOL_ID,
+				LOAN_AMOUNT,
+				REAL_AMOUNT,
+				CONTRACT_SIGNED_TIME,
+				HISTORY_FLAG
+				)
+			VALUES
+				(#groupLoanRegistId:INTEGER#,
+				#creditapplicationId:INTEGER#,
+				#groupNumber:VARCHAR#,
+				#loanOfficerId:VARCHAR#,
+				#loanOfficerName:VARCHAR#,
+				#loanTime:TIMESTAMP#,
+				#protocolFile:VARCHAR#,
+				#loanPerson:VARCHAR#,
+				#loanConfirmTime:TIMESTAMP#,
+				#remarkComment:VARCHAR#,
+				#loanRegistDate:TIMESTAMP#,
+				#registStatus:VARCHAR#,
+				#protocolID:VARCHAR#,
+				#loanAmount#,
+				#realAmount#,
+				#contractSignedTime:TIMESTAMP#,
+				#historyFlag:VARCHAR#)
+		]]>
+	</insert>
+	
+	
+	
+	
+	<insert id="insert2" parameterClass="GroupLoanRegist">
+		<selectKey keyProperty="groupLoanRegistId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+		<![CDATA[
+			INSERT INTO RL_GROUP_LOAN_REGIST
+				(GROUP_LOAN_REGIST_ID,
+				CREDITAPPLICATION_ID,
+				LOAN_TIME,
+				CONTRACT_SIGNED_TIME,
+				HISTORY_FLAG
+				)
+			VALUES
+				(#groupLoanRegistId:INTEGER#,
+				#creditapplicationId:INTEGER#,
+				#loanTime:TIMESTAMP#,
+				#contractSignedTime:DATE#,
+				#historyFlag:VARCHAR#
+				)
+		]]>
+	</insert>
+	<update id="update" parameterClass="GroupLoanRegist">
+		<![CDATA[
+			UPDATE  RL_GROUP_LOAN_REGIST
+		]]>
+		<dynamic prepend="SET">
+			<isNotEmpty  prepend="," property="groupNumber">
+				GROUP_NO = #groupNumber#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="loanPerson">
+				LOAN_PERSON = #loanPerson#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="loanConfirmTime">
+				LOAN_CONFIRM_TIME = #loanConfirmTime:TIMESTAMP#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="remarkComment">
+				REMARK_COMMENT = #remarkComment#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="registStatus">
+				REGIST_STATUS = #registStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="protocolID">
+				PROTOCOL_ID = #protocolID#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="loanAmount">
+				LOAN_AMOUNT = #loanAmount#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="realAmount">
+				REAL_AMOUNT = #realAmount#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="contractSignedTime">
+				CONTRACT_SIGNED_TIME = #contractSignedTime:TIMESTAMP#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="historyFlag">
+				HISTORY_FLAG = #historyFlag#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			WHERE GROUP_LOAN_REGIST_ID = #groupLoanRegistId#
+		]]>
+	</update>
+	<select id="searchByRegistStatus" parameterClass="GroupLoanRegist" resultMap="GroupLoanRegistMap">
+			<![CDATA[
+				SELECT * FROM RL_GROUP_LOAN_REGIST
+			]]>
+			<dynamic prepend="WHERE" >
+				<isNotEmpty prepend="AND" property="registStatus">
+					REGIST_STATUS = #registStatus#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="creditapplicationId">
+					CREDITAPPLICATION_ID = #creditapplicationId#
+				</isNotEmpty>
+			</dynamic>
+	</select>
+	
+	<!-- 用于放款确认的查看 -->
+	<select id="searchConfirm" parameterClass="GroupLoanRegist" resultClass="GroupLoanRegistVo">
+			<![CDATA[
+				SELECT c.group_loan_regist_id as groupLoanRegistId,
+				       c.creditapplication_id as creditapplicationId,
+				       c.group_no             as groupNumber,
+				       c.loan_officer_id      as loanOfficerId,
+				       c.loan_officer_name    as loanOfficerName,
+				       c.loan_time            as loanTime,
+				       c.protocol_file        as protocolFile,
+				       c.loan_person          as loanPerson,
+				       c.loan_confirm_time    as loanConfirmTime,
+				       c.remark_comment       as remarkComment,
+				       c.loan_regist_date     as loanRegistDate,
+				       c.regist_status        as registStatus,
+				       c.protocol_id          as protocolID,
+				       c.loan_amount          as loanAmount,
+				       c.real_amount          as realAmount,
+				       c.CONTRACT_SIGNED_TIME as contractSignedTime,
+				       C.HISTORY_FLAG		  AS historyFlag,
+				        ac.account 			  as bankAccountNumber,
+				       b.credentials_number   as credentialsNumber
+				  FROM RL_GROUP_LOAN_REGIST c
+				  left join rl_credit_application cr
+				    on cr.creditapplication_id = c.creditapplication_id
+				  left join rl_borrower_service_app b
+				    on (b.creditapplication_id = c.creditapplication_id and b.leader = '1' and
+				       b.valid_state = '1')
+				  ,rl_account_info ac
+				  
+				  WHERE   
+						 ac.account_info_id =  cr.account_info_id
+			]]>
+			<dynamic prepend="and" >
+				<isNotEmpty prepend="AND" property="registStatus">
+					c.REGIST_STATUS = #registStatus#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="creditapplicationId">
+					c.CREDITAPPLICATION_ID = #creditapplicationId#
+				</isNotEmpty>
+			</dynamic>
+	</select>
+	
+	<select id="searchList" parameterClass="GroupLoanRegist" resultMap="GroupLoanRegistMap">
+			<![CDATA[
+				SELECT * FROM RL_GROUP_LOAN_REGIST
+				where (REGIST_STATUS = '1' or REGIST_STATUS = '2')
+				and CREDITAPPLICATION_ID = #creditapplicationId#
+				order by LOAN_CONFIRM_TIME asc
+			]]>
+	</select>
+	
+	<!-- 赵旭兵 -->
+	<select id="searchByCreditApplicationId" parameterClass="GroupLoanRegist" resultClass="GroupLoanRegist">
+			<![CDATA[
+				SELECT * FROM RL_GROUP_LOAN_REGIST
+			]]>
+			<dynamic prepend="WHERE" >
+				<isNotEmpty prepend="AND" property="registStatus">
+					REGIST_STATUS = #registStatus#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="creditapplicationId">
+					CREDITAPPLICATION_ID = #creditapplicationId#
+				</isNotEmpty>
+			</dynamic>
+	</select>
+	<select id="selectDengji" parameterClass="GroupLoanRegist" resultMap="GroupLoanRegistMap">
+		<![CDATA[
+				SELECT * FROM RL_GROUP_LOAN_REGIST
+				WHERE GROUP_LOAN_REGIST_ID=
+				(SELECT MAX(GROUP_LOAN_REGIST_ID) FROM RL_GROUP_LOAN_REGIST
+					WHERE REGIST_STATUS = #registStatus#
+					AND CREDITAPPLICATION_ID = #creditapplicationId#
+				)
+		]]>
+	</select>
+<!-- 查询最后一次下载合同时间 
+<select id="selectlastTimeDown" parameterClass="Integer" resultMap="GroupLoanRegist">
+		<![CDATA[
+				SELECT * FROM RL_GROUP_LOAN_REGIST
+				WHERE CREDITAPPLICATION_ID = #creditapplicationId#
+				)
+		]]>
+	</select>
+	--><!-- 放款登记查看 -->
+	<select id="selectRegist" parameterClass="GroupLoanRegist" resultClass="GroupLoanRegist">
+		select c.business_number as groupNumber,
+		       c.loan_officer_name as loanOfficerName,
+		       c.loan_officer_id as loanOfficerId,
+		       c.creditapplication_id as creditapplicationId,
+		       g.group_loan_regist_id as groupLoanRegistId,
+		       g.loan_time as loanTime,
+		       g.protocol_file as protocolFile,
+		       g.loan_person  as loanPerson,
+		       g.loan_confirm_time as loanConfirmTime,
+		       g.remark_comment as remarkComment,
+		       g.loan_regist_date as loanRegistDate,
+		       g.regist_status as registStatus,
+		       g.protocol_id as  protocolID,
+		       g.loan_amount as loanAmount,
+		       g.real_amount as realAmount,
+		       g.CONTRACT_SIGNED_TIME as contractSignedTime,
+		       G.HISTORY_FLAG AS historyFlag
+		 from 
+		      rl_credit_application c 
+		left join (SELECT * FROM RL_GROUP_LOAN_REGIST
+				WHERE GROUP_LOAN_REGIST_ID=
+				(SELECT MAX(GROUP_LOAN_REGIST_ID) FROM RL_GROUP_LOAN_REGIST
+					WHERE REGIST_STATUS = #registStatus#
+					AND CREDITAPPLICATION_ID = #creditapplicationId#
+				))  g 
+		on c.creditapplication_id = g.creditapplication_id
+		   where c.creditapplication_id =#creditapplicationId#  
+	</select>
+	<!-- 分公司放款确认回退 ，清空放款确认时的数据 韩大年 -->
+	<update id="updateGroupLoanAffirmRollback" parameterClass="GroupLoanRegist">
+			UPDATE  RL_GROUP_LOAN_REGIST
+			set LOAN_CONFIRM_TIME = null,
+			    LOAN_PERSON = null,
+			    REGIST_STATUS='0'
+		<![CDATA[
+			WHERE GROUP_LOAN_REGIST_ID = #groupLoanRegistId#
+		]]>
+	</update>
+	<!-- 根据业务单号取放款确认数据 liuli 2013-05-20 -->
+	<select id="selectByBusinessNum" parameterClass="String" resultMap="GroupLoanRegistMap">
+		<![CDATA[
+			SELECT * FROM RL_GROUP_LOAN_REGIST
+				where 
+			GROUP_NO = #businessNum#
+		]]>
+	</select>
+	
+	<select id="selectById" resultMap="GroupLoanRegistMap" parameterClass="Integer">
+		select * from rl_group_loan_regist g where g.group_loan_regist_id = #groupLoanRegistId#
+	</select>
+	<!-- 根据业务单号  -上传合同资料的时候更新 放款信息确认 -->
+	<update id="updateGroupLoanRegistConfirm" parameterClass="GroupLoanRegist">
+	  UPDATE  RL_GROUP_LOAN_REGIST gr
+      set 
+      gr.loan_time=#loanTime#,
+      gr.contract_signed_time=#contractSignedTime#
+      WHERE gr.creditapplication_id=#creditapplicationId#
+	</update>
+	<!-- 根据业务单号取  查看需要的内容 -->
+	<select id="searchForGroupLoanRegist" parameterClass="java.lang.Long" resultClass="GroupLoanRegist">
+		 select grl.group_loan_regist_id as groupLoanRegistId,
+         grl.loan_time as loanTime,
+         grl.contract_signed_time as contractSignedTime
+          from rl_group_loan_regist grl
+         where  grl.history_flag='F' and
+         grl.creditapplication_id = #creditapplicationId#
+	</select>
+		<!-- 根据业务单号取  查看需要的内容 new add by ygx 2014-09-09 -->
+	<select id="searchForGroupLoanRegistForGroupLoanRegist" parameterClass="java.lang.Long" resultClass="GroupLoanRegist">
+        <![CDATA[
+          select x.groupLoanRegistId, x.loanTime, x.contractSignedTime
+          from (select grl.group_loan_regist_id as groupLoanRegistId,
+                       grl.loan_time as loanTime,
+                       grl.contract_signed_time as contractSignedTime,
+                       row_number() over(partition by grl.creditapplication_id order by grl.contract_signed_time desc nulls last) rno
+                  from rl_group_loan_regist grl
+                 where grl.creditapplication_id = #creditapplicationId#) x
+          where rno = 1
+         ]]>
+         </select>
+</sqlMap>

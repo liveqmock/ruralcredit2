@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="COMPREHENSIVECREDIT">
+	<typeAlias alias="orderInfoList" type="com.creditease.rc.vo.OrderInfoList" />
+	<select id="queryOrderInfo" parameterClass="java.util.HashMap" resultClass="orderInfoList">
+		select ca.business_number as businessNumber,
+		ca.sys_guid as uuid,
+		ca.loan_officer_id as loanOfficerId,
+		ca.loan_officer_name as loanOfficerName,
+		bsa.credentials_number as clientIDNumber,
+		ca.producttypeid as productcategoryId,
+		ca.repayment_plan_id as productInfoId,
+		ca.company_id as salesDepartmentId,
+		ca.company_name as salesDepartmentName,
+        ca.signagreement_date as cashierTime
+		from rl_credit_application ca
+		left join rl_borrower_service_app bsa
+		on ca.creditapplication_id = bsa.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		where ca.valid_state = '1'
+		<isNotEmpty prepend="and" property="businessNumber">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="uuid">
+			ca.sys_guid = #uuid#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="clientName">
+			bsa.name = #clientName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="clientIDNumber">
+			bsa.credentials_number = #clientIDNumber#
+		</isNotEmpty>
+	</select>
+</sqlMap>

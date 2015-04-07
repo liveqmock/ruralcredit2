@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXUPRIRECORD">
+	<resultMap id="wxupriRecordMap" class="com.creditease.rc.domain.WxupriRecord">
+		<result column="WX_UPRI_RECORD_ID" property="wxUpriRecordId" jdbcType="DECIMAL" />
+		<result column="WX_USER_ID" property="wxUserId" jdbcType="DECIMAL" />
+		<result column="WX_PRIZE_ID" property="wxPrizeId" jdbcType="DECIMAL" />
+		<result column="UPRI_RECORD_CODE" property="upriRecordCode" jdbcType="VARCHAR" />
+		<result column="PROVINCEHOME" property="provincehome" jdbcType="VARCHAR" />
+		<result column="CITYHOME" property="cityhome" jdbcType="VARCHAR" />
+		<result column="COUNTYHOME" property="countyhome" jdbcType="VARCHAR" />
+		<result column="BRANCHOFFICE_NAME" property="branchofficeName" jdbcType="VARCHAR" />
+		<result column="BRANCHOFFICE_ID" property="branchofficeId" jdbcType="VARCHAR" />
+		<result column="IS_RECEIVE" property="isReceive" jdbcType="VARCHAR" />
+		<result column="RECPRI_NAME" property="recpriName" jdbcType="VARCHAR" />
+		<result column="RECPRI_PHONE" property="recpriPhone" jdbcType="VARCHAR" />
+		<result column="RECPRI_DATE" property="recpriDate" jdbcType="TIMESTAMP" />
+		<result column="REAL_RECPRI_NAME" property="realRecpriName" jdbcType="VARCHAR" />
+		<result column="REAL_RECPRI_PHONE" property="realRecpriPhone" jdbcType="VARCHAR" />
+		<result column="RECEIVER_ID" property="receiverId" jdbcType="VARCHAR" />
+		<result column="RECEIVER_NAME" property="receiverName" jdbcType="VARCHAR" />
+		<result column="RECEIVE_TIME" property="receiveTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxupriRecordMap" parameterClass="com.creditease.rc.domain.WxupriRecord">
+		select WX_UPRI_RECORD_ID, WX_USER_ID, WX_PRIZE_ID,
+		UPRI_RECORD_CODE, PROVINCEHOME, CITYHOME,
+		COUNTYHOME, BRANCHOFFICE_NAME, BRANCHOFFICE_ID, IS_RECEIVE, RECPRI_NAME, RECPRI_PHONE,
+		RECPRI_DATE,
+		REAL_RECPRI_NAME, REAL_RECPRI_PHONE, RECEIVER_ID, RECEIVER_NAME, RECEIVE_TIME
+		from RL_WX_UPRI_RECORD
+		where WX_UPRI_RECORD_ID =
+		#wxUpriRecordId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxupriRecord">
+		delete from RL_WX_UPRI_RECORD
+		where WX_UPRI_RECORD_ID = #wxUpriRecordId:DECIMAL#
+	</delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxupriRecord">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxUpriRecordId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_UPRI_RECORD (WX_UPRI_RECORD_ID, WX_USER_ID, WX_PRIZE_ID, UPRI_RECORD_CODE, PROVINCEHOME,
+		CITYHOME, COUNTYHOME, BRANCHOFFICE_NAME,
+		BRANCHOFFICE_ID,
+		IS_RECEIVE, RECPRI_NAME,
+		RECPRI_PHONE, RECPRI_DATE, REAL_RECPRI_NAME, REAL_RECPRI_PHONE, RECEIVER_ID, RECEIVER_NAME,
+		RECEIVE_TIME)
+		values
+		(#wxUpriRecordId:DECIMAL#, #wxUserId:DECIMAL#, #wxPrizeId:DECIMAL#, #upriRecordCode:VARCHAR#,
+		#provincehome:VARCHAR#, #cityhome:VARCHAR#,
+		#countyhome:VARCHAR#,
+		#branchofficeName:VARCHAR#,
+		#branchofficeId:VARCHAR#, #isReceive:VARCHAR#, #recpriName:VARCHAR#, #recpriPhone:VARCHAR#,
+		#recpriDate:TIMESTAMP#,
+		#realRecpriName:VARCHAR#, #realRecpriPhone:VARCHAR#,
+		#receiverId:VARCHAR#, #receiverName:VARCHAR#, #receiveTime:TIMESTAMP#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxupriRecord">
+		update RL_WX_UPRI_RECORD
+		set WX_USER_ID = #wxUserId:DECIMAL#,
+		WX_PRIZE_ID =
+		#wxPrizeId:DECIMAL#,
+		UPRI_RECORD_CODE = #upriRecordCode:VARCHAR#,
+		PROVINCEHOME = #provincehome:VARCHAR#,
+		CITYHOME = #cityhome:VARCHAR#,
+		COUNTYHOME =
+		#countyhome:VARCHAR#,
+		BRANCHOFFICE_NAME = #branchofficeName:VARCHAR#,
+		BRANCHOFFICE_ID = #branchofficeId:VARCHAR#,
+		IS_RECEIVE = #isReceive:VARCHAR#,
+		RECPRI_NAME = #recpriName:VARCHAR#,
+		RECPRI_PHONE = #recpriPhone:VARCHAR#,
+		RECPRI_DATE = #recpriDate:TIMESTAMP#,
+		REAL_RECPRI_NAME =
+		#realRecpriName:VARCHAR#,
+		REAL_RECPRI_PHONE = #realRecpriPhone:VARCHAR#,
+		RECEIVER_ID = #receiverId:VARCHAR#,
+		RECEIVER_NAME = #receiverName:VARCHAR#,
+		RECEIVE_TIME = #receiveTime:TIMESTAMP#
+		where WX_UPRI_RECORD_ID = #wxUpriRecordId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxupriRecord">
+		update RL_WX_UPRI_RECORD
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="wxUserId">
+				WX_USER_ID = #wxUserId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="wxPrizeId">
+				WX_PRIZE_ID = #wxPrizeId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="upriRecordCode">
+				UPRI_RECORD_CODE = #upriRecordCode:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="provincehome">
+				PROVINCEHOME = #provincehome:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="cityhome">
+				CITYHOME = #cityhome:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="countyhome">
+				COUNTYHOME = #countyhome:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="branchofficeName">
+				BRANCHOFFICE_NAME = #branchofficeName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="branchofficeId">
+				BRANCHOFFICE_ID = #branchofficeId:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="isReceive">
+				IS_RECEIVE = #isReceive:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="recpriName">
+				RECPRI_NAME = #recpriName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="recpriPhone">
+				RECPRI_PHONE = #recpriPhone:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="recpriDate">
+				RECPRI_DATE = #recpriDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="realRecpriName">
+				REAL_RECPRI_NAME = #realRecpriName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="realRecpriPhone">
+				REAL_RECPRI_PHONE = #realRecpriPhone:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="receiverId">
+				RECEIVER_ID = #receiverId:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="receiverName">
+				RECEIVER_NAME = #receiverName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="receiveTime">
+				RECEIVE_TIME = #receiveTime:TIMESTAMP#
+      </isNotNull>
+		</dynamic>
+		where WX_UPRI_RECORD_ID = #wxUpriRecordId:DECIMAL#
+	</update>
+	<sql id="upriRecordList">
+		select wur.wx_upri_record_id as wxUpriRecordId,
+		wur.wx_user_id as wxUserId,
+		wur.wx_prize_id as wxPrizeId,
+		wur.upri_record_code as upriRecordCode,
+		wur.recpri_name as recpriName,
+		wur.recpri_phone as recpriPhone,
+		wur.recpri_date as recpriDate,
+		wp.prize_type as prizeType,
+		wp.prize_name as prizeName,
+		wp.prize_content as prizeContent,
+		wur.real_recpri_name as
+		realRecpriName,
+		wur.real_recpri_phone as
+		realRecpriPhone,
+		wur.is_receive as isReceive,
+		wur.receiver_id as
+		receiverId,
+		wur.receiver_name as receiverName,
+		wur.branchoffice_id as branchofficeId,
+		wur.branchoffice_name as branchofficeName
+		from
+		rl_wx_upri_record
+		wur
+		left join
+		rl_wx_user wu
+		on wu.wx_user_id =
+		wur.wx_user_id
+		left join rl_wx_prize wp
+		on wp.wx_prize_id = wur.wx_prize_id
+
+		<dynamic prepend="where">
+			<isEqual property="isHQ" compareValue="0" prepend="and">
+				wur.branchoffice_id in
+				($areaDepartmentIdSs$)
+			</isEqual>
+			<isNotEmpty prepend="and" property="recpriName">
+				wur.recpri_name like '%$recpriName$%'
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="branchofficeIds">
+				wur.branchoffice_id in (#branchofficeIds#)
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="beginTime">
+				trunc(wur.recpri_date, 'dd') >= to_date(#beginTime#, 'yyyy-MM-dd')
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="endTime">
+				to_date(#endTime#, 'yyyy-MM-dd') >= trunc(wur.recpri_date, 'dd')
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="receiverName">
+				wur.receiver_name like '%$receiverName$%'
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="isReceive">
+				wur.is_receive = #isReceive#
+      </isNotEmpty>
+			<isNotEmpty prepend="and" property="prizeType">
+				wp.prize_type = #prizeType#
+      </isNotEmpty>
+		</dynamic>
+		<isEmpty property="order">
+			order by wur.recpri_date desc,wur.wx_upri_record_id desc
+		</isEmpty>
+		<isNotEmpty property="order">
+			<isEqual property="sort" compareValue="recpriName">
+				order by wur.recpri_name $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="recpriPhone">
+				order by wur.recpri_phone $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="recpriDate">
+				order by wur.recpri_date $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="prizeType">
+				order by wp.prize_type $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="realRecpriName">
+				order by wur.real_recpri_name $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="realRecpriPhone">
+				order by wur.real_recpri_phone $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="isReceive">
+				order by wur.is_receive $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="receiverName">
+				order by wur.receiver_name $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+			<isEqual property="sort" compareValue="branchofficeName">
+				order by wur.branchoffice_name $order$,wur.wx_upri_record_id $order$
+			</isEqual>
+		</isNotEmpty>
+	</sql>
+	<select id="queryWxupriRecordList" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.domain.WxupriRecord">
+		select * from rl_wx_upri_record
+	</select>
+	<select id="queryUpriRecordList" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.WxupriRecordVo">
+		<include refid="upriRecordList" />
+	</select>
+	<select id="countUpriRecordList" parameterClass="java.util.HashMap" resultClass="int">
+		select count(*) from (
+		<include refid="upriRecordList" />
+		)
+	</select>
+</sqlMap>

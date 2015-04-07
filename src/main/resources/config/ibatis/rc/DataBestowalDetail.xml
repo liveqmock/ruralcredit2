@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="dataBestowalDetail" >
+  <typeAlias alias="dataBestowalDetail" type="com.creditease.rc.domain.DataBestowalDetail"/>
+  <resultMap id="abatorgenerated_DataBestowalDetailResult" class="dataBestowalDetail" >
+    <result column="DATA_BESTOWAL_DETAIL_ID" property="dataBestowalDetailId" jdbcType="DECIMAL" />
+    <result column="DATA_BESTOWAL_ID" property="dataBestowalId" jdbcType="DECIMAL" />
+    <result column="CREDIT_APPLICATION_ID" property="creditApplicationId" jdbcType="DECIMAL" />
+    <result column="AUDIT_STATUS" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="IS_OVERDUE" property="isOverdue" jdbcType="VARCHAR" />
+    <result column="SIGNAGREEMENT_DATE" property="signagreementDate" jdbcType="VARCHAR" />
+  </resultMap>
+  <!-- 根据dataBestowalId查询 明细-->
+  <select id="selectDataBestowalDetailByDataBestowalId" resultMap="abatorgenerated_DataBestowalDetailResult" parameterClass="java.lang.Long" >
+    select DATA_BESTOWAL_DETAIL_ID, DATA_BESTOWAL_ID, CREDIT_APPLICATION_ID,AUDIT_STATUS
+      from RL_DATA_BESTOWAL_DETAIL
+     where DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#
+  </select>
+ 
+  <!-- 全量新增 -->
+  <insert id="insertByDataBestowalDetail" parameterClass="dataBestowalDetail" >
+ 	<selectKey keyProperty="dataBestowalDetailId" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+	</selectKey>
+    insert into RL_DATA_BESTOWAL_DETAIL (DATA_BESTOWAL_DETAIL_ID, DATA_BESTOWAL_ID,
+      CREDIT_APPLICATION_ID,AUDIT_STATUS,IS_OVERDUE,SIGNAGREEMENT_DATE)
+    values (#dataBestowalDetailId:DECIMAL#, #dataBestowalId:DECIMAL#, #creditApplicationId:DECIMAL#,#auditStatus:VARCHAR#,#isOverdue:VARCHAR#,#signagreementDate:DATE#)
+  </insert>
+  
+  <!-- 不为空。则更新 -->
+  <update id="updateByDataBestowalDetailSelective" parameterClass="dataBestowalDetail">
+    update RL_DATA_BESTOWAL_DETAIL
+    <dynamic prepend="set" >
+      <isNotEmpty prepend="," property="dataBestowalId" >
+        DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="creditApplicationId" >
+        CREDIT_APPLICATION_ID = #creditApplicationId:DECIMAL#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="auditStatus" >
+        AUDIT_STATUS = #auditStatus:VARCHAR#
+      </isNotEmpty>
+     </dynamic>
+       where DATA_BESTOWAL_DETAIL_ID=#dataBestowalDetailId:DECIMAL#
+  </update>
+  <!-- 全量更新 -->
+  <update id="updateByDataBestowalDetail" parameterClass="dataBestowalDetail">
+    update RL_DATA_BESTOWAL_DETAIL
+    set 
+      DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#,
+      CREDIT_APPLICATION_ID = #creditApplicationId:DECIMAL#,
+      AUDIT_STATUS = #auditStatus:VARCHAR#
+    where DATA_BESTOWAL_DETAIL_ID=#dataBestowalDetailId:DECIMAL#
+  </update>
+  
+  <!-- 根据dataBestowalId查询 明细 业务编号-->
+  <select id="selectCredit" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+  	    select d.DATA_BESTOWAL_DETAIL_ID, d.DATA_BESTOWAL_ID, d.CREDIT_APPLICATION_ID,d.AUDIT_STATUS,
+	    (select c.code_value from  rl_codetable c where c. section='auditStatus' and c.code_key= d.Audit_Status) AUDIT_STATUS_SHOW,
+	    ca.business_number,
+	    d.IS_OVERDUE,
+	    d.SIGNAGREEMENT_DATE
+	      from RL_DATA_BESTOWAL_DETAIL  d
+	      left join rl_credit_application ca
+	      on ca.creditapplication_id = d.CREDIT_APPLICATION_ID
+	       where DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#
+  </select>
+   <!-- 根据dataBestowalId查询 明细 业务编号-->
+  <select id="selectCustomerConsult" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+  	   select d.DATA_BESTOWAL_DETAIL_ID,
+       d.DATA_BESTOWAL_ID,
+       d.CREDIT_APPLICATION_ID,
+       d.AUDIT_STATUS,
+       ca.telphone,
+       ca.status
+  from RL_DATA_BESTOWAL_DETAIL d
+  left join rl_customer_consult ca
+    on ca.customer_consult_id = d.CREDIT_APPLICATION_ID
+ where DATA_BESTOWAL_ID = #dataBestowalId :DECIMAL#
+  </select>
+</sqlMap>

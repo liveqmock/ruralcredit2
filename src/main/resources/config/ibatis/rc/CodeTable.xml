@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="codeTable">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+
+	<resultMap class="com.creditease.rc.domain.CodeTable" id="codeTableMap">
+		<result column="CODETABLE_ID" jdbcType="INTEGER" property="codaTableId" />
+		<result column="SECTION" jdbcType="VARCHAR" property="section" />
+		<result column="CODE_KEY" jdbcType="VARCHAR" property="codeKey" />
+		<result column="CODE_VALUE" jdbcType="VARCHAR" property="codeVlue" />
+		<result column="CODE_NOTES" jdbcType="VARCHAR" property="codeNote" />
+		<result column="AVAILABLE" jdbcType="VARCHAR" property="available" />
+		<result column="SEQUENCE" jdbcType="VARCHAR" property="sequence" />
+		<result column="PARENTID" jdbcType="INTEGER" property="parentId" />
+	</resultMap>
+
+	<sql id="byCodeTableIdCondition">
+        <![CDATA[
+           CODETABLE_ID = #codaTableId:NUMBER#
+        ]]>
+	</sql>
+
+	<select id="selectByAll" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE where AVAILABLE is null or AVAILABLE = '0'
+        ]]>
+	</select>
+	<select id="getSection" resultClass="java.lang.String">
+        <![CDATA[
+	       select distinct SECTION from RL_CODETABLE  code where code.SECTION is not null
+        ]]>
+	</select>
+	<select id="selectByPagination" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="section">
+				SECTION like '%$section$%'
+		   </isNotEmpty>
+			<isNotEmpty prepend="AND" property="codeValue">
+				CODE_VALUE like '%$codeValue$%'
+		   </isNotEmpty>
+        </dynamic>
+        order by SECTION,SEQUENCE
+    </select>
+    <select id="countByPage" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultClass="int">
+        <![CDATA[
+            SELECT COUNT(*) FROM RL_CODETABLE 
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="section">
+				SECTION like '%$section$%'
+		   </isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 查出所有的用于查询 -->
+	<select id="selectBySection" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE 
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="section">
+				SECTION = #section:VARCHAR#
+        	</isNotEmpty>
+			<isNotEmpty prepend="AND" property="codeKey">
+				CODE_KEY = #codeKey#
+		   </isNotEmpty>
+			<isNotEmpty prepend="AND" property="codeValue">
+				CODE_VALUE like '%$codeValue$%'
+		   </isNotEmpty>
+		   <isNotEmpty prepend="and" property="section">
+				order by SEQUENCE
+        	</isNotEmpty>
+		</dynamic>
+	</select>
+
+    <!-- 根据section查找对应启用的数据字典 -->
+	<select id="selectBySectionZw" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+	       select * from RL_CODETABLE where SECTION = #section:VARCHAR# and (AVAILABLE is null or AVAILABLE = '0')
+	</select>
+	<!-- 查出所有启用的用于 下拉 -->
+	<select id="selectByEnabled" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE 
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="section">
+				SECTION = #section:VARCHAR#
+        	</isNotEmpty>
+			<isNotEmpty prepend="AND" property="codeKey">
+				CODE_KEY = #codeKey#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="codeValue">
+				CODE_VALUE = #codeValue#
+		   </isNotEmpty>
+		</dynamic>
+		<![CDATA[
+	       and (AVAILABLE is null or AVAILABLE = '0')
+        ]]>
+        <dynamic prepend=" ">
+        	<isNotEmpty prepend="and" property="section">
+				order by SEQUENCE
+        	</isNotEmpty>
+        </dynamic>
+	</select>
+	<!-- 查出所有的用于校验重复数据 -->
+	<select id="selectByValidate" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE 
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="section">
+				SECTION = #section:VARCHAR#
+        	</isNotEmpty>
+			<isNotEmpty prepend="AND" property="codeKey">
+				CODE_KEY = #codeKey#
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="codeValue">
+				CODE_VALUE = #codeValue#
+		   </isNotEmpty>
+		</dynamic>
+	</select>
+	<insert id="insertCodeTable" parameterClass="com.creditease.rc.domain.CodeTable">
+		<![CDATA[
+			insert into RL_CODETABLE 
+			(CODETABLE_ID,SECTION,CODE_KEY,CODE_VALUE,CODE_NOTES,SEQUENCE,AVAILABLE)
+			values (SEQ_BASIC_INFO.NEXTVAL, #section:VARCHAR#, #codeKey:VARCHAR#,
+			#codeVlue:VARCHAR#, #codeNote:VARCHAR#,
+			#sequence:VARCHAR#,#available:VARCHAR#)
+		]]>
+	</insert>
+	<update id="updateCodeVal" parameterClass="com.creditease.rc.domain.CodeTable">
+		<![CDATA[
+			update RL_CODETABLE
+			set SECTION = #section:VARCHAR#,
+			CODE_VALUE = #codeVlue:VARCHAR#,
+			CODE_NOTES = #codeNote:VARCHAR#,
+			SEQUENCE = #sequence:VARCHAR#,
+			AVAILABLE = #available:VARCHAR#
+		]]>
+		<dynamic prepend="WHERE">
+			<include refid="byCodeTableIdCondition" />
+		</dynamic>
+	</update>
+	<statement id="batchDelete" parameterClass="java.util.List">
+		delete from RL_CODETABLE
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			CODETABLE_ID = #list[]#
+		</iterate>
+	</statement>
+	<delete id="deleteObject" parameterClass="com.creditease.rc.domain.CodeTable">
+		 delete from RL_CODETABLE where CODETABLE_ID = #codaTableId:INTEGER# 
+	</delete>
+	<select id="selectNational" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE 
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="value">
+				SECTION = #section:VARCHAR#
+        	</isNotEmpty>
+			<isNotEmpty prepend="and" property="value">
+				CODE_VALUE like '%$codeVlue$%'
+        	</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="nationalCombobox" resultMap="codeTableMap" parameterClass="java.lang.String">
+    <![CDATA[
+	       select * from RL_CODETABLE 
+	       where
+	       SECTION = 'national'
+    ]]>
+		<dynamic >
+			<isNotEmpty prepend="and">
+				CODE_NOTES like '%$value$%'
+        </isNotEmpty>
+		</dynamic>
+
+	</select>
+	<select id="selectBySerialNum" resultMap="codeTableMap">
+        <![CDATA[
+	       select * from RL_CODETABLE where SECTION in ('departmentSN','productSN')
+        ]]>
+        order by SECTION,SEQUENCE
+    </select>
+    <select id="selectSerialNumBySeq" resultClass="int">
+        <![CDATA[
+	       select seq_credit_application.nextval  from dual
+        ]]>
+    </select>
+    <select id="countBySerialNum" resultClass="int">
+        <![CDATA[
+	       select count(*) from RL_CODETABLE where SECTION in ('departmentSN','productSN')
+        ]]>
+    </select>
+    <select id="selectCodeValueByKey" parameterClass="com.creditease.rc.vo.DataDictionaryVo" resultClass="String">
+        <![CDATA[
+	       SELECT ct.code_value FROM rl_codetable ct
+        ]]>
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="section">
+				ct.section = #section:VARCHAR#
+        	</isNotEmpty>
+			<isNotEmpty prepend="and" property="codeKey">
+				ct.code_key = #codeKey:VARCHAR#
+        	</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	  <select id="selectByParentId" parameterClass="Integer" resultMap="codeTableMap">
+        <![CDATA[
+	       SELECT * FROM rl_codetable ct 
+	       where ct.PARENTID = #parentId#
+	       and (ct.AVAILABLE  = '0' or ct.AVAILABLE is null)
+	       order by ct.sequence
+        ]]>
+	</select>
+	
+	<select id="selectSection" parameterClass="String" resultClass="java.util.HashMap">
+		select rc.section SECTION from rl_codetable rc group by rc.section having rc.section like '%$section$%'
+	</select>
+	
+	<update id="updateParentId" parameterClass="java.util.HashMap">
+		update rl_codetable rc set rc.parentid =#parentId# where rc.codetable_id in ($codeIds$)
+	</update>
+	
+	<update id="deleteParentId" parameterClass="java.util.HashMap">
+		update rl_codetable rc set rc.parentid ='' where rc.codetable_id in ($codeIds$)
+	</update>
+
+    <!--根据section、parentId获取数据字典-->
+    <select id="selectBySectionAndParentId" parameterClass="java.util.HashMap" resultMap="codeTableMap">
+        <![CDATA[
+	       SELECT * FROM rl_codetable ct
+	       where ct.SECTION = #section#
+	       and ct.PARENTID = #parentId#
+	       and (ct.AVAILABLE  = '0' or ct.AVAILABLE is null)
+	       order by ct.sequence
+        ]]>
+    </select>
+</sqlMap>

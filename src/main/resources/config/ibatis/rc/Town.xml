@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="TOWNINFO">
+
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="town" type="com.creditease.rc.domain.Town" />
+	<typeAlias alias="townlist" type="com.creditease.rc.vo.Area" />
+	<resultMap class="com.creditease.rc.domain.Town" id="townMap">
+		<result property="townshipinfoid" jdbcType="LONG" column="TOWNSHIPINFOID" />
+		<result property="parentId" jdbcType="LONG" column="PARENT_ID" />
+		<result property="townshipinfName" jdbcType="VARCHAR" column="TOWNSHIPINF_NAME" />
+		<result property="key" jdbcType="VARCHAR" column="KEY" />
+		<result property="onLine" jdbcType="VARCHAR" column="ON_LINE" />
+	</resultMap>
+	<resultMap id="nscMap" class="java.util.HashMap">
+		<result property="villageId" column="villageId" />
+		<result property="townId" column="townId" />
+		<result property="countyId" column="countyId" />
+		<result property="cityId" column="cityId" />
+		<result property="provinceId" column="provinceId" />
+	</resultMap>
+	<sql id="byTownshipinfoid">
+        <![CDATA[
+           TOWNSHIPINFOID = #townshipinfoid:LONG#
+        ]]>
+	</sql>
+	<!-- *******张嫚******* -->
+	<select id="select" parameterClass="town" resultMap="townMap">
+        <![CDATA[
+	        select * from RL_TOWNSHIP_INFO 
+		  ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="townshipinfName">
+				TOWNSHIPINF_NAME = #townshipinfName#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="key">
+				KEY = #key#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="parentId">
+				PARENT_ID = #parentId#
+			</isNotEmpty>
+			<!--根据关联的ID查 -->
+			<isNotEmpty prepend="AND" property="townshipinfoid">
+				TOWNSHIPINFOID=#townshipinfoid#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- zhangman 按照parentid查询 上线的乡镇 -->
+	<select id="selectByparentid" parameterClass="town" resultMap="townMap">
+        <![CDATA[
+	        select * from RL_TOWNSHIP_INFO 
+		  ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="townshipinfName">
+				TOWNSHIPINF_NAME like '%$townshipinfName$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="parentId">
+				PARENT_ID = #parentId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="onLine">
+
+			</isNotEmpty>
+			<isEmpty prepend="AND" property="onLine">
+				ON_LINE = '1'
+			</isEmpty>
+		</dynamic>
+	</select>
+
+	<select id="selectAll" resultClass="com.creditease.rc.vo.Area" parameterClass="com.creditease.rc.vo.Area">
+        <![CDATA[
+	        select t.TOWNSHIPINF_NAME  as town,
+       t.KEY               as townCode,
+       t1.PARENT_ID        as parentId,
+       t1.ON_LINE          as "onLine",
+       t1.TOWNSHIPINF_NAME as village,
+       t1.TOWNSHIPINFOID   as townshipinfoid,
+       t1.KEY              as code,
+       n.CITY_NAME         as district,
+       n.city_code         as districtCode,
+       n1.CITY_NAME        as city,
+       n2.CITY_NAME        as province
+	        from RL_TOWNSHIP_INFO t ,RL_TOWNSHIP_INFO t1,RL_NATIONAL_STANDARD_CODE n,RL_NATIONAL_STANDARD_CODE n1,RL_NATIONAL_STANDARD_CODE n2
+	        where t.TOWNSHIPINFOID = t1.PARENT_ID AND n.CITY_CODE = t.PARENT_ID AND n1.CITY_CODE = n.PARENT_ID AND n2.CITY_CODE = n1.PARENT_ID
+		 ]]>
+		<dynamic>
+			<isNotEmpty prepend="AND" property="town">
+				t.TOWNSHIPINF_NAME like '%$town$%'
+			</isNotEmpty>
+			<isNotEmpty property="village" prepend="AND">
+				t1.TOWNSHIPINF_NAME like '%$village$%'
+	        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="code">
+				upper(t1.KEY) like upper('%$code$%')
+			</isNotEmpty>
+			<isNotEmpty property="district" prepend="AND">
+				n.CITY_NAME like '%$district$%'
+	        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="city">
+				n1.CITY_NAME like '%$city$%'
+			</isNotEmpty>
+			<isNotEmpty property="province" prepend="AND">
+				n2.CITY_NAME like '%$province$%'
+	        </isNotEmpty>
+		</dynamic>
+		 <![CDATA[
+	          order by t1.townshipinfoid desc
+		 ]]>
+
+	</select>
+	<insert id="insert" parameterClass="town">
+		<selectKey keyProperty="townshipinfoid" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+    	<![CDATA[
+    		insert into RL_TOWNSHIP_INFO
+    			(TOWNSHIPINFOID,PARENT_ID,TOWNSHIPINF_NAME,KEY,ON_LINE)
+    		values(#townshipinfoid:LONG#,#parentId:LONG#,#townshipinfName:VARCHAR#,#key:VARCHAR#,#onLine:VARCHAR#)
+    	]]>
+	</insert>
+
+	<select id="countByPage" resultClass="int" parameterClass="com.creditease.rc.vo.Area">
+        <![CDATA[
+            SELECT COUNT(*) FROM  RL_TOWNSHIP_INFO t ,RL_TOWNSHIP_INFO t1,RL_NATIONAL_STANDARD_CODE n,RL_NATIONAL_STANDARD_CODE n1,RL_NATIONAL_STANDARD_CODE n2
+	        where t.TOWNSHIPINFOID = t1.PARENT_ID AND n.CITY_CODE = t.PARENT_ID AND n1.CITY_CODE = n.PARENT_ID AND n2.CITY_CODE = n1.PARENT_ID
+        ]]>
+		<dynamic>
+			<isNotEmpty prepend="AND" property="town">
+				t.TOWNSHIPINF_NAME like '%$town$%'
+			</isNotEmpty>
+			<isNotEmpty property="village" prepend="AND">
+				t1.TOWNSHIPINF_NAME like '%$village$%'
+	        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="code">
+				upper(t1.KEY) like upper('%$code$%')
+			</isNotEmpty>
+			<isNotEmpty property="district" prepend="AND">
+				n.CITY_NAME like '%$district$%'
+	        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="city">
+				n1.CITY_NAME like '%$city$%'
+			</isNotEmpty>
+			<isNotEmpty property="province" prepend="AND">
+				n2.CITY_NAME like '%$province$%'
+	        </isNotEmpty>
+		</dynamic>
+	</select>
+
+	<update id="update" parameterClass="town">
+		update RL_TOWNSHIP_INFO set
+		TOWNSHIPINF_NAME =#townshipinfName:VARCHAR#,
+		KEY = #key:varchar#,
+		ON_LINE = #onLine:CHAR#
+		where TOWNSHIPINFOID = #townshipinfoid:LONG#
+    </update>
+
+	<select id="selectByTown" parameterClass="java.lang.Long" resultMap="townMap">
+        <![CDATA[
+	       select * from RL_TOWNSHIP_INFO t where t.on_line = '1' and t.parent_id = (
+       		select t2.parent_id
+ 			from RL_TOWNSHIP_INFO t1,RL_TOWNSHIP_INFO t2
+			where t1.townshipinfoid = #townshipinfoid:LONG#
+			and t1.parent_id = t2.townshipinfoid
+			)
+        ]]>
+	</select>
+
+	<select id="selectByVillage" parameterClass="java.lang.Long" resultMap="townMap">
+        <![CDATA[
+        	select * from RL_TOWNSHIP_INFO t where t.on_line='1' and t.parent_id = (
+	       		select t1.parent_id
+	 			from RL_TOWNSHIP_INFO t1
+				where t1.townshipinfoid = #townshipinfoid:LONG#
+			)
+        ]]>
+	</select>
+
+	<select id="queryCountryTownByVillageId" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+        <![CDATA[
+        	select t2.townshipinfoid as townshipinfoId,t3.city_code as cityCode
+			 from RL_TOWNSHIP_INFO t1,RL_TOWNSHIP_INFO t2,RL_NATIONAL_STANDARD_CODE t3
+			where t1.townshipinfoid = #townshipinfoid:LONG#
+			and t1.parent_id = t2.townshipinfoid
+			and t2.parent_id = t3.city_code
+        ]]>
+	</select>
+
+	<select id="selectFuzzy" parameterClass="String" resultClass="com.creditease.rc.vo.Area">
+    	<![CDATA[
+    		  select t.TOWNSHIPINF_NAME  as town,
+       t.KEY               as townCode,
+       t1.PARENT_ID        as parentId,
+       t1.ON_LINE          as "onLine",
+       t1.TOWNSHIPINF_NAME as village,
+       t1.TOWNSHIPINFOID   as townshipinfoid,
+       t1.KEY              as code,
+       n.CITY_NAME         as district,
+       n.city_code         as districtCode,
+       n1.CITY_NAME        as city,
+       n2.CITY_NAME        as province
+	        from RL_TOWNSHIP_INFO t ,RL_TOWNSHIP_INFO t1,RL_NATIONAL_STANDARD_CODE n,RL_NATIONAL_STANDARD_CODE n1,RL_NATIONAL_STANDARD_CODE n2
+	        where t.TOWNSHIPINFOID = t1.PARENT_ID AND n.CITY_CODE = t.PARENT_ID AND n1.CITY_CODE = n.PARENT_ID AND n2.CITY_CODE = n1.PARENT_ID
+	        and(
+	        	t.TOWNSHIPINF_NAME like '%$fuzzy$%'
+	        OR  t1.TOWNSHIPINF_NAME like '%$fuzzy$%'
+	        OR	upper(t1.KEY) like upper('%$fuzzy$%')
+	        OR	upper(t.KEY) like upper('%$fuzzy$%')
+	        OR  n.CITY_NAME  like '%$fuzzy$%'
+	        OR  n1.CITY_NAME like '%$fuzzy$%'
+	        OR  n2.CITY_NAME  like '%$fuzzy$%'
+	        )
+	           order by t1.townshipinfoid desc
+    	]]>
+	</select>
+
+	<select id="countFuzzy" resultClass="int" parameterClass="String">
+    	   <![CDATA[
+            SELECT COUNT(*) FROM  RL_TOWNSHIP_INFO t ,RL_TOWNSHIP_INFO t1,RL_NATIONAL_STANDARD_CODE n,RL_NATIONAL_STANDARD_CODE n1,RL_NATIONAL_STANDARD_CODE n2
+	        where t.TOWNSHIPINFOID = t1.PARENT_ID AND n.CITY_CODE = t.PARENT_ID AND n1.CITY_CODE = n.PARENT_ID AND n2.CITY_CODE = n1.PARENT_ID
+	        and(
+	        	t.TOWNSHIPINF_NAME like '%$fuzzy$%'
+	        OR  t1.TOWNSHIPINF_NAME like '%$fuzzy$%'
+	        OR	upper(t1.KEY) like upper('%$fuzzy$%')
+	        OR	upper(t.KEY) like upper('%$fuzzy$%')
+	        OR  n.CITY_NAME  like '%$fuzzy$%'
+	        OR  n1.CITY_NAME like '%$fuzzy$%'
+	        OR  n2.CITY_NAME  like '%$fuzzy$%'
+	     )
+        ]]>
+	</select>
+
+	<select id="searchById" resultMap="townMap" parameterClass="long">
+    	   <![CDATA[
+            SELECT * FROM  RL_TOWNSHIP_INFO t  where t.townshipinfoid = #townshipinfoid#
+        ]]>
+	</select>
+	<select id="selectNscByVillageId" resultMap="nscMap" parameterClass="long">
+    	   <![CDATA[
+            select ti1.townshipinfoid villageId,
+			ti2.townshipinfoid townId,
+			nsc1.city_code countyId,
+			nsc2.city_code cityId,
+			nsc3.city_code provinceId
+			 from RL_TOWNSHIP_INFO ti1,RL_TOWNSHIP_INFO ti2,rl_national_standard_code nsc1
+			,rl_national_standard_code nsc2,rl_national_standard_code nsc3
+			where ti1.parent_id = ti2.townshipinfoid
+			and ti2.parent_id = nsc1.city_code
+			and nsc1.parent_id = nsc2.city_code
+			and nsc2.parent_id = nsc3.city_code
+			and ti1.townshipinfoid = #townshipinfoid#
+        ]]>
+	</select>
+	<select id="queryCheckTowns" resultClass="com.creditease.rc.vo.QueryCheckTownsVo" parameterClass="java.lang.Long">
+		select ti.townshipinf_name as townName,
+		upper(ti.key) as townKey,
+		t.townshipinf_name as villageName,
+		upper(t.key) as villageKey
+		from rl_township_info ti
+		left join rl_township_info t
+		on ti.townshipinfoid = t.parent_id
+		where ti.parent_id = #parentId#
+    </select>
+</sqlMap>

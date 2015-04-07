@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SALESPLANNING">
+	<typeAlias alias="salesPlanning" type="com.creditease.rc.domain.SalesPlanning" />
+	<typeAlias alias="salesPlanningTable" type="com.creditease.rc.vo.SalesPlanningTable" />
+	<resultMap class="salesPlanning" id="salesPlanningMAP">
+		<result property="salesPlanningId" column="SALES_PLANNING_ID" />
+		<result property="year" column="YEAR" />
+		<result property="month" column="MONTH" />
+		<result property="type" column="TYPE" />
+		<result property="areaDepartmentId" column="AREA_DEPARTMENT_ID" />
+		<result property="areaDepartmentName" column="AREA_DEPARTMENT_NAME" />
+		<result property="value" column="VALUE" />
+		<result property="planType" column="PLAN_TYPE" />
+	</resultMap>
+
+	<insert id="dynamicInsert" parameterClass="salesPlanning">
+		<selectKey keyProperty="salesPlanningId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into rl_sales_planning(
+			sales_planning_id
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="year">
+				,year
+			</isNotEmpty>
+			<isNotEmpty property="month">
+				,month
+			</isNotEmpty>
+			<isNotEmpty property="type">
+				,type
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentId">
+				,area_department_id
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentName">
+				,area_department_name
+			</isNotEmpty>
+			<isNotEmpty property="value">
+				,value
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#salesPlanningId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="year">
+				,#year#
+			</isNotEmpty>
+			<isNotEmpty property="month">
+				,#month#
+			</isNotEmpty>
+			<isNotEmpty property="type">
+				,#type#
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentId">
+				,#areaDepartmentId#
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentName">
+				,#areaDepartmentName#
+			</isNotEmpty>
+			<isNotEmpty property="value">
+				,#value#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="salesPlanning">
+		<![CDATA[
+			update rl_sales_planning
+			set
+			value = #value#
+		]]>
+		<isNotNull property="year" prepend=",">
+			year = #year#
+			</isNotNull>
+		<isNotNull property="month" prepend=",">
+			month = #month#
+			</isNotNull>
+		<isNotNull property="type" prepend=",">
+			type = #type#
+			</isNotNull>
+		<isNotNull property="areaDepartmentId" prepend=",">
+			area_department_id = #areaDepartmentId#
+			</isNotNull>
+		<isNotNull property="areaDepartmentName" prepend=",">
+			area_department_name = #areaDepartmentName#
+			</isNotNull>
+		<![CDATA[
+			where
+			sales_planning_id = #salesPlanningId#
+		]]>
+	</update>
+	<sql id="querySalesPlanningTableSQL">
+	<![CDATA[
+	   select sp.area_department_id as areaDepartmentId,
+       sp.area_department_name as areaDepartmentName,
+       sp.type as type,
+       sp.year as year,
+       max(case sp.month
+             when 1 then
+              sp.value
+             else
+              null
+           end) as jan,
+       max(case sp.month
+             when 2 then
+              sp.value
+             else
+              null
+           end) as feb,
+       max(case sp.month
+             when 3 then
+              sp.value
+             else
+              null
+           end) as mar,
+       max(case sp.month
+             when 4 then
+              sp.value
+             else
+              null
+           end) as apr,
+       max(case sp.month
+             when 5 then
+              sp.value
+             else
+              null
+           end) as may,
+       max(case sp.month
+             when 6 then
+              sp.value
+             else
+              null
+           end) as jun,
+       max(case sp.month
+             when 7 then
+              sp.value
+             else
+              null
+           end) as jul,
+       max(case sp.month
+             when 8 then
+              sp.value
+             else
+              null
+           end) as aug,
+       max(case sp.month
+             when 9 then
+              sp.value
+             else
+              null
+           end) as sep,
+       max(case sp.month
+             when 10 then
+              sp.value
+             else
+              null
+           end) as oct,
+       max(case sp.month
+             when 11 then
+              sp.value
+             else
+              null
+           end) as nov,
+       max(case sp.month
+             when 12 then
+              sp.value
+             else
+              null
+           end) as dec,
+       max(case sp.month
+             when 1 then
+              sp.sales_planning_id
+             else
+              null
+           end) as janId,
+       max(case sp.month
+             when 2 then
+              sp.sales_planning_id
+             else
+              null
+           end) as febId,
+       max(case sp.month
+             when 3 then
+              sp.sales_planning_id
+             else
+              null
+           end) as marId,
+       max(case sp.month
+             when 4 then
+              sp.sales_planning_id
+             else
+              null
+           end) as aprId,
+       max(case sp.month
+             when 5 then
+              sp.sales_planning_id
+             else
+              null
+           end) as mayId,
+       max(case sp.month
+             when 6 then
+              sp.sales_planning_id
+             else
+              null
+           end) as junId,
+       max(case sp.month
+             when 7 then
+              sp.sales_planning_id
+             else
+              null
+           end) as julId,
+       max(case sp.month
+             when 8 then
+              sp.sales_planning_id
+             else
+              null
+           end) as augId,
+       max(case sp.month
+             when 9 then
+              sp.sales_planning_id
+             else
+              null
+           end) as sepId,
+       max(case sp.month
+             when 10 then
+              sp.sales_planning_id
+             else
+              null
+           end) as octId,
+       max(case sp.month
+             when 11 then
+              sp.sales_planning_id
+             else
+              null
+           end) as novId,
+       max(case sp.month
+             when 12 then
+              sp.sales_planning_id
+             else
+              null
+           end) as decId
+  	   from rl_sales_planning sp
+  	   where sp.type = '0'
+  	   ]]>
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="year">
+				sp.year = #year#
+		</isNotEmpty>
+			<isNotEmpty prepend="and" property="areaDepartmentIds">
+				sp.area_department_id in ($areaDepartmentIds$)
+		</isNotEmpty>
+		</dynamic>
+	<![CDATA[
+	   group by (sp.area_department_id, sp.area_department_name, sp.type, sp.year)
+  	   union
+  	   select sp.area_department_id as areaDepartmentId,
+       sp.area_department_name as areaDepartmentName,
+       sp.type as type,
+       sp.year as year,
+       max(case sp.month
+             when 1 then
+              sp.value/10000
+             else
+              null
+           end) as jan,
+       max(case sp.month
+             when 2 then
+              sp.value/10000
+             else
+              null
+           end) as feb,
+       max(case sp.month
+             when 3 then
+              sp.value/10000
+             else
+              null
+           end) as mar,
+       max(case sp.month
+             when 4 then
+              sp.value/10000
+             else
+              null
+           end) as apr,
+       max(case sp.month
+             when 5 then
+              sp.value/10000
+             else
+              null
+           end) as may,
+       max(case sp.month
+             when 6 then
+              sp.value/10000
+             else
+              null
+           end) as jun,
+       max(case sp.month
+             when 7 then
+              sp.value/10000
+             else
+              null
+           end) as jul,
+       max(case sp.month
+             when 8 then
+              sp.value/10000
+             else
+              null
+           end) as aug,
+       max(case sp.month
+             when 9 then
+              sp.value/10000
+             else
+              null
+           end) as sep,
+       max(case sp.month
+             when 10 then
+              sp.value/10000
+             else
+              null
+           end) as oct,
+       max(case sp.month
+             when 11 then
+              sp.value/10000
+             else
+              null
+           end) as nov,
+       max(case sp.month
+             when 12 then
+              sp.value/10000
+             else
+              null
+           end) as dec,
+       max(case sp.month
+             when 1 then
+              sp.sales_planning_id
+             else
+              null
+           end) as janId,
+       max(case sp.month
+             when 2 then
+              sp.sales_planning_id
+             else
+              null
+           end) as febId,
+       max(case sp.month
+             when 3 then
+              sp.sales_planning_id
+             else
+              null
+           end) as marId,
+       max(case sp.month
+             when 4 then
+              sp.sales_planning_id
+             else
+              null
+           end) as aprId,
+       max(case sp.month
+             when 5 then
+              sp.sales_planning_id
+             else
+              null
+           end) as mayId,
+       max(case sp.month
+             when 6 then
+              sp.sales_planning_id
+             else
+              null
+           end) as junId,
+       max(case sp.month
+             when 7 then
+              sp.sales_planning_id
+             else
+              null
+           end) as julId,
+       max(case sp.month
+             when 8 then
+              sp.sales_planning_id
+             else
+              null
+           end) as augId,
+       max(case sp.month
+             when 9 then
+              sp.sales_planning_id
+             else
+              null
+           end) as sepId,
+       max(case sp.month
+             when 10 then
+              sp.sales_planning_id
+             else
+              null
+           end) as octId,
+       max(case sp.month
+             when 11 then
+              sp.sales_planning_id
+             else
+              null
+           end) as novId,
+       max(case sp.month
+             when 12 then
+              sp.sales_planning_id
+             else
+              null
+           end) as decId
+  	   from rl_sales_planning sp
+  	   where sp.type = '1'
+	]]>
+		<dynamic prepend="and">
+			<isNotEmpty prepend="and" property="year">
+				sp.year = #year#
+		</isNotEmpty>
+			<isNotEmpty prepend="and" property="areaDepartmentIds">
+				sp.area_department_id in ($areaDepartmentIds$)
+		</isNotEmpty>
+		</dynamic>
+		
+	<![CDATA[
+		group by (sp.area_department_id, sp.area_department_name, sp.type, sp.year)
+	]]>
+	</sql>
+	<select id="querySalesPlanningTable" parameterClass="java.util.HashMap" resultClass="salesPlanningTable">
+		<include refid="querySalesPlanningTableSQL" />
+	</select>
+
+    <!--获取被更新数据-->
+    <select id="searchSalesPlanningDel" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+        SELECT t.sales_planning_id FROM rl_sales_planning t WHERE t.plan_type = #plan_type# AND t.type = #type# AND t.area_department_id
+        IN
+        <iterate property="del" open="(" close=")" conjunction=",">
+            #del[]#
+        </iterate>
+        AND year = #year#
+    </select>
+
+    <insert id="saveSalesPlanning" parameterClass="salesPlanning">
+        <selectKey keyProperty="salesPlanningId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        insert into rl_sales_planning(
+            sales_planning_id
+            ,year
+            ,month
+            ,type
+            ,area_department_id
+            ,area_department_name
+            ,value
+            ,plan_type
+        )values(
+            #salesPlanningId#
+            ,#year#
+            ,#month#
+            ,#type#
+            ,#areaDepartmentId#
+            ,#areaDepartmentName#
+            ,#value#
+            ,#planType#
+        )
+    </insert>
+
+    <statement id="deleteSalesPlanning" parameterClass="java.util.List">
+        DELETE FROM rl_sales_planning WHERE sales_planning_id IN
+        <iterate open="(" close=")" conjunction=",">
+            #list[]#
+        </iterate>
+    </statement>
+
+    <!--按照条件查询数据-->
+    <sql id="sql_searchSalesPlanningByCase">
+        SELECT
+              t2.SALES_PLANNING_ID AS salesPlanningId,
+              t2.YEAR AS year,
+              t2.TYPE AS type,
+              t2.AREA_DEPARTMENT_ID AS areaDepartmentId,
+              t2.AREA_DEPARTMENT_NAME AS areaDepartmentName,
+              t2.VALUE AS value,
+              t2.MONTH AS month,
+              t2.PLAN_TYPE AS planType
+        FROM (SELECT
+                    t1.SALES_PLANNING_ID,
+                    t1.YEAR,
+                    t1.TYPE,
+                    t1.AREA_DEPARTMENT_ID,
+                    t1.AREA_DEPARTMENT_NAME,
+                    t1.VALUE,
+                    t1.MONTH,
+                    t1.PLAN_TYPE,
+                    row_number() OVER (PARTITION BY t1.AREA_DEPARTMENT_ID ORDER BY t1.SALES_PLANNING_ID DESC) rn
+              FROM RL_SALES_PLANNING t1
+              WHERE t1.YEAR = #year#
+              AND t1.TYPE = #type#
+                <isNotEmpty property="departmentIds">
+                    AND t1.AREA_DEPARTMENT_ID IN ($departmentIds$)
+                </isNotEmpty> ) t2
+        WHERE t2.rn BETWEEN 1 AND 12
+    </sql>
+    <select id="searchSalesPlanningByCase" parameterClass="java.util.HashMap" resultClass="salesPlanning">
+        <include refid="sql_searchSalesPlanningByCase"/>
+    </select>
+</sqlMap>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<b:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:b="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">    
+    
+    <!-- 引入参数配置文件 -->
+	
+    <http auto-config="true" entry-point-ref="casProcessingFilterEntryPoint">
+        <logout logout-success-url="${casserver.url}/logout?service=${rc.url}"/>
+        <session-management>
+        	<concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+    	</session-management>
+        <custom-filter ref="casAuthenticationFilter" after="CAS_FILTER"/>
+        <custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="filterSecurityInterceptor" />
+        <custom-filter ref="controlFilterer" after="SWITCH_USER_FILTER" />
+    </http>
+    <b:bean id="controlFilterer" class="com.creditease.core.security.ControlFilterer">
+		<b:property name="userAutService" ref="userAutService"></b:property>
+		<b:property name="systemSign" value="44"></b:property>
+	</b:bean>
+    <authentication-manager alias="authenticationManager">        
+        <authentication-provider ref="casAuthenticationProvider_com"/>
+        <authentication-provider ref="casAuthenticationProvider"/>
+    </authentication-manager> 
+
+    <b:bean id="casAuthenticationFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+        <b:property name="authenticationManager" ref="authenticationManager"/>
+        <b:property name="authenticationFailureHandler">
+            <b:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <b:property name="defaultFailureUrl" value="${casserver.url}/login"/>
+            </b:bean>
+        </b:property>
+        <b:property name="authenticationSuccessHandler">
+            <b:bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+                <b:property name="defaultTargetUrl" value="${rc.url}/"/>
+            </b:bean>
+        </b:property>
+        <b:property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage" />
+        <b:property name="proxyReceptorUrl" value="${rc.url}" />
+    </b:bean>
+    <b:bean id="casProcessingFilterEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+        <b:property name="loginUrl" value="${casserver.url}/login"/>
+        <b:property name="serviceProperties" ref="serviceProperties"/>
+    </b:bean>
+
+   <!--  cas内网-->   
+    <b:bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+         <b:property name="userDetailsService" ref="userDetailsService"/>
+        <b:property name="serviceProperties" ref="serviceProperties" />    
+        <b:property name="ticketValidator">  
+            <b:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+            <b:constructor-arg index="0" value="http://smpauth.creditease.corp" /> 
+                <b:property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage" />
+                <b:property name="proxyCallbackUrl" value="http://rural2.creditease.corp" />
+            </b:bean>
+        </b:property>
+        <b:property name="key" value="changeit"/>
+    </b:bean>   
+    
+    <!--  cas外网-->      
+   <b:bean id="casAuthenticationProvider_com" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <b:property name="userDetailsService" ref="userDetailsService"/>
+        <b:property name="serviceProperties" ref="serviceProperties_com" />
+        <b:property name="ticketValidator">  
+            <b:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+            <b:constructor-arg index="0" value="http://smpauth.creditease.cn" /> 
+                <b:property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage" />
+                <b:property name="proxyCallbackUrl" value="http://rural2.creditease.cn" />
+            </b:bean>
+        </b:property>
+        <b:property name="key" value="changeit"/>
+    </b:bean>
+
+    <b:bean id="proxyGrantingTicketStorage" class="org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl" />
+
+
+   <!--  ls内网--> 
+    <b:bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
+        <b:property name="service" value="http://rural2.creditease.corp/j_spring_cas_security_check"/>       
+        <b:property name="sendRenew" value="false"/>
+    </b:bean>    
+    <!--  ls外网-->  
+    <b:bean id="serviceProperties_com" class="org.springframework.security.cas.ServiceProperties">
+        <b:property name="service" value="http://rural2.creditease.cn/j_spring_cas_security_check"/>       
+        <b:property name="sendRenew" value="false"/>
+    </b:bean>
+
+	<b:bean id="userDetailsService"
+		class="com.creditease.core.security.UserDetailsServiceImp">
+		<b:property name="userAutService" ref="userAutService"></b:property>
+		<b:property name="systemSign" value="44"></b:property>
+	</b:bean>
+	<b:bean id="filterSecurityInterceptor"
+		class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+		<b:property name="authenticationManager" ref="authenticationManager" />
+		<b:property name="accessDecisionManager" ref="accessDecisionManager" />
+		<b:property name="securityMetadataSource" ref="securityMetadataSource" />
+	</b:bean>
+	<b:bean id="securityMetadataSource" class="com.creditease.core.security.SecurityMetadataSource">
+		<b:property name="resourceDetailsService" ref="resourceDetailsService" />
+	</b:bean>
+	<b:bean id="resourceDetailsService"
+		class="com.creditease.core.security.ResourceDetailsServiceImp">
+		<b:property name="filterURL">
+			<b:map>
+				<b:entry key="/image/**" value="ROLE_ANONYMOUS" />
+				<b:entry key="/systemPatch/**" value="ROLE_ANONYMOUS" />
+				<b:entry key="/services/**" value="ROLE_ANONYMOUS" />
+				<!-- b:entry key="/**/processMsg*.*" value="ROLE_ANONYMOUS" /> -->
+				<b:entry key="/**" value="ROLE_USER" />
+			</b:map>
+		</b:property>
+		<b:property name="userAutService" ref="userAutService" />
+		<b:property name="systemSign" value="44" />
+	</b:bean>
+
+	<b:bean id="accessDecisionManager"
+		class="org.springframework.security.access.vote.AffirmativeBased">
+		<b:property name="decisionVoters">
+			<b:list>
+				<b:bean class="org.springframework.security.access.vote.RoleVoter">
+					<b:property name="rolePrefix" value="ROLE_" />
+				</b:bean>
+				<b:bean
+					class="org.springframework.security.access.vote.AuthenticatedVoter" />			 
+			</b:list>
+		</b:property>
+	</b:bean>
+</b:beans>

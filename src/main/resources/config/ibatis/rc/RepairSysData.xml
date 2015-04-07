@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="repairsysData">
+	
+	<!-- 修改业务编号-主键 -->
+	<update id="updateBusNumById" parameterClass="java.util.HashMap">
+  		update rl_credit_application ca set ca.business_number = #newBusNum#
+	  <dynamic prepend="where">
+	  	<isNotEmpty prepend="and" property="caId">
+	  		ca.creditapplication_id = #caId#
+	  	</isNotEmpty>
+	  </dynamic>
+ 	</update>
+ 	<!-- 修改业务编号-旧编号 -->
+ 	<update id="updateBusNumByOld" parameterClass="java.util.HashMap">
+  		update rl_credit_application ca set ca.business_number = #newBusNum#
+	  <dynamic prepend="where">
+	  	<isNotEmpty prepend="and" property="oldBusNum">
+	  		ca.business_number = #oldBusNum#
+	  	</isNotEmpty>
+	  </dynamic>
+ 	</update>
+ 	<!-- 查询业务编号是否有重复 -->
+ 	<select id="queryCountByOld" parameterClass="java.lang.String" resultClass="int">
+ 		select count(*) from rl_credit_application ca where 1=1 and ca.business_number=#busNum#
+ 	</select>
+</sqlMap>

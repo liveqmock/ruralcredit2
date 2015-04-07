@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="LAONBALANCEDATA">
+	<typeAlias alias="laonBalanceData" type="com.creditease.rc.domain.LaonBalanceData" />
+	<resultMap class="laonBalanceData" id="laonBalanceDataMAP">
+		<result property="laonBalanceDataId" column="laon_balance_data_id" />
+		<result property="sysGuid" column="sys_guid" />
+		<result property="dCorpus" column="d_corpus" />
+		<result property="dInterest" column="d_interest" />
+		<result property="dOverhead" column="d_overhead" />
+		<result property="dCharges" column="d_charges" />
+		<result property="fCorpus" column="f_corpus" />
+		<result property="fInterest" column="f_interest" />
+		<result property="fOverhead" column="f_overhead" />
+		<result property="fCharges" column="f_charges" />
+		<result property="dfCorpus" column="df_corpus" />
+		<result property="dfInterest" column="df_interest" />
+		<result property="dfOverhead" column="df_overhead" />
+		<result property="dfCharges" column="df_charges" />
+	</resultMap>
+	<insert id="dynamicInsert" parameterClass="laonBalanceData">
+		<selectKey keyProperty="laonBalanceDataId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into rl_laon_balance_data(
+			laon_balance_data_id
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="sysGuid">
+				,sys_guid
+			</isNotEmpty>
+			<isNotEmpty property="dCorpus">
+				,d_corpus
+			</isNotEmpty>
+			<isNotEmpty property="dInterest">
+				,d_interest
+			</isNotEmpty>
+			<isNotEmpty property="dOverhead">
+				,d_overhead
+			</isNotEmpty>
+			<isNotEmpty property="dCharges">
+				,d_charges
+			</isNotEmpty>
+			<isNotEmpty property="fCorpus">
+				,f_corpus
+			</isNotEmpty>
+			<isNotEmpty property="fInterest">
+				,f_interest
+			</isNotEmpty>
+			<isNotEmpty property="fOverhead">
+				,f_overhead
+			</isNotEmpty>
+			<isNotEmpty property="fCharges">
+				,f_charges
+			</isNotEmpty>
+			<isNotEmpty property="dfCorpus">
+				,df_corpus
+			</isNotEmpty>
+			<isNotEmpty property="dfInterest">
+				,df_interest
+			</isNotEmpty>
+			<isNotEmpty property="dfOverhead">
+				,df_overhead
+			</isNotEmpty>
+			<isNotEmpty property="dfCharges">
+				,df_charges
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#laonBalanceDataId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="sysGuid">
+				,#sysGuid#
+			</isNotEmpty>
+			<isNotEmpty property="dCorpus">
+				,#dCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="dInterest">
+				,#dInterest#
+			</isNotEmpty>
+			<isNotEmpty property="dOverhead">
+				,#dOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="dCharges">
+				,#dCharges#
+			</isNotEmpty>
+			<isNotEmpty property="fCorpus">
+				,#fCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="fInterest">
+				,#fInterest#
+			</isNotEmpty>
+			<isNotEmpty property="fOverhead">
+				,#fOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="fCharges">
+				,#fCharges#
+			</isNotEmpty>
+			<isNotEmpty property="dfCorpus">
+				,#dfCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="dfInterest">
+				,#dfInterest#
+			</isNotEmpty>
+			<isNotEmpty property="dfOverhead">
+				,#dfOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="dfCharges">
+				,#dfCharges#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="laonBalanceData">
+		<![CDATA[
+			update rl_laon_balance_data
+		]]>
+		<dynamic prepend="set">
+			<isNotEmpty property="sysGuid" prepend=",">
+				sys_guid = #sysGuid#
+			</isNotEmpty>
+			<isNotEmpty property="dCorpus" prepend=",">
+				d_corpus = #dCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="dInterest" prepend=",">
+				d_interest = #dInterest#
+			</isNotEmpty>
+			<isNotEmpty property="dOverhead" prepend=",">
+				d_overhead = #dOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="dCharges" prepend=",">
+				d_charges = #dCharges#
+			</isNotEmpty>
+			<isNotEmpty property="fCorpus" prepend=",">
+				f_corpus = #fCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="fInterest" prepend=",">
+				f_interest = #fInterest#
+			</isNotEmpty>
+			<isNotEmpty property="fOverhead" prepend=",">
+				f_overhead = #fOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="fCharges" prepend=",">
+				f_charges = #fCharges#
+			</isNotEmpty>
+			<isNotEmpty property="dfCorpus" prepend=",">
+				df_corpus = #dfCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="dfInterest" prepend=",">
+				df_interest = #dfInterest#
+			</isNotEmpty>
+			<isNotEmpty property="dfOverhead" prepend=",">
+				df_overhead = #dfOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="dfCharges" prepend=",">
+				df_charges = #dfCharges#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			where
+			laon_balance_data_id = #laonBalanceDataId#
+		]]>
+	</update>
+	<delete id="deleteAll" parameterClass="java.lang.Long">
+		delete rl_laon_balance_data
+	</delete>
+	<select id="queryLoanTableDatas" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.LoanBalanceQuertData">
+		SELECT
+		b.balance                                       AS balance,
+		decode(b.defaultValue, NULL, 0, b.defaultValue) AS defaultValue,
+		decode(b.overdueDays, NULL, 0, b.overdueDays)   AS overdueDays,
+		b.customerCount                                 AS customerCount
+		FROM rl_credit_application a
+		INNER JOIN (SELECT
+		lbd.sys_guid                                        AS sysGuid,
+		(lbd.df_corpus + lbd.df_interest + lbd.df_overhead) AS balance,
+		1                                                   AS customerCount,
+		a.defaultValue,
+		a.overdueDays
+		FROM rl_laon_balance_data lbd LEFT JOIN (SELECT
+		od.laon_balance_data_id AS laonBalanceDataId,
+		sum(od.odf_corpus +
+		od.odf_interest +
+		od.odf_overhead)    AS defaultValue,
+		max(
+		od.overdue_days)    AS overdueDays
+		FROM rl_overdue_data od
+		GROUP BY od.laon_balance_data_id) a
+		ON a.laonBalanceDataId = lbd.laon_balance_data_id) b
+		ON b.sysGuid = a.SYS_GUID
+		INNER JOIN (SELECT DISTINCT OBJECT_ID_IDENTITY
+		FROM sid_view
+		WHERE CLASS = 'com.creditease.rc.domain.CreditApplication' AND
+		ace_sid IN ($authList$)) v
+		ON (v.object_id_identity = a.CREDITAPPLICATION_ID)
+		WHERE 1 = 1 AND a.company_id IN ($areaDepartmentIds$)
+	</select>
+</sqlMap>

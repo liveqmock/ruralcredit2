@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="dataBestowal" >
+   <typeAlias alias="dataBestowal" type="com.creditease.rc.domain.DataBestowal"/>
+  <resultMap id="abatorgenerated_DataBestowalResult" class="dataBestowal" >
+    <result column="DATA_BESTOWAL_ID" property="dataBestowalId" jdbcType="DECIMAL" />
+    <result column="OLD_LOAN_OFFICER_ID" property="oldLoanOfficerId" jdbcType="VARCHAR" />
+    <result column="OLD_LOAN_OFFICER_NAME" property="oldLoanOfficerName" jdbcType="VARCHAR" />
+    <result column="NEW_LOAN_OFFICER_ID" property="newLoanOfficerId" jdbcType="VARCHAR" />
+    <result column="NEW_LOAN_OFFICER_NAME" property="newLoanOfficerName" jdbcType="VARCHAR" />
+    <result column="NOTE" property="note" jdbcType="VARCHAR" />
+    <result column="OPERATING_ID" property="operatingId" jdbcType="VARCHAR" />
+    <result column="OPERATING_NAME" property="operatingName" jdbcType="VARCHAR" />
+    <result column="OPERATING_TIME" property="operatingTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="selectByDataBestowalSelective_condition">
+  	 <dynamic prepend="where" >
+      <isNotEmpty prepend="and" property="dataBestowalId" >
+        DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="oldLoanOfficerId" >
+        OLD_LOAN_OFFICER_ID = #oldLoanOfficerId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="oldLoanOfficerName" >
+        OLD_LOAN_OFFICER_NAME = #oldLoanOfficerName:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="newLoanOfficerId" >
+        NEW_LOAN_OFFICER_ID = #newLoanOfficerId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="newLoanOfficerName" >
+        NEW_LOAN_OFFICER_NAME = #newLoanOfficerName:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="note">
+        NOTE = #note:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="operatingId" >
+        OPERATING_ID = #operatingId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="operatingName" >
+        OPERATING_NAME = #operatingName:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="operatingTime" >
+        OPERATING_TIME = #operatingTime:TIMESTAMP#
+      </isNotEmpty>
+    </dynamic>
+  </sql>
+  <!-- 查询 -->
+  <select id="selectByDataBestowalSelective" resultMap="abatorgenerated_DataBestowalResult" parameterClass="dataBestowal" >
+    select DATA_BESTOWAL_ID, OLD_LOAN_OFFICER_ID, OLD_LOAN_OFFICER_NAME, NEW_LOAN_OFFICER_ID,
+      NEW_LOAN_OFFICER_NAME, NOTE, OPERATING_ID, OPERATING_NAME, OPERATING_TIME
+    from RL_DATA_BESTOWAL
+   	<include refid="selectByDataBestowalSelective_condition"/>
+    <![CDATA[
+    	order by operating_time desc
+    ]]>
+  </select>
+  <!-- 统计 -->
+  <select id="countByDataBestowalSelective" parameterClass="dataBestowal"  resultClass="java.lang.Integer">
+  	 select count(*)  from RL_DATA_BESTOWAL
+   	<include refid="selectByDataBestowalSelective_condition"/>
+  </select>
+  <!-- 保存 -->
+  <insert id="insertByDataBestowal" parameterClass="dataBestowal" >
+    	<selectKey keyProperty="dataBestowalId" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+	</selectKey>
+    insert into RL_DATA_BESTOWAL (DATA_BESTOWAL_ID, OLD_LOAN_OFFICER_ID, OLD_LOAN_OFFICER_NAME,
+      NEW_LOAN_OFFICER_ID, NEW_LOAN_OFFICER_NAME, NOTE, OPERATING_ID, OPERATING_NAME)
+    values (#dataBestowalId:DECIMAL#, #oldLoanOfficerId:VARCHAR#, #oldLoanOfficerName:VARCHAR#,
+      #newLoanOfficerId:VARCHAR#, #newLoanOfficerName:VARCHAR#, #note:VARCHAR#,
+      #operatingId:VARCHAR#, #operatingName:VARCHAR#)
+  </insert>
+  <!-- 更新 未启用 -->
+  <update id="updateByDataBestowalSelective" parameterClass="dataBestowal">
+    update RL_DATA_BESTOWAL
+    <dynamic prepend="set" >
+      <isNotEmpty prepend="," property="dataBestowalId" >
+        DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="oldLoanOfficerId" >
+        OLD_LOAN_OFFICER_ID = #oldLoanOfficerId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="oldLoanOfficerName" >
+        OLD_LOAN_OFFICER_NAME = #oldLoanOfficerName:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="newLoanOfficerId" >
+        NEW_LOAN_OFFICER_ID = #newLoanOfficerId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="newLoanOfficerName" >
+        NEW_LOAN_OFFICER_NAME = #newLoanOfficerName:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="note" >
+        NOTE = #note:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="operatingId" >
+        OPERATING_ID = #operatingId:VARCHAR#
+      </isNotEmpty>
+      <isNotEmpty prepend="," property="operatingName" >
+        OPERATING_NAME = #operatingName:VARCHAR#
+      </isNotEmpty>
+    </dynamic>
+  </update>
+  <!-- 全量更新 未启用 -->
+  <update id="updateBydataBestowal" parameterClass="dataBestowal" >
+    update RL_DATA_BESTOWAL
+    set DATA_BESTOWAL_ID = #dataBestowalId:DECIMAL#,
+      OLD_LOAN_OFFICER_ID = #oldLoanOfficerId:VARCHAR#,
+      OLD_LOAN_OFFICER_NAME = #oldLoanOfficerName:VARCHAR#,
+      NEW_LOAN_OFFICER_ID = #newLoanOfficerId:VARCHAR#,
+      NEW_LOAN_OFFICER_NAME = #newLoanOfficerName:VARCHAR#,
+      NOTE = #note:VARCHAR#,
+      OPERATING_ID = #operatingId:VARCHAR#,
+      OPERATING_NAME = #operatingName:VARCHAR#
+  </update>
+  
+  <!-- 按申请id 分页查询 -->
+  <sql id="searchbusinessSql">
+  		 select  DATA_BESTOWAL_ID, OLD_LOAN_OFFICER_ID, OLD_LOAN_OFFICER_NAME, NEW_LOAN_OFFICER_ID,
+      NEW_LOAN_OFFICER_NAME, NOTE, OPERATING_ID, OPERATING_NAME, OPERATING_TIME from rl_data_bestowal d 
+		where d.data_bestowal_id in
+		(select dd.data_bestowal_id from RL_DATA_BESTOWAL_DETAIL dd where dd.credit_application_id = #creditApplicationId#)
+		order by d.operating_time desc
+  </sql>
+  <select id="searchbusiness" parameterClass="long"  resultMap="abatorgenerated_DataBestowalResult">
+		 <include refid="searchbusinessSql"/>
+  </select>
+  <select id="countbusiness" parameterClass="long" resultClass="int">
+  		select count(*) from 
+  		(<include refid="searchbusinessSql"/>)
+  </select>
+  
+</sqlMap>

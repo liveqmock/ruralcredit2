@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXANSWERSRECORD">
+	<resultMap id="wxAnswersRecordMap" class="com.creditease.rc.domain.WxAnswersRecord">
+		<result column="WX_ANSWERS_RECORD_ID" property="wxAnswersRecordId" jdbcType="DECIMAL" />
+		<result column="WX_USER_ID" property="wxUserId" jdbcType="DECIMAL" />
+		<result column="WX_QUESTION_ID" property="wxQuestionId" jdbcType="DECIMAL" />
+		<result column="IS_CORRECT" property="isCorrect" jdbcType="VARCHAR" />
+		<result column="SCORE" property="score" jdbcType="DECIMAL" />
+		<result column="VIP_SCORE" property="vipScore" jdbcType="DECIMAL" />
+		<result column="ANSWER_DATE" property="answerDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxAnswersRecordMap" parameterClass="com.creditease.rc.domain.WxAnswersRecord">
+		select WX_ANSWERS_RECORD_ID, WX_USER_ID,
+		WX_QUESTION_ID, IS_CORRECT, SCORE, VIP_SCORE, ANSWER_DATE
+		from RL_WX_ANSWERS_RECORD
+		where WX_ANSWERS_RECORD_ID = #wxAnswersRecordId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxAnswersRecord">
+		delete from RL_WX_ANSWERS_RECORD
+		where WX_ANSWERS_RECORD_ID =
+		#wxAnswersRecordId:DECIMAL#
+  </delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxAnswersRecord">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxAnswersRecordId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_ANSWERS_RECORD (WX_ANSWERS_RECORD_ID, WX_USER_ID, WX_QUESTION_ID, IS_CORRECT, SCORE, VIP_SCORE, ANSWER_DATE)
+		values
+		(#wxAnswersRecordId:DECIMAL#, #wxUserId:DECIMAL#, #wxQuestionId:DECIMAL#, #isCorrect:VARCHAR#, #score:DECIMAL#, #vipScore:DECIMAL#,
+		#answerDate:TIMESTAMP#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxAnswersRecord">
+		update RL_WX_ANSWERS_RECORD
+		set WX_USER_ID = #wxUserId:DECIMAL#,
+		WX_QUESTION_ID =
+		#wxQuestionId:DECIMAL#,
+		IS_CORRECT = #isCorrect:VARCHAR#,
+		SCORE = #score:DECIMAL#,
+		VIP_SCORE = #vipScore:DECIMAL#,
+		ANSWER_DATE = #answerDate:TIMESTAMP#
+		where WX_ANSWERS_RECORD_ID =
+		#wxAnswersRecordId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxAnswersRecord">
+		update RL_WX_ANSWERS_RECORD
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="wxUserId">
+				WX_USER_ID = #wxUserId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="wxQuestionId">
+				WX_QUESTION_ID = #wxQuestionId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="isCorrect">
+				IS_CORRECT = #isCorrect:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="score">
+				SCORE = #score:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="vipScore">
+				VIP_SCORE = #vipScore:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="answerDate">
+				ANSWER_DATE = #answerDate:TIMESTAMP#
+      </isNotNull>
+		</dynamic>
+		where WX_ANSWERS_RECORD_ID = #wxAnswersRecordId:DECIMAL#
+	</update>
+</sqlMap>

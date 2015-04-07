@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="REPAYMENTPLANITEM">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="repaymentPlanItem" type="com.creditease.rc.domain.RepaymentPlanItem" />
+	<resultMap class="com.creditease.rc.domain.RepaymentPlanItem" id="repaymentPlanItemMap">
+		<result property="repaymentPlanItemId" column="REPAYMENT_PLAN_ITEM_ID" jdbcType="INTEGER" />
+		<result property="repaymentPlanId" column="REPAYMENT_PLAN_ID" jdbcType="INTEGER" />
+		<result property="months" column="MONTHS" jdbcType="INTEGER" />
+		<result property="principalRepayment" column="PRINCIPAL_REPAYMENT" jdbcType="CHAR" />
+		<result property="principal" column="PRINCIPAL" jdbcType="DOUBLE" />
+		<result property="intertestRepayment" column="INTEREST_REPAYMENT" jdbcType="CHAR" />
+		<result property="interest" column="INTEREST" jdbcType="DOUBLE" />
+		<result property="chargeServiceMethod" column="CHARGE_SERVICE_METHOD" jdbcType="CHAR" />
+		<result property="serviceFree" column="SERVICE_FREE" jdbcType="DOUBLE" />
+	</resultMap>
+	<select id="select" resultMap="repaymentPlanItemMap">
+		select * from
+		RL_REPAYMENT_PLAN_ITEM
+	</select>
+	<select id="selectRepaymentPlanItem" parameterClass="int" resultMap="repaymentPlanItemMap">
+        <![CDATA[
+	        select * from RL_REPAYMENT_PLAN_ITEM 
+	        where
+	        REPAYMENT_PLAN_ID = #repaymentPlanId:INTEGER#
+        ]]>
+         <![CDATA[
+			order by MONTHS asc
+		]]>
+	</select>
+	<select id="countRepaymentPlanItem" parameterClass="int" resultClass="int">
+        <![CDATA[
+            select count(*) from RL_REPAYMENT_PLAN_ITEM
+            where
+            REPAYMENT_PLAN_ID = #repaymentPlanId:INTEGER#
+        ]]>
+
+	</select>
+	<insert id="insertIntorepaymentPlanItem" parameterClass="repaymentPlanItem">
+		<selectKey keyProperty="repaymentPlanItemId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_REPAYMENT_PLAN_ITEM (REPAYMENT_PLAN_ITEM_ID,REPAYMENT_PLAN_ID,MONTHS,PRINCIPAL_REPAYMENT,PRINCIPAL,INTEREST_REPAYMENT,INTEREST,CHARGE_SERVICE_METHOD,SERVICE_FREE)
+			values (#repaymentPlanItemId:INTEGER#, #repaymentPlanId:INTEGER#, #months:INTEGER#,
+			#principalRepayment:CHAR#, #principal:DOUBLE#,
+			#intertestRepayment:CHAR#, #interest:DOUBLE#,
+			#chargeServiceMethod:CHAR#, #serviceFree:DOUBLE#)
+		]]>
+	</insert>
+	<update id="updateRepaymentPlanItemByrepaymentPlanItemId" parameterClass="repaymentPlanItem">
+		<![CDATA[
+			update RL_REPAYMENT_PLAN_ITEM
+			set
+			PRINCIPAL=#principal:DOUBLE#,
+			INTEREST=#interest:DOUBLE#,
+			SERVICE_FREE=#serviceFree:DOUBLE#
+			where
+			REPAYMENT_PLAN_ITEM_ID=#repaymentPlanItemId:INTEGER#
+		]]>
+	</update>
+</sqlMap>

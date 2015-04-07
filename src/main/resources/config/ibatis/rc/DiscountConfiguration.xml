@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="DISCOUNTCONFIGURATION">
+	<typeAlias alias="discountConfiguration" type="com.creditease.rc.domain.DiscountConfiguration" />
+	<typeAlias alias="creditChannelConfig" type="com.creditease.rc.domain.CreditChannelConfig" />
+	<resultMap id="discountConfigurationMap" class="com.creditease.rc.domain.DiscountConfiguration">
+		<result column="DISCOUNT_CONFIGURATION_ID" property="discountConfigurationId" jdbcType="DECIMAL" />
+		<result column="AREA_DEPARTMENT_ID" property="areaDepartmentId" jdbcType="DECIMAL" />
+		<result column="AREA_DEPARTMENT_NAME" property="areaDepartmentName" jdbcType="VARCHAR" />
+		<result column="PRODUCTINFO_ID" property="productinfoId" jdbcType="DECIMAL" />
+		<result column="PRODUCT_CATEGORY_ID" property="productCategoryId" jdbcType="DECIMAL" />
+		<result column="DISCOUNT_RATE" property="discountRate" jdbcType="DECIMAL" />
+		<result column="PRODUCT_NAME" property="productName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- 根据信贷申请id查询是否配置综合信贷 -->
+	<select id="queryIsZhxindai" parameterClass="long" resultClass="string">
+		select ct.channel  from rl_credit_channel_config ct where ct.department_id=
+			(select t.company_id  from rl_credit_application t where t.creditapplication_id=#creditapplicationId#)
+	</select>
+	
+	<select id="select" resultMap="discountConfigurationMap" parameterClass="discountConfiguration">
+		select DISCOUNT_CONFIGURATION_ID, AREA_DEPARTMENT_ID, AREA_DEPARTMENT_NAME, PRODUCTINFO_ID,
+		PRODUCT_CATEGORY_ID, DISCOUNT_RATE,PRODUCT_NAME
+		from RL_DISCOUNT_CONFIGURATION
+		where DISCOUNT_CONFIGURATION_ID = #discountConfigurationId:DECIMAL#
+	</select>
+	<delete id="deleteByPrimeKey" parameterClass="java.lang.Long">
+		delete from RL_DISCOUNT_CONFIGURATION
+		where DISCOUNT_CONFIGURATION_ID = #discountConfigurationId:DECIMAL#
+	</delete>
+	<insert id="insert" parameterClass="discountConfiguration">
+		insert into RL_DISCOUNT_CONFIGURATION (DISCOUNT_CONFIGURATION_ID,AREA_DEPARTMENT_ID, AREA_DEPARTMENT_NAME, PRODUCTINFO_ID,
+		PRODUCT_CATEGORY_ID, DISCOUNT_RATE,PRODUCT_NAME)
+		values (#discountConfigurationId:DECIMAL#,#areaDepartmentId:DECIMAL#, #areaDepartmentName:VARCHAR#, #productinfoId:DECIMAL#,
+		#productCategoryId:DECIMAL#, #discountRate:DECIMAL#,#productName:VARCHAR#)
+		<selectKey resultClass="java.lang.Long" keyProperty="discountConfigurationId" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+    </selectKey>
+	</insert>
+	<update id="update" parameterClass="discountConfiguration">
+		update RL_DISCOUNT_CONFIGURATION
+		set AREA_DEPARTMENT_ID = #areaDepartmentId:DECIMAL#,
+		AREA_DEPARTMENT_NAME = #areaDepartmentName:VARCHAR#,
+		PRODUCTINFO_ID = #productinfoId:DECIMAL#,
+		PRODUCT_CATEGORY_ID = #productCategoryId:DECIMAL#,
+		DISCOUNT_RATE = #discountRate:DECIMAL#,
+		PRODUCT_NAME = #productName:VARCHAR#
+		where DISCOUNT_CONFIGURATION_ID = #discountConfigurationId:DECIMAL#
+	</update>
+	<update id="dynamicUpdate" parameterClass="discountConfiguration">
+		update RL_DISCOUNT_CONFIGURATION
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="areaDepartmentId">
+				AREA_DEPARTMENT_ID = #areaDepartmentId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="areaDepartmentName">
+				AREA_DEPARTMENT_NAME = #areaDepartmentName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="productinfoId">
+				PRODUCTINFO_ID = #productinfoId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="productCategoryId">
+				PRODUCT_CATEGORY_ID = #productCategoryId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="discountRate">
+				DISCOUNT_RATE = #discountRate:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="productName">
+				PRODUCT_NAME = #productName:DECIMAL#
+      </isNotNull>
+		</dynamic>
+		where DISCOUNT_CONFIGURATION_ID = #discountConfigurationId:DECIMAL#
+	</update>
+	<sql id="queryDiscountConfigurationByDomain">
+		select dc.discount_configuration_id as discountConfigurationId,
+		dc.area_department_id as areaDepartmentId,
+		dc.area_department_name as areaDepartmentName,
+		dc.productinfo_id as productinfoId,
+		dc.product_category_id as productCategoryId,
+		dc.discount_rate as discountRate,
+		dc.product_name as productName
+		from rl_discount_configuration dc
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="discountConfigurationId">
+				DISCOUNT_CONFIGURATION_ID = #discountConfigurationId:DECIMAL#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="areaDepartmentId">
+				AREA_DEPARTMENT_ID = #areaDepartmentId:DECIMAL#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="areaDepartmentName">
+				AREA_DEPARTMENT_NAME = #areaDepartmentName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="productinfoId">
+				PRODUCTINFO_ID = #productinfoId:DECIMAL#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="productCategoryId">
+				PRODUCT_CATEGORY_ID = #productCategoryId:DECIMAL#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="discountRate">
+				DISCOUNT_RATE = #discountRate:DECIMAL#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="productName">
+				PRODUCT_NAME = #productName:DECIMAL#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	<select id="queryDiscountConfigurationEntity" parameterClass="discountConfiguration" resultClass="discountConfiguration">
+		<include refid="queryDiscountConfigurationByDomain" />
+		order by dc.area_department_id asc, dc.area_department_id asc
+	</select>
+	<select id="queryDiscountConfigurationCount" parameterClass="discountConfiguration" resultClass="int">
+		select count(*) from (
+		<include refid="queryDiscountConfigurationByDomain" />
+		order by dc.area_department_id asc, dc.area_department_id asc)
+	</select>
+	<select id="queryDiscountConfiguration" parameterClass="discountConfiguration" resultClass="discountConfiguration">
+		<include refid="queryDiscountConfigurationByDomain" />
+	</select>
+	<select id="discountRule" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+		select ca.creditapplication_id
+		from rl_credit_application ca, rl_borrower_service_app bsa
+		where ca.creditapplication_id = bsa.creditapplication_id
+		and ca.creditapplication_id = $creditapplicationId$
+		and ca.valid_state = '1'
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		and ca.revolving_credit = '1'
+		and to_date(#discountConfigurationDate#, 'yyyy-mm-dd') >= ca.create_date
+		and bsa.credentials_number not in
+		(select credentials_number
+		from (select bsa.credentials_number as credentials_number,
+		sum(ca.discount_flag) as sumD,
+		ca.audit_status as audit_status
+		from rl_credit_application ca, rl_borrower_service_app bsa
+		where ca.creditapplication_id = bsa.creditapplication_id
+		and ca.valid_state = '1'
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		and (ca.audit_status = '16' or ca.audit_status = '20')
+		group by bsa.credentials_number, ca.audit_status) k
+		where k.sumD > 0)
+	</select>
+	<update id="updateCreditDiscountVo" parameterClass="com.creditease.rc.vo.CreditDiscountVo">
+		update rl_credit_application ca
+		set
+		ca.discount_flag = #discountFlag#,
+		ca.discount = #discount#
+		where ca.creditapplication_id = #creditapplicationId#
+	</update>
+	<select id="checkDiscountConfiguration" resultClass="com.creditease.rc.vo.CreditDiscountVo" parameterClass="java.lang.Long">
+		select ca.creditapplication_id as creditapplicationId,
+		ca.discount_flag as discountFlag,
+		dc.discount_rate as discount
+		from rl_credit_application ca
+		left join rl_discount_configuration dc
+		on ca.company_id = dc.area_department_id
+		and ca.repayment_plan_id = dc.productinfo_id
+		and ca.producttypeid = dc.product_category_id
+		where ca.creditapplication_id = #creditapplicationId#
+	</select>
+	<select id="queryCreditDisConfig" resultClass="com.creditease.rc.vo.CreditDiscountVo" parameterClass="java.lang.Long">
+		select ca.creditapplication_id as creditapplicationId,
+		ca.discount_flag as discountFlag,
+		ca.discount as discount
+		from rl_credit_application ca
+		where ca.creditapplication_id = #creditapplicationId#
+	</select>
+
+	<!--业务单渠道配置-查询-->
+	<sql id="sql_queryCreditChannelConfig">
+		select t.CONFIG_ID as configId,
+		t.DEPARTMENT_ID as departmentId,
+		t.DEPARTMENT_NAME as departmentName,
+		t.CHANNEL as channel,
+		(select CODE_VALUE from RL_CODETABLE WHERE CODE_KEY = t.CHANNEL AND "SECTION" = 'creditchannel') as channelText
+		from RL_CREDIT_CHANNEL_CONFIG t
+		where 1 = 1
+		<isNotEmpty property="ids" >
+			and t.DEPARTMENT_ID in ($ids$)
+		</isNotEmpty>
+	</sql>
+	<select id="queryCreditChannelConfig" parameterClass="creditChannelConfig" resultClass="creditChannelConfig">
+		<include refid="sql_queryCreditChannelConfig"/>
+	</select>
+	<select id="queryCreditChannelConfigCount" parameterClass="creditChannelConfig" resultClass="int">
+		select count(1) from (
+		<include refid="sql_queryCreditChannelConfig"/>)
+	</select>
+
+	<!--业务单渠道配置-保存-->
+	<insert id="insertCreditChannelConfig" parameterClass="creditChannelConfig">
+		<selectKey resultClass="java.lang.Long" keyProperty="configId" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		insert into rl_credit_channel_config (config_Id, department_Id, department_Name, channel)
+		values(#configId#, #departmentId#, #departmentName#, #channel#)
+	</insert>
+
+	<!--业务单渠道配置-更新-->
+	<update id="updateCreditChannelConfig" parameterClass="creditChannelConfig">
+		update rl_credit_channel_config t
+		<dynamic prepend="set">
+			t.channel = #channel#
+		</dynamic>
+		where config_Id = #configId#
+	</update>
+
+	<!--业务单渠道配置-删除-->
+	<delete id="removeCreditChannelConfigById" parameterClass="java.lang.Long">
+		delete rl_credit_channel_config where config_Id = #value#
+	</delete>
+
+	<!--业务单渠道配置-存在性-->
+	<select id="countCreditChannelConfig" parameterClass="java.lang.String" resultClass="java.lang.Integer">
+		select count(1) from RL_CREDIT_CHANNEL_CONFIG t where t.DEPARTMENT_ID = #value#
+	</select>
+</sqlMap>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AVGINCRATE">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="avgIncRate" type="com.creditease.rc.domain.AvgIncRate" />
+    <resultMap class="com.creditease.rc.domain.AvgIncRate" id="AvgIncRateMap">
+		<result property="avgIncRateId" column="AVG_INC_RATE_ID" jdbcType="INTEGER"/>
+	    <result property="sellProject" column="SELL_PROJECT" jdbcType="VARCHAR"/>
+	    <result property="purchaceCost" column="PURCHACE_COST" jdbcType="DOUBLE"/>
+	    <result property="purchaceQuantity" column="PURCHACE_QUANTITY" jdbcType="INTEGER"/>
+	    <result property="onePieceCost" column="ONE_PIECE_COST" jdbcType="DOUBLE"/>
+	    <result property="onePieceSalePrice" column="ONE_PIECE_SALE_PRICE" jdbcType="DOUBLE"/>
+	    <result property="itemSort" column="ITEM_SORT" jdbcType="INTEGER"/>
+	    <result property="belongId" column="BELONG_ID" jdbcType="INTEGER"/>
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="avgIncRate" >
+    	 <selectKey keyProperty="avgIncRateId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_AVG_INC_RATE
+        		(
+					AVG_INC_RATE_ID,
+					SELL_PROJECT,
+					PURCHACE_COST,
+					PURCHACE_QUANTITY,
+					ONE_PIECE_COST,
+					ONE_PIECE_SALE_PRICE,
+					ITEM_SORT,
+					BELONG_ID
+					)
+        	values(
+					#avgIncRateId:INTEGER#,
+					#sellProject:VARCHAR#,
+					#purchaceCost:DOUBLE#,
+					#purchaceQuantity:INTEGER#,
+					#onePieceCost:DOUBLE#,
+					#onePieceSalePrice:DOUBLE#,
+					#itemSort:INTEGER#,
+					#belongId:INTEGER#
+				  )
+        ]]>
+    </insert>
+
+     <update id="update" parameterClass="avgIncRate">
+     	update RL_AVG_INC_RATE
+			set 
+				SELL_PROJECT = #sellProject:VARCHAR#,
+				PURCHACE_COST = #purchaceCost:DOUBLE#,
+				PURCHACE_QUANTITY = #purchaceQuantity:INTEGER#,
+				ONE_PIECE_COST = #onePieceCost:DOUBLE#,
+				ONE_PIECE_SALE_PRICE = #onePieceSalePrice:DOUBLE#
+			where
+				AVG_INC_RATE_ID = #avgIncRateId:INTEGER#
+     </update>
+     
+     <select id="selectByBelongId" parameterClass="int" resultMap="AvgIncRateMap">
+     	<![CDATA[
+     		SELECT * 
+     			FROM 
+     				RL_AVG_INC_RATE 
+     		where 
+     			BELONG_ID = #belongId:INTEGER#
+     		order by ITEM_SORT
+     	]]>
+     </select>
+     
+    <select id="selectCountByBelongId" parameterClass="int" resultClass="int">
+     	<![CDATA[
+     		SELECT count(*) 
+     			FROM RL_AVG_INC_RATE 
+     				where BELONG_ID = #belongId:INTEGER#
+     	]]>
+    </select>
+    
+    <delete id="deleteByBelongId" parameterClass="int">
+    	<![CDATA[
+    		DELETE FROM RL_AVG_INC_RATE WHERE BELONG_ID=#belongId:INTEGER#
+    	]]>
+    </delete>
+     
+</sqlMap>

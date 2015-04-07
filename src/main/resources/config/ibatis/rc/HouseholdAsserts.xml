@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="householdasserts">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="householdasserts" type="com.creditease.rc.domain.Householdasserts" />
+	<resultMap class="com.creditease.rc.domain.Householdasserts" id="householdassertsMap">
+		<result column="HOUSEHOLD_ASSERTS_ID" jdbcType="INTEGER" property="householdAssertsId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="HOUSEHOLD_ASSERTS_TYPE" jdbcType="CHAR" property="householdAssertsType" />
+		<result column="DESCRIPTION1" jdbcType="VARCHAR" property="description1" />
+		<result column="DESCRIPTION2" jdbcType="VARCHAR" property="description2" />
+		<result column="VALUE" jdbcType="DOUBLE" property="value" />
+		<result column="unit" jdbcType="VARCHAR" property="unit" />
+		<result column="buy_date" jdbcType="VARCHAR" property="buyDate" />
+		<result column="buy_price" jdbcType="VARCHAR" property="buyPrice" />
+		<result column="photo" jdbcType="VARCHAR" property="photo" />
+	</resultMap>
+	<sql id="byhouseholdAssertsIdCondition">
+        <![CDATA[
+           HOUSEHOLD_ASSERTS_ID  = #householdAssertsId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertIntohouseholdasserts" parameterClass="householdasserts">
+		<selectKey keyProperty="householdAssertsId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_HOUSEHOLD_ASSERTS 
+			(HOUSEHOLD_ASSERTS_ID,BORROWER_SERVICE_APP_ID,HOUSEHOLD_ASSERTS_TYPE,
+			DESCRIPTION1,DESCRIPTION2,VALUE,unit,buy_date,buy_price,photo)
+			values 
+			(#householdAssertsId:INTEGER#, #borrowerServiceAppId:INTEGER#, #householdAssertsType:CHAR#, 
+			#description1:VARCHAR#,#description2:VARCHAR#,#value:DOUBLE#,#unit#,#buyDate#,#buyPrice#,#photo#)
+		]]>
+	</insert>
+	<select id="selecthouseholdassertsByBorrowerServiceAppId" parameterClass="int" resultMap="householdassertsMap">
+		<![CDATA[
+			select * 
+			from RL_HOUSEHOLD_ASSERTS
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<update id="updatehouseholdassertsByPrimaryKey" parameterClass="householdasserts">
+		<![CDATA[
+			update RL_HOUSEHOLD_ASSERTS
+			set 
+			HOUSEHOLD_ASSERTS_TYPE = #householdAssertsType:CHAR#,
+			DESCRIPTION1 = #description1:VARCHAR#,
+			DESCRIPTION2 = #description2:VARCHAR#,
+			VALUE = #value:DOUBLE#,
+			unit = #unit#,
+			buy_date = #buyDate#,
+			buy_price = #buyPrice#,
+			photo = #photo#
+			where
+			HOUSEHOLD_ASSERTS_ID = #householdAssertsId:INTEGER#
+		]]>
+	</update>
+	<delete id="deletehouseholdassertsByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_HOUSEHOLD_ASSERTS
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			HOUSEHOLD_ASSERTS_ID = #deleteHouseholdassertsList[]#
+		</iterate>
+	</delete>
+</sqlMap>

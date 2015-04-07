@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="otherFileUpload">
+
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="otherFileUpload" type="com.creditease.rc.domain.OtherFileUpload" />
+	<resultMap class="com.creditease.rc.domain.OtherFileUpload" id="otherFileUploadMap">
+		<result property="otherFileUploadId" column="OTHER_FILE_UPLOAD_ID" jdbcType="INTEGER" />
+		<result property="uploadFileName" column="UPLOAD_FILE_NAME" jdbcType="VARCHAR" />
+		<result property="fileType" column="FILE_TYPE" jdbcType="VARCHAR" />
+		<result property="uploadDependClass" column="UPLOAD_DEPEND_CLASS" jdbcType="VARCHAR" />
+		<result property="fileSubType" column="FILE_SUB_TYPE" jdbcType="VARCHAR" />
+		<result property="uploadDependId" column="UPLOAD_DEPEND_ID" jdbcType="INTEGER" />
+	</resultMap>
+
+	<insert id="insertFile" parameterClass="otherFileUpload">
+		<![CDATA[
+			insert into RL_OTHER_FILE_UPLOAD (OTHER_FILE_UPLOAD_ID,UPLOAD_FILE_NAME,FILE_TYPE,UPLOAD_DEPEND_CLASS,FILE_SUB_TYPE,UPLOAD_DEPEND_ID)
+			values (SEQ_BASIC_INFO.NEXTVAL, #uploadFileName:VARCHAR#, #fileType:VARCHAR#,
+			#uploadDependClass:VARCHAR#, #fileSubType:VARCHAR#,
+			#uploadDependId:INTEGER#)
+		]]>
+	</insert>
+	<select id="selectBycaId" parameterClass="java.lang.Integer" resultClass="java.lang.String" >
+        <![CDATA[
+	       select t.upload_file_name from RL_OTHER_FILE_UPLOAD t
+		   where t.upload_depend_id in (
+           select bsa.borrower_service_app_id from rl_borrower_service_app bsa where bsa.creditapplication_id=#caId:NUMBER#
+		   )
+		   or t.upload_depend_id = #caId:NUMBER#
+        ]]>
+    </select>
+	<select id="selectByPagination" parameterClass="java.lang.Integer" resultMap="otherFileUploadMap">
+        <![CDATA[
+	       select t.* from RL_OTHER_FILE_UPLOAD t
+		   where t.upload_depend_id in (
+           select bsa.borrower_service_app_id from rl_borrower_service_app bsa where bsa.creditapplication_id=#caId:NUMBER#
+		   )
+		   or t.upload_depend_id = #caId:NUMBER#
+        ]]>
+    </select>
+    <select id="countByPage" parameterClass="java.lang.Integer" resultClass="int">
+        <![CDATA[
+           select count(*) from RL_OTHER_FILE_UPLOAD t
+		   where t.upload_depend_id in (
+           select bsa.borrower_service_app_id from rl_borrower_service_app bsa where bsa.creditapplication_id=#caId:NUMBER#
+		   )
+		   or t.upload_depend_id = #caId:NUMBER# 
+        ]]>
+    </select>
+    
+    <delete id="deleteByFileName" parameterClass="java.lang.String">
+    	delete from RL_OTHER_FILE_UPLOAD where upload_file_name = #uploadFileName:VARCHAR#
+    </delete>
+    
+    <select id="selectOtherFiles" parameterClass="map" resultMap="otherFileUploadMap">
+      select t.* from RL_OTHER_FILE_UPLOAD t
+		   where t.upload_depend_id  = #caId#
+		   and t.FILE_TYPE =#fileType#
+    </select>
+</sqlMap>

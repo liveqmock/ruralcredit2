@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="FINANCESTATE">
+	<typeAlias alias="financestate" type="com.creditease.rc.domain.FinanceState" />
+	<insert id="insertFinanceState" parameterClass="financeState">
+		<selectKey keyProperty="financeStateId" resultClass="int"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FINANCE_STATE (
+				FINANCE_STATE_ID,
+				FS_STATUS,
+				FS_MONEY,
+				FS_TYPE,
+				ASSOCIATION_ID,
+				FS_REMARK,
+				FS_GROUPFLAG
+			)
+			values (
+				#financeStateId:INTEGER#,
+				#fsStatus:CHAR#,
+				#fsMoney:INTEGER#,
+				#fsType:CHAR#,
+				#associationId:INTEGER#,
+				#fsRemark:VARCHAR#,
+				#fsGroupflag:VARCHAR#
+			)
+		]]>
+	</insert>
+	<update id="updateFinanceState" parameterClass="financeState"> 
+		 <![CDATA[
+           update RL_FINANCE_STATE set FS_STATUS=#fsStatus# 
+           , FS_GROUPFLAG=#fsGroupflag# where ASSOCIATION_ID=#associationId#
+        ]]>
+	</update>
+	<select id="selectFinanceState" parameterClass="financeState" resultClass="financeState">
+		<![CDATA[
+			select 
+		        FINANCE_STATE_ID   financeStateId  ,
+				FS_STATUS          fsStatus       ,
+				FS_MONEY           fsMoney        ,
+				FS_TYPE            fsType           ,
+				ASSOCIATION_ID     associationId ,
+				FS_REMARK          fsRemark       ,
+				FS_GROUPFLAG       fsGroupflag   
+			from RL_FINANCE_STATE where ASSOCIATION_ID=#associationId#
+		]]>
+	</select>
+	<select id="getBizId" resultClass="int">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+	</select>
+</sqlMap>

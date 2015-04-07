@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RLAUDITDETAIL">
+	<typeAlias alias="rlauditdetail" type="com.creditease.rc.domain.RlAuditDetail" />
+	<insert id="insertRlAuditDetail" parameterClass="rlauditdetail">
+		<selectKey keyProperty="rlAuditDetailId" resultClass="int"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_AUDIT_DETAIL (
+				RL_AUDIT_DETAIL_ID,
+				APPLYAUDITTABLE_ID,
+				BORROWER_APP_ID,
+				BORROWER_NAME,
+				AUDIT_STATUS,
+				AMOUNT,
+				AUDIT_FLAG
+			)
+			values (
+				#rlAuditDetailId:INTEGER#,
+				#applyaudittableId:INTEGER#,
+				#borrowerAppId:INTEGER#,
+				#borrowerName:VARCHAR#,
+				#auditStatus:VARCHAR#,
+				#amount:DOUBLE#,
+				#auditFlag:CHAR#
+			)
+		]]>
+	</insert>
+	<select id="selectChgMount" parameterClass="Integer" resultClass="rlauditdetail"> 
+		 <![CDATA[
+            select 
+				BORROWER_APP_ID borrowerAppId,
+				AMOUNT amount
+			from RL_AUDIT_DETAIL 
+			where applyaudittable_id=
+			(select 
+				max(APPLYAUDITTABLE_ID) 
+			from rl_apply_audit_table 
+			where CREDITAPPLICATION_ID=#value#) 
+        ]]>
+	</select>
+</sqlMap>

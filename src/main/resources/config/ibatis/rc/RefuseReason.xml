@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RefuseReason">
+	<typeAlias alias="RefuseReasonClass" type="com.creditease.rc.domain.RefuseReason"/>
+	<typeAlias alias="RefuseReasonClassVo" type="com.creditease.rc.vo.RefuseReasonVo"/>
+	<resultMap class="com.creditease.rc.domain.RefuseReason" id="RefuseReasonMap">
+		
+		<result property="refuseReasonId" column="REFUSE_REASON_ID" jdbcType="NUMBER"/>
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="NUMBER"/>
+		<result property="codeKey" column="CODE_KEY" jdbcType="VARCHAR"/>
+		<result property="codeSection" column="CODE_SECTION" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<insert id="insert" parameterClass="RefuseReasonClass">
+		<selectKey type="pre" keyProperty="refuseReasonId" resultClass="java.lang.Long">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+		</selectKey>
+		<![CDATA[
+			INSERT INTO RL_REFUSE_REASON (
+				REFUSE_REASON_ID,
+				CREDITAPPLICATION_ID,
+				CODE_KEY,
+				CODE_SECTION
+			)
+			VALUES(
+				#refuseReasonId#,
+				#creditapplicationId#,
+				#codeKey#,
+				#codeSection#
+			)
+		]]>
+	</insert>
+	<select id="selectByCreditId" parameterClass="Long" resultClass="String">
+		
+	</select>
+	<!--客户放弃列表查询语句 -->
+	<sql id="queryCustomerGiveUpList">
+			 	select distinct re.refuseReasonId refuseReasonId,
+		                ca.creditapplication_id creditapplicationId,
+		                ca.business_number businessNumber,
+		                bo.name name,
+		                bo.audit_status auditStatus,
+		                ca.company_name companyName,
+		                lo.operator_name operatorName,
+		                ci.credit_investigatio_id as fxid,
+		                (select t.code_value
+		                   from rl_codetable t
+		                  where t.section = 'auditStatus'
+		                    and t.code_key = ca.audit_status) as auditStatusShow,
+		                lo.operate_date operateDate,
+                    	re.refuseReasons 
+		  from rl_credit_application ca
+		  left join (select xx.refuse_reason_id     refuseReasonId,
+		                    ct.code_value           refuseReasons,
+		                    xx.creditapplication_id,
+		                    xx.code_key
+		               from (select re.*,
+		                            row_number() over(partition by re.creditapplication_id order by re.refuse_reason_id desc nulls last) rno
+		                       from rl_refuse_reason re) xx
+		               join rl_codetable ct
+		                 on ct.code_key = xx.code_key
+		                and ct.section = xx.code_section
+		              where xx.rno = 1) re
+		    on re.creditapplication_id = ca.creditapplication_id
+		  left join (select *
+		               from (select lo.*,
+		                            row_number() over(partition by lo.creditapplication_id order by lo.operate_date desc nulls last) rno
+		                       from rl_operate_log lo
+		                      where lo.function_code = '100060') x
+		              where x.rno = 1) lo
+		    on lo.creditapplication_id = ca.creditapplication_id
+		  left join rl_credit_investigatio ci
+		    on ca.creditapplication_id = ci.creditapplication_id
+		  left join rl_borrower_service_app bo
+		    on bo.creditapplication_id = ca.creditapplication_id, sid_view v
+		 where ca.audit_status = '28'
+		   and bo.leader = '1'
+		   and ca.valid_state = '1'
+		   and bo.valid_state = '1'
+          <isNotEmpty prepend="AND" property="authList">
+				ca.CREDITAPPLICATION_ID
+				= v.object_id_identity
+				and v.class='com.creditease.rc.domain.CreditApplication'
+				and v.ace_sid IN
+				($authList$)
+            </isNotEmpty> 
+            <isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number like
+				'%$businessNumber$%'
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			bo.name like
+				'%$name$%'
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty property="codeKey" prepend="and">
+			re.code_key = #codeKey#
+		</isNotEmpty>
+		order by lo.operate_date desc nulls last, ca.business_number desc
+		
+	</sql>
+	<select id="queryCustomerGiveUpListEntity" resultClass="RefuseReasonClassVo" parameterClass="java.util.HashMap">
+		<include refid="queryCustomerGiveUpList" />
+	</select>
+	<select id="queryCustomerGiveUpListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="queryCustomerGiveUpList" />
+		)
+	</select>
+	<!--拒贷列表查询语句 -->
+	<sql id="queryDeniedLoansList">
+	   select newCredit.*,
+       (select wm_concat(rcc.code_value)
+          from rl_codetable rcc
+         where rcc.code_key in
+               (select rrr.code_key
+                  from rl_refuse_reason rrr
+                 where rrr.creditapplication_id =
+                       newCredit.creditapplicationId)
+           and rcc.section =
+               'refuseReason') refuseReasons
+  from (select distinct ca.creditapplication_id creditapplicationId,
+               ca.business_number businessNumber,
+               bo.name name,
+               ca.company_name companyName,
+               lo.operator_name operatorName,
+               ci.credit_investigatio_id as fxid,
+               lo.operate_date operateDate
+          from rl_credit_application ca
+          left join rl_refuse_reason re
+            on re.creditapplication_id = ca.creditapplication_id
+		left join  (
+		select * from (
+		select lo.*,row_number() over(partition by lo.creditapplication_id order by lo.operate_date desc nulls last)rno
+		from  rl_operate_log lo where lo.function_bussiness like '%拒贷%'  and   lo.function_code = '100060' ) loo where loo.rno =1
+		)  lo
+		on lo.creditapplication_id = ca.creditapplication_id
+            and   lo.function_code = '100060'
+            left join rl_credit_investigatio ci
+            on ca.creditapplication_id = ci.creditapplication_id
+            left join rl_borrower_service_app bo
+            on bo.creditapplication_id=ca.creditapplication_id
+            , sid_view v
+            where ca.audit_status='27'
+            and bo.leader='1'
+            and ca.valid_state = '1'
+            and bo.valid_state='1'
+         <isNotEmpty prepend="AND" property="authList">
+				ca.CREDITAPPLICATION_ID
+				= v.object_id_identity
+				and v.class='com.creditease.rc.domain.CreditApplication'
+				and v.ace_sid IN
+				($authList$)
+            </isNotEmpty>   
+            <isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number like
+				'%$businessNumber$%'
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			bo.name like
+				'%$name$%'
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in  ($companyId$)
+		</isNotEmpty>
+		order by lo.operate_date desc nulls last, ca.business_number desc
+          ) newCredit
+	</sql>
+	<select id="queryDenideLoansListEntity" resultClass="RefuseReasonClassVo" parameterClass="java.util.HashMap">
+		<include refid="queryDeniedLoansList" />
+	</select>
+	<select id="queryDenideLoansListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="queryDeniedLoansList" />
+		)
+	</select>
+
+    <!--根据信贷申请ID查询拒贷原因-->
+    <select id="selectRefuseReasonById" parameterClass="java.lang.Long" resultClass="RefuseReasonClass">
+        SELECT T1.REFUSE_REASON_ID AS refuseReasonId,
+        T1.CREDITAPPLICATION_ID AS creditapplicationId,
+        T1.CODE_KEY AS codeKey,
+        T1.CODE_SECTION AS codeSection
+        FROM RL_REFUSE_REASON T1 WHERE T1.CREDITAPPLICATION_ID=#creditApplicationId#
+    </select>
+</sqlMap>

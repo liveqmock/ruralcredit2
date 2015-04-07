@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RETURNSCHEDULE">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="returnSchedule" type="com.creditease.rc.domain.ReturnSchedule"/>
+	<resultMap class="com.creditease.rc.domain.ReturnSchedule" id="returnScheduleMap">
+		<result property="scheduleId"	 column="SCHEDULE_I" jdbcType="INTEGER"	/>
+		<result property="borrowerServiceAppid"	 column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER	"/>
+		<result property="returnDate"	 column="RETURN_DATE" jdbcType="DATE"/>
+		<result property="damount"	 column="D_AMOUNT" jdbcType="INTEGER"/>
+		<result property="dcorpus"	 column="D_CORPUS" jdbcType="INTEGER"/>
+		<result property="dinterest"	 column="D_INTEREST" jdbcType="INTEGER"/>
+		<result property="doverhead"	 column="D_OVERHEAD" jdbcType="INTEGER"/>
+	</resultMap>
+	<insert id="insert" parameterClass="returnSchedule">
+		<selectKey keyProperty="scheduleId" resultClass="int" type="pre">
+			<![CDATA[
+				select SEQ_BASIC_INFO.NEXTVAL as value from dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO RL_RETURN_SCHEDULE
+				(
+				SCHEDULE_ID,
+				BORROWER_SERVICE_APP_ID,
+				RETURN_DATE,
+				D_AMOUNT,
+				D_CORPUS,
+				D_INTEREST,
+				D_OVERHEAD
+				)
+			VALUES
+				(
+				#scheduleId#,
+				#borrowerServiceAppid#,
+				#returnDate#,
+				#damount#,
+				#dcorpus#,
+				#dinterest#,
+				#doverhead#
+				)
+		]]>
+	</insert>
+</sqlMap>

@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="STATISTICALINFO">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="auditRemind" type="com.creditease.rc.vo.AuditRemindVo" />
+	<typeAlias alias="loanRealAndPlanning" type="com.creditease.rc.vo.LoanRealAndPlanning" />
+	<typeAlias alias="creditApplication" type="com.creditease.rc.domain.CreditApplication" />
+	<typeAlias alias="borrower_service_app_vo" type="com.creditease.rc.vo.BorrowerServiceVo" />
+	<typeAlias alias="overDueListVo" type="com.creditease.rc.vo.OverDueListVo" />
+	<typeAlias alias="departmentEntity" type="com.creditease.rc.common.DepartmentEntity" />
+
+	<resultMap class="com.creditease.rc.domain.CreditApplication" id="CreditApplicationMap">
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="INTEGER" />
+		<result property="repaymentPlanId" column="REPAYMENT_PLAN_ID" jdbcType="INTEGER" />
+		<result property="accountInfoId" column="ACCOUNT_INFO_ID" jdbcType="INTEGER" />
+		<result property="contactNumber" column="CONTACT_NUMBER" jdbcType="VARCHAR" />
+		<result property="groupNumber" column="BUSINESS_NUMBER" jdbcType="VARCHAR" />
+		<result property="groupName" column="BORROWER_NAME" jdbcType="VARCHAR" />
+		<result property="address" column="ADDRESS" jdbcType="VARCHAR" />
+		<result property="loanOfficerId" column="LOAN_OFFICER_ID" jdbcType="VARCHAR" />
+		<result property="loanOfficerName" column="LOAN_OFFICER_NAME" jdbcType="VARCHAR" />
+		<result property="auditStatus" column="AUDIT_STATUS" jdbcType="CHAR" />
+		<result property="createDate" column="CREATE_DATE" jdbcType="TIMESTAMP" />
+		<result property="submitDate" column="SUBMIT_DATE" jdbcType="TIMESTAMP" />
+		<result property="firstSubmitDate" column="FIRST_SUBMIT_DATE" jdbcType="TIMESTAMP" />
+		<result property="uploadFile" column="UPLOAD_FILE" jdbcType="VARCHAR" />
+		<result property="loansStatus" column="LOANS_STATUS" jdbcType="CHAR" />
+		<result property="reasonType" column="REASON_TYPE" jdbcType="CHAR" />
+		<result property="revokeReason" column="REVOKE_REASON" jdbcType="VARCHAR" />
+		<result property="groupAppTotal" column="AMOUNT" jdbcType="DOUBLE" />
+		<result property="signagreementDate" column="SIGNAGREEMENT_DATE" jdbcType="DATE" />
+		<result property="applyRevokePerson" column="APPLY_REVOKE_PERSON" jdbcType="VARCHAR" />
+		<result property="applyRevokeTime" column="APPLY_REVOKE_TIME" jdbcType="DATE" />
+		<result property="expectLoanDate" column="EXPECT_LOAN_DATE" jdbcType="DATE" />
+		<result property="businessType" column="BUSINESS_TYPE" jdbcType="CHAR" />
+		<result property="villageId" column="VILLAGE_ID" jdbcType="INTEGER" />
+		<result property="countyId" column="COUNTY_ID" jdbcType="INTEGER" />
+		<result property="townId" column="TOWN_ID" jdbcType="INTEGER" />
+		<result property="validState" column="VALID_STATE" jdbcType="CHAR" />
+		<result property="customerConsultId" column="CUSTOMER_CONSULT_ID" jdbcType="LONG" />
+		<result property="defaultReturnmentWay" column="DEFAULT_RETURNMENT_WAY" jdbcType="CHAR" />
+		<result property="departmentId" column="DEPARTMENT_ID" jdbcType="VARCHAR" />
+		<result property="repaymentPlanName" column="REPAYMENT_PLAN_NAME" jdbcType="VARCHAR" />
+		<result property="returnAccountInfoId" column="RETURN_ACCOUNT_INFO_ID" jdbcType="INTEGER" />
+		<result property="companyName" column="COMPANY_NAME" jdbcType="VARCHAR" />
+		<result property="instalments" column="INSTALMENTS" jdbcType="VARCHAR" />
+		<result property="repaymentType" column="REPAYMENT_TYPE" jdbcType="VARCHAR" />
+		<result property="companyId" column="COMPANY_ID" jdbcType="VARCHAR" />
+		<result property="capitalUpperLimit" column="CAPITAL_UPPER_LIMIT" jdbcType="DOUBLE" />
+		<result property="capitalLowerLimit" column="CAPITAL_LOWER_LIMIT" jdbcType="DOUBLE" />
+	</resultMap>
+	<sql id="isssss">
+		<![CDATA[
+		select distinct caa.creditapplication_id,
+                        caa.business_number,
+                        bsa.name,
+                        caa.loan_officer_name,
+                        caa.company_name,
+                        decode(caa.business_type,
+                               '0',
+                               '公司',
+                               '1',
+                               '个人',
+                               'null') business_type,
+                        caa.repayment_plan_name,
+                        ac.amount,
+                        to_char(trunc(sp.trade_time,'dd'), 'yyyy-mm-dd') signagreement_date
+          from (select ca.*
+                  from rl_credit_application ca
+                 where ca.audit_status in ('15', '16', '20','29','30')
+                   and ca.valid_state = '1') caa,
+               sid_view v,
+               rl_amount_confirm ac,
+               rl_customer_consult cc,
+               rl_borrower_service_app bsa,
+               (SELECT *
+                                  FROM (SELECT *
+                                          FROM (SELECT gg.group_loan_regist_id,
+                                                       gg.trade_time,
+                                                       gg.creditapplication_id,
+                                                       RANK() OVER(PARTITION BY group_loan_regist_id ORDER BY trade_time, group_loan_regist_id ASC) AS rankj
+                                                  FROM (SELECT *
+                                                          FROM (SELECT glr.group_loan_regist_id AS group_loan_regist_id,
+                                                                       fm.trade_time            AS trade_time,
+                                                                       glr.creditapplication_id AS creditapplication_id
+                                                                  FROM rl_group_loan_regist glr
+                                                                  LEFT JOIN rl_finance_money fm
+                                                                    ON glr.group_loan_regist_id =
+                                                                       fm.association_id
+                                                                   AND fm.history_flag = 'F'
+                                                                   and   glr.regist_status='1'
+                                                                   AND fm.trade_time IS NOT NULL)) gg)
+                                         GROUP BY group_loan_regist_id,
+                                                  trade_time,
+                                                  creditapplication_id,
+                                                  rankj) kk
+                                 WHERE kk.rankj = 1) sp
+         where caa.creditapplication_id = ac.credit_application_id
+           and sp.creditapplication_id = caa.creditapplication_id
+   and caa.customer_consult_id = cc.customer_consult_id
+   and ac.history_flag = '0'
+   and bsa.creditapplication_id = caa.creditapplication_id
+   and bsa.leader = '1'
+   and bsa.valid_state = '1'
+		]]>
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="authList">
+				caa.CREDITAPPLICATION_ID
+				= v.object_id_identity
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		    </isNotEmpty>
+			<isNotEmpty prepend="AND" property="startDate">
+			<![CDATA[
+				to_date(#startDate#,'YYYY-MM-DD') <= trunc(trade_time,'dd')
+			]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[
+				trunc(trade_time,'dd') <= to_date(#endDate#,'YYYY-MM-DD')
+				]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fuzzyValue">
+				(caa.business_number
+				like
+				'%$fuzzyValue$%'
+				or
+				caa.borrower_name
+				like
+				'%$fuzzyValue$%')
+		    </isNotEmpty>
+			<isNotEmpty prepend="AND" property="businessNumber">
+				caa.business_number = #businessNumber#
+		    </isNotEmpty>
+			<isNotEmpty prepend="AND" property="borrowerName">
+				caa.borrower_name = #borrowerName#
+		    </isNotEmpty>
+		    <isNotEmpty prepend="and" property="companyId">
+      			caa.company_id in ($companyId$)
+      		</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="queryLoanPortfolioList" resultClass="java.util.HashMap" parameterClass="java.util.Map">
+		select
+		creditapplication_id as CREDITAPPLICATIONID,
+		business_number as BUSINESSNUMBER,
+		name as BORROWERNAME,
+		loan_officer_name as LOANOFFICERNAME,
+		company_name as COMPANYNAME,
+		business_type as BUSINESSTYPE,
+		repayment_plan_name as REPAYMENTPLANNAME,
+		amount as AMOUNT,
+		signagreement_date as SIGNAGREEMENTDATE
+		from (
+		<include refid="isssss" />
+		)order by signagreement_date desc,creditapplicationid desc
+	</select>
+	<select id="countLoanPortfolioList" resultClass="int" parameterClass="java.util.Map">
+		select count (*) from (
+		<include refid="isssss" />
+		) order by signagreement_date desc,creditapplication_id desc
+	</select>
+
+
+	<sql id="selectCreditApplicationByPrimaryKeys">
+		<![CDATA[
+		select ca.creditapplication_id   as creditapplicationId,
+       ca.business_number        as groupNumber,
+       bsa.name                  as groupName,
+       ca.loan_officer_name      as loanOfficerName,
+       ca.business_type          as businessType,
+       ca.company_id             as companyId,
+       ca.company_name           as companyName,
+       ca.default_returnment_way as defaultReturnmentWay,
+       ca.repayment_plan_name    as repaymentPlanName,
+       ca.signagreement_date     as signagreementDate
+  	   from rl_credit_application ca
+  	   left join rl_borrower_service_app bsa
+       on bsa.creditapplication_id = ca.creditapplication_id
+       and bsa.leader = '1'
+       and bsa.valid_state = '1'
+  	   where 1 = 1
+  		]]>
+		<isNotEmpty property="getCreditApplitionIdString" prepend="and">
+			ca.creditapplication_id in ($getCreditApplitionIdString$)
+		</isNotEmpty>
+		<isNotEmpty property="fuzzyValue" prepend="and">
+			(ca.business_number
+			like
+			'%$fuzzyValue$%'
+			or
+			bsa.name
+			like
+			'%$fuzzyValue$%'
+			or
+			ca.loan_officer_name
+			like
+			'%$fuzzyValue$%'
+			)
+		</isNotEmpty>
+		<isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty property="borrowerName" prepend="and">
+			bsa.name = #borrowerName#
+		</isNotEmpty>
+		<isNotEmpty property="businessType" prepend="and">
+			ca.business_type = #businessType#
+		</isNotEmpty>
+		<isNotEmpty property="defaultReturnmentWay" prepend="and">
+			ca.default_returnment_way = #defaultReturnmentWay#
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startDate">
+			<![CDATA[
+				to_date(#startDate#,'YYYY-MM-DD') <= ca.signagreement_date
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[
+				ca.signagreement_date <= to_date(#endDate#,'YYYY-MM-DD')
+				]]>
+		</isNotEmpty>
+	</sql>
+	<select id="queryCreditApplicationList" resultClass="overDueListVo" parameterClass="java.util.Map">
+		<include refid="selectCreditApplicationByPrimaryKeys" />
+	</select>
+	<select id="countCreditApplicationList" resultClass="int" parameterClass="java.util.Map">
+		select count(*) from(
+		<include refid="selectCreditApplicationByPrimaryKeys" />
+		)
+	</select>
+
+	<sql id="selectReceivables">
+		<![CDATA[
+		select distinct ca.creditapplication_id   as creditapplicationId,
+                bsa.name                  as groupName,
+                ca.business_number        as groupNumber,
+                ca.signagreement_date     as signagreementDate,
+                ca.loan_officer_name      as loanOfficerName,
+                ca.business_type          as businessType,
+                ca.company_name           as companyName,
+                ca.repayment_plan_name    as repaymentPlanName,
+                huankuanri.repayment_date as repaymentDate
+ 		 from rl_credit_application ca
+  		 left join (select rp.creditapplication_id,
+               min(rp.repayment_date) as repayment_date
+               from rl_return_plan rp
+              where rp.repayment_date >= (trunc(sysdate, 'DD'))
+                and rp.period != 1
+                and rp.period != 2
+              group by (rp.creditapplication_id)) huankuanri
+    	on ca.creditapplication_id = huankuanri.creditapplication_id, sid_view v,
+ 		rl_borrower_service_app bsa
+ 		where ca.creditapplication_id = bsa.creditapplication_id
+   		and bsa.leader = '1'
+   		and bsa.valid_state = '1'
+   		and ca.valid_state = '1'
+   		and ca.audit_status in('15','29','30')
+  		]]>
+		<isNotEmpty prepend="AND" property="authList">
+			ca.CREDITAPPLICATION_ID
+			= v.object_id_identity
+		        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			v.ace_sid IN
+			($authList$)
+		    </isNotEmpty>
+		<isNotEmpty property="fuzzyValue" prepend="and">
+			(ca.business_number
+			like
+			'%$fuzzyValue$%'
+			or
+			bsa.name
+			like
+			'%$fuzzyValue$%'
+			or
+			ca.loan_officer_name
+			like
+			'%$fuzzyValue$%'
+			)
+		</isNotEmpty>
+		<isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty property="borrowerName" prepend="and">
+			bsa.name = #borrowerName#
+		</isNotEmpty>
+		<isNotEmpty property="businessType" prepend="and">
+			ca.business_type = #businessType#
+		</isNotEmpty>
+		<isNotEmpty property="defaultReturnmentWay" prepend="and">
+			ca.default_returnment_way = #defaultReturnmentWay#
+		</isNotEmpty>
+
+		<!--<isNotEmpty property="companyId" prepend="and">
+			ca.company_id = #companyId#
+		</isNotEmpty>
+		-->
+        <isNotEmpty prepend="AND" property="repaymentPlanName">
+            ca.REPAYMENT_PLAN_NAME =#repaymentPlanName#
+        </isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startDate">
+			<![CDATA[
+				to_date(#startDate#,'YYYY-MM-DD') <= ca.signagreement_date
+			]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+				<![CDATA[
+				ca.signagreement_date <= to_date(#endDate#,'YYYY-MM-DD')
+				]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="ids">
+			ca.creditapplication_id in ($ids$)
+		</isNotEmpty>
+		<isEmpty property="order">
+			order by repaymentDate asc, signagreementDate asc,creditapplicationId asc
+		</isEmpty>
+		<isNotEmpty property="order">
+			order by signagreementDate $order$,creditapplicationId $order$
+		</isNotEmpty>
+	</sql>
+
+	<select id="queryReceivablesList" resultClass="creditApplication" parameterClass="java.util.Map">
+		<include refid="selectReceivables" />
+	</select>
+	<select id="countReceivablesList" resultClass="int" parameterClass="java.util.Map">
+		select count(*) from(
+		<include refid="selectReceivables" />
+		)
+	</select>
+	<select id="queryRealAndPlanning" resultClass="loanRealAndPlanning" parameterClass="java.util.HashMap">
+			SELECT t.sdate AS dateTime,
+			t.amount AS rAmount,
+			t.countnumber AS rCount,
+			q.amount AS pAmount,
+			q.countnumber AS pCount
+			FROM (SELECT *
+			FROM (SELECT a.sDate,
+			SUM(a.amount) AS amount,
+			SUM(a.countNumber) AS countNumber
+			FROM (SELECT ca.amount AS amount,
+			trunc(x.trade_time, 'mm') AS sDate,
+			1 AS countNumber
+			FROM rl_credit_application ca,
+			(SELECT *
+			FROM (SELECT *
+			FROM (SELECT gg.group_loan_regist_id,
+			gg.trade_time,
+			gg.creditapplication_id,
+			RANK() OVER(PARTITION BY group_loan_regist_id ORDER BY trade_time,
+			group_loan_regist_id ASC) AS rankj
+			FROM (SELECT *
+			FROM (SELECT glr.group_loan_regist_id AS group_loan_regist_id,
+			fm.trade_time AS trade_time,
+			glr.creditapplication_id AS creditapplication_id
+			FROM rl_group_loan_regist glr
+			LEFT JOIN rl_finance_money fm
+			ON glr.group_loan_regist_id =
+			fm.association_id
+			AND fm.history_flag = 'F'
+			and glr.regist_status='1'
+			AND fm.trade_time IS NOT NULL)) gg)
+			GROUP BY group_loan_regist_id,
+			trade_time,
+			creditapplication_id,
+			rankj) kk
+			WHERE kk.rankj = 1) x,
+			sid_view v
+			WHERE ca.creditapplication_id =
+			x.creditapplication_id(+)
+			AND ca.valid_state = '1'
+			AND (ca.audit_status = '15' OR
+			ca.audit_status = '16' OR
+			ca.audit_status = '20' OR
+			ca.audit_status ='29' OR
+			ca.audit_status ='30')
+			AND ca.company_id IN ($areaDepartmentIds$)
+		<isNotEmpty prepend="AND" property="authList">
+			ca.CREDITAPPLICATION_ID= v.object_id_identity
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			v.class='com.creditease.rc.domain.CreditApplication'
+	    </isNotEmpty>
+		<isNotEmpty prepend="AND" property="authList">
+			v.ace_sid IN
+			($authList$)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="calS">
+			trunc(x.trade_time, 'mm') >= to_date(#calS#,'YYYY-MM-DD')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="calE">
+			to_date(#calE#,'YYYY-MM-DD') >= trunc(x.trade_time,'mm')
+		</isNotEmpty>
+			) a
+			GROUP BY a.sDate) k) t
+			LEFT JOIN (SELECT l.adate,
+			SUM(CASE l.sptype
+			WHEN '0' THEN
+			l.spvalue
+			ELSE
+			0
+			END) AS countNumber,
+			SUM(CASE l.sptype
+			WHEN '1' THEN
+			l.spvalue
+			ELSE
+			0
+			END) AS amount
+			FROM (SELECT trunc(to_date(sp.year || '-' || sp.month || '-01',
+			'yyyy-MM-dd'),
+			'mm') AS aDate,
+			sp.value AS spvalue,
+			sp.type AS sptype
+			FROM rl_sales_planning sp
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="areaDepartmentIds">
+				sp.area_department_id in($areaDepartmentIds$)
+			</isNotEmpty>
+				</dynamic>
+			) l
+			GROUP BY l.adate) q
+			ON t.sdate = q.adate
+			ORDER BY datetime ASC
+	</select>
+
+	<select id="queryDepartmentEntities" parameterClass="java.util.HashMap" resultClass="departmentEntity">
+		select cc.department_id as departmentId,
+		cc.department_name as departmentName
+		from rl_customer_consult cc,sid_view v
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="authList">
+				cc.customer_consult_id= v.object_id_identity
+		</isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CustomerConsult'
+	    </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		</isNotEmpty>
+		</dynamic>
+		group by (cc.department_id, cc.department_name)
+
+
+	</select>
+</sqlMap>

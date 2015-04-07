@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="http://cxf.apache.org/jaxws 
+						http://cxf.apache.org/schemas/jaxws.xsd 
+						http://cxf.apache.org/core 
+						http://cxf.apache.org/schemas/core.xsd 
+						http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" default-autowire="byType" default-lazy-init="true">
+
+	<description>WebService服务器端配置</description>
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<!--测试webservice -->
+	<bean id="creditWS" class="com.creditease.webservice.impl.CreditWS" />
+	<bean id="comprehensiveCreditWS" class="com.creditease.webservice.impl.ComprehensiveCreditWS" />
+	<bean id="weiXinWS" class="com.creditease.webservice.impl.WeiXinWS" />
+	<bean id="complianceCheckImpl" class="com.creditease.webservice.impl.ComplianceCheckImpl" />
+	<!-- CXF 配置WebServices的服务名及访问地址 -->
+	<bean id="outLoggingInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+	<!-- 注意下面的address，这里的address的名称就是访问的WebService的name -->
+	<jaxws:server id="iCreditWS" serviceClass="com.creditease.webservice.ICreditWS" address="/creditWS">
+		<jaxws:serviceBean>
+			<!-- 要暴露的 bean 的引用 -->
+			<ref bean="creditWS" />
+		</jaxws:serviceBean>
+		<jaxws:outInterceptors>
+			<ref bean="outLoggingInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:server>
+	<jaxws:server id="iComprehensiveCreditWS" serviceClass="com.creditease.webservice.IComprehensiveCreditWS" address="/comprehensiveCreditWS">
+		<jaxws:serviceBean>
+			<!-- 要暴露的 bean 的引用 -->
+			<ref bean="comprehensiveCreditWS" />
+		</jaxws:serviceBean>
+		<jaxws:outInterceptors>
+			<ref bean="outLoggingInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:server>
+	<jaxws:server id="iWeiXinWS" serviceClass="com.creditease.webservice.IWeiXinWS" address="/weiXinWS">
+		<jaxws:serviceBean>
+			<!-- 要暴露的 bean 的引用 -->
+			<ref bean="weiXinWS" />
+		</jaxws:serviceBean>
+		<jaxws:outInterceptors>
+			<ref bean="outLoggingInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:server>
+	<jaxws:server id="icontractConfirmationWS" serviceClass="com.creditease.webservice.IcontractConfirmation" address="/contractConfirmationWS">
+		<jaxws:serviceBean>
+			<!-- 要暴露的 bean  -->
+			<bean class="com.creditease.webservice.impl.ContractConfirmationImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:outInterceptors>
+			<ref bean="outLoggingInterceptor" />
+		</jaxws:outInterceptors>
+	</jaxws:server>
+
+	<!--start 客服检查（apply for 综合信贷）-->
+	<jaxws:server id="icomplianceCheckWS"
+				  serviceClass="com.creditease.webservice.IComplianceCheckWS"
+				  address="/complianceCheckWS">
+		<jaxws:serviceBean>
+			<ref bean="complianceCheckImpl"/>
+		</jaxws:serviceBean>
+		<jaxws:outInterceptors>
+			<ref bean="outLoggingInterceptor"/>
+		</jaxws:outInterceptors>
+	</jaxws:server>
+	<!--end 客服检查（apply for 综合信贷）-->
+</beans>

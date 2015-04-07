@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="REPAYMENTPLAN">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="repaymentPlan" type="com.creditease.rc.domain.RepaymentPlan" />
+	<resultMap class="com.creditease.rc.domain.RepaymentPlan" id="repaymentPlanMap">
+		<result property="repaymentPlanId" column="REPAYMENT_PLAN_ID" jdbcType="INTEGER" />
+		<result property="repaymentPlanName" column="REPAYMENT_PLAN_NAME" jdbcType="VARCHAR" />
+		<result property="nominalInterestRate" column="NOMINAL_INTEREST_RATE" jdbcType="DOUBLE" />
+		<result property="firstServiceFree" column="FIRST_SERVICE_FREE" jdbcType="DOUBLE" />
+		<result property="followupServiceFree" column="FOLLOWUP_SERVICE_FREE" jdbcType="DOUBLE" />
+		<result property="repaymentWay" column="REPAYMENT_WAY" jdbcType="CHAR" />
+		<result property="loanPeriod" column="LOAN_PERIOD" jdbcType="INTEGER" />
+		<result property="repaymentInstallments" column="REPAYMENT_INSTALLMENTS" jdbcType="INTEGER" />
+		<result property="eachInterval" column="EACH_INTERVAL" jdbcType="INTEGER" />
+		<result property="repaymentStartMonth" column="REPAYMENT_START_MONTH" jdbcType="INTEGER" />
+		<result property="useFlag" column="USE_FLAG" jdbcType="CHAR" />
+		<result property="heightLoanAmount" column="HEIGHT_LOAN_AMOUNT" jdbcType="DOUBLE" />
+		<result property="earlyType" column="EARLY_TYPE" jdbcType="CHAR" />
+	</resultMap>
+	<select id="select" resultMap="repaymentPlanMap">
+		select * from RL_REPAYMENT_PLAN
+	</select>
+	<select id="selectRepaymentPlanByrepaymentPlanId" resultMap="repaymentPlanMap">
+		select * from RL_REPAYMENT_PLAN
+		where
+		REPAYMENT_PLAN_ID =
+		#repaymentPlanId:INTEGER#
+	</select>
+	<select id="selectRepaymentPlanByIdOrName" parameterClass="repaymentPlan" resultMap="repaymentPlanMap">
+		select * from RL_REPAYMENT_PLAN
+		<dynamic prepend="WHERE">
+			<isPropertyAvailable property="repaymentPlanId">
+				<isNotEmpty property="repaymentPlanId" prepend="AND">
+					REPAYMENT_PLAN_ID =
+					#repaymentPlanId:INTEGER#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="repaymentPlanName">
+				<isNotEmpty property="repaymentPlanName" prepend="AND">
+					REPAYMENT_PLAN_NAME =
+					#repaymentPlanName:VARCHAR#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+		</dynamic>
+	</select>
+	<insert id="insertIntorepaymentPlan" parameterClass="repaymentPlan">
+		<selectKey keyProperty="repaymentPlanId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_REPAYMENT_PLAN (REPAYMENT_PLAN_ID,REPAYMENT_PLAN_NAME,NOMINAL_INTEREST_RATE,FIRST_SERVICE_FREE,FOLLOWUP_SERVICE_FREE,REPAYMENT_WAY,LOAN_PERIOD,REPAYMENT_INSTALLMENTS,EACH_INTERVAL,REPAYMENT_START_MONTH,USE_FLAG,HEIGHT_LOAN_AMOUNT,EARLY_TYPE)
+			values (#repaymentPlanId:INTEGER#, #repaymentPlanName:VARCHAR#, #nominalInterestRate:DOUBLE#,
+			#firstServiceFree:DOUBLE#, #followupServiceFree:DOUBLE#,
+			#repaymentWay:INTEGER#, #loanPeriod:INTEGER#,
+			#repaymentInstallments:INTEGER#, #eachInterval:INTEGER#, #repaymentStartMonth:INTEGER#, #useFlag:CHAR#,#heightLoanAmount:DOUBLE#,#earlyType:CHAR#)
+		]]>
+	</insert>
+	<select id="selectRepaymentPlan" parameterClass="repaymentPlan" resultMap="repaymentPlanMap">
+        <![CDATA[
+	        select * from RL_REPAYMENT_PLAN 
+        ]]>
+		<dynamic prepend="WHERE">
+			<isPropertyAvailable property="repaymentPlanName">
+				<isNotEmpty property="repaymentPlanName" prepend="AND">
+					REPAYMENT_PLAN_NAME
+					like '%$repaymentPlanName$%'
+				</isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="loanPeriod">
+				<isNotEmpty property="loanPeriod" prepend="AND">
+					LOAN_PERIOD =
+					#loanPeriod:INTEGER#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="nominalInterestRate">
+				<isNotEmpty property="nominalInterestRate" prepend="AND">
+					NOMINAL_INTEREST_RATE =
+					#nominalInterestRate:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="firstServiceFree">
+				<isNotEmpty property="firstServiceFree" prepend="AND">
+					FIRST_SERVICE_FREE =
+					#firstServiceFree:DOUBLE#
+				</isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="followupServiceFree">
+				<isNotEmpty property="followupServiceFree" prepend="AND">
+					FOLLOWUP_SERVICE_FREE =
+					#followupServiceFree:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="repaymentWay">
+				<isNotEmpty property="repaymentWay" prepend="AND">
+					REPAYMENT_WAY
+					=
+					#repaymentWay:INTEGER#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="useFlag">
+				<isNotEmpty property="useFlag" prepend="AND">
+					USE_FLAG
+					=
+					#useFlag:CHAR#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="heightLoanAmount">
+				<isNotEmpty property="heightLoanAmount" prepend="AND">
+					HEIGHT_LOAN_AMOUNT
+					=
+					#heightLoanAmount:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="earlyType">
+				<isNotEmpty property="earlyType" prepend="AND">
+					EARLY_TYPE
+					=
+					#earlyType:CHAR#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+		</dynamic>
+		<![CDATA[
+			order by REPAYMENT_PLAN_ID desc
+		]]>
+	</select>
+	<select id="selectRepaymentPlanOnFuzzy" parameterClass="java.lang.String" resultMap="repaymentPlanMap">
+        <![CDATA[
+	        select * from RL_REPAYMENT_PLAN 
+        ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND">
+				REPAYMENT_PLAN_NAME
+				like '%$value$%'
+				or
+				USE_FLAG
+				like '%$value$%'
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by REPAYMENT_PLAN_ID desc
+		]]>
+	</select>
+	<select id="countRepaymentPlanOnFuzzy" parameterClass="java.lang.String" resultClass="int">
+        <![CDATA[
+	        select count(*) from RL_REPAYMENT_PLAN
+        ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND">
+				REPAYMENT_PLAN_NAME
+				like '%$value$%'
+				or
+				USE_FLAG
+				like '%$value$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="countRepaymentPlan" parameterClass="repaymentPlan" resultClass="int">
+        <![CDATA[
+            select count(*) from RL_REPAYMENT_PLAN
+        ]]>
+		<dynamic prepend="WHERE">
+			<isPropertyAvailable property="repaymentPlanName">
+				<isNotEmpty property="repaymentPlanName" prepend="AND">
+					REPAYMENT_PLAN_NAME
+					=
+					#repaymentPlanName:VARCHAR#
+				</isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="loanPeriod">
+				<isNotEmpty property="loanPeriod" prepend="AND">
+					LOAN_PERIOD =
+					#loanPeriod:INTEGER#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="nominalInterestRate">
+				<isNotEmpty property="nominalInterestRate" prepend="AND">
+					NOMINAL_INTEREST_RATE =
+					#nominalInterestRate:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="firstServiceFree">
+				<isNotEmpty property="firstServiceFree" prepend="AND">
+					FIRST_SERVICE_FREE =
+					#firstServiceFree:DOUBLE#
+				</isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="followupServiceFree">
+				<isNotEmpty property="followupServiceFree" prepend="AND">
+					FOLLOWUP_SERVICE_FREE =
+					#followupServiceFree:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="repaymentWay">
+				<isNotEmpty property="repaymentWay" prepend="AND">
+					REPAYMENT_WAY
+					=
+					#repaymentWay:INTEGER#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="useFlag">
+				<isNotEmpty property="useFlag" prepend="AND">
+					USE_FLAG
+					=
+					#useFlag:CHAR#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="heightLoanAmount">
+				<isNotEmpty property="heightLoanAmount" prepend="AND">
+					HEIGHT_LOAN_AMOUNT
+					=
+					#heightLoanAmount:DOUBLE#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+			<isPropertyAvailable property="earlyType">
+				<isNotEmpty property="earlyType" prepend="AND">
+					EARLY_TYPE
+					=
+					#earlyType:CHAR#
+		        </isNotEmpty>
+			</isPropertyAvailable>
+		</dynamic>
+	</select>
+	<update id="updateRepaymentPlanByrepaymentPlanId" parameterClass="repaymentPlan">
+		<![CDATA[
+			update RL_REPAYMENT_PLAN
+			set
+			NOMINAL_INTEREST_RATE=#nominalInterestRate:DOUBLE#,
+			FIRST_SERVICE_FREE=#firstServiceFree:DOUBLE#,
+			FOLLOWUP_SERVICE_FREE=#followupServiceFree:DOUBLE#,
+			USE_FLAG=#useFlag:CHAR#,
+			HEIGHT_LOAN_AMOUNT=#heightLoanAmount:DOUBLE#,
+			EARLY_TYPE=#earlyType:CHAR#
+			where
+			REPAYMENT_PLAN_ID=#repaymentPlanId:INTEGER#
+		]]>
+	</update>
+	<select id="selectEarlyTypeByCAId" resultClass="java.lang.String" parameterClass="java.lang.Integer">
+		select EARLY_TYPE from RL_REPAYMENT_PLAN a,RL_CREDIT_APPLICATION b
+		where
+		a.repayment_plan_id = b.repayment_plan_id
+		and
+		b.creditapplication_id = #value#
+	</select>
+</sqlMap>

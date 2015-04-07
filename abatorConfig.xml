@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE abatorConfiguration PUBLIC "-//Apache Software Foundation//DTD Abator for iBATIS Configuration 1.0//EN" "http://ibatis.apache.org/dtd/abator-config_1_0.dtd" > 
+<abatorConfiguration > 
+	<abatorContext > 
+		 <!-- 为了防止生成的代码中有很多注释，比较难看，加入下面的配置控制 -->
+	    <commentGenerator>
+	      <property name="suppressAllComments" value="true" />
+	      <property name="suppressDate" value="true" />
+	    </commentGenerator>
+	    <!-- 注释控制完毕 -->
+	    
+		<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+	        connectionURL="jdbc:oracle:thin:@10.100.20.14:1521:cedb2"
+	        userId="rural2"
+	        password="rural2%I">
+	      <!-- 注意：以下的classPathEntry一定要设置，否则会出现Exception JDBC Driver的错误 -->
+	      <classPathEntry location="E:/MyEclipse9/ruralcredit2/WebContent/WEB-INF/lib/ojdbc6.jar" />
+    	</jdbcConnection>
+   		
+ 		<!-- java生成位置 -->
+		<javaModelGenerator targetPackage="com.creditease.rc.domain" targetProject="ruralcredit2\src\main\java"> 
+			<property name="enableSubPackages" value="false"/> 
+			<!-- domain对象的属性如果是string类型，去掉空格 -->
+			<property name="trimStrings" value="true"/> 
+		</javaModelGenerator> 
+		<!-- xml生成位置 -->	
+        <sqlMapGenerator targetPackage="config.ibatis.rc" targetProject="ruralcredit2\src\main\resources"> 
+            <property name="enableSubPackages" value="false"/>  
+        </sqlMapGenerator> 
+		 <!--dao生成位置  -->
+		<daoGenerator targetPackage="com.creditease.rc.dao" targetProject="ruralcredit2\src\main\java" type="SPRING"> 
+            <property name="enableSubPackages" value="true"/> 
+		</daoGenerator> 
+		
+		<!-- tableName:用于自动生成代码的数据库表；domainObjectName:对应于数据库表的javaBean类名 -->
+		<!-- 
+		<table tableName="RL_DATA_BESTOWAL" domainObjectName="DataBestowal" enableCountByExample="false" enableUpdateByExample="false"  
+            enableDeleteByExample="false" enableSelectByExample="false"  />
+		<table tableName="RL_DATA_BESTOWAL_DETAIL" domainObjectName="DataBestowalDetail" enableCountByExample="false" enableUpdateByExample="false"  
+            enableDeleteByExample="false" enableSelectByExample="false"  />
+             -->
+		<!--<table tableName="RL_DATA_BESTOWAL" domainObjectName="DataBestowal"  />
+		<table tableName="RL_DATA_BESTOWAL_DETAIL" domainObjectName="DataBestowalDetail"  />
+		-->
+		<!-- 修改对应表明和domain类的名字生成-->
+		<table tableName="rl_trade_deal_form" domainObjectName="TradeDealForm"   enableSelectByExample="false" enableDeleteByExample="false" 
+			enableCountByExample="false" enableUpdateByExample="false" >
+			<!-- insert方法的主键生成策略 -->
+			<generatedKey column="TRADEDEALFORMID" identity="true"   sqlStatement="select SEQ_BASIC_INFO.NEXTVAL  from dual"/>
+        </table>
+        
+	</abatorContext> 
+</abatorConfiguration> 

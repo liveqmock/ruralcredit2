@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RLCREDITAPPLICATION">
+	<typeAlias alias="rlCreditApplication" type="com.creditease.rc.domain.CreditApplication" />
+	<typeAlias alias="rlBorrowerServiceApp" type="com.creditease.rc.vo.TBorrowerServiceAppVo" />
+	<update id="update" parameterClass="rlCreditApplication">
+			UPDATE RL_CREDIT_APPLICATION 
+			<dynamic prepend="SET">
+				<isNotEmpty property="auditStatus" prepend="," removeFirstPrepend="true">
+					AUDIT_STATUS=#auditStatus#
+				</isNotEmpty>
+				<isNotEmpty property="accountInfoId" prepend=",">
+					ACCOUNT_INFO_ID=#accountInfoId#
+				</isNotEmpty>
+				<isNotEmpty property="amount" prepend=",">
+					AMOUNT=#amount#
+				</isNotEmpty>
+			</dynamic>
+			WHERE CREDITAPPLICATION_ID=#creditapplicationId#	
+	</update>
+	<update id="updateiRlCreditApplicationByList" parameterClass="rlCreditApplication">
+			UPDATE RL_CREDIT_APPLICATION 
+			<dynamic prepend="SET">
+				<isNotEmpty property="auditStatus" prepend="," removeFirstPrepend="true">
+					AUDIT_STATUS=#auditStatus#
+				</isNotEmpty>
+			</dynamic>
+			WHERE CREDITAPPLICATION_ID=#creditapplicationId#	
+	</update>
+	<select id="selectRlBorrowerServiceApp" parameterClass="rlCreditApplication" resultClass="rlBorrowerServiceApp"> 
+           SELECT 
+           		CREDITAPPLICATION_ID creditapplicationId,
+           		BORROWER_SERVICE_APP_ID borrowerServiceAppId,
+           		NAME name,
+           		APPLY_LIMIT applyLimit
+		   FROM RL_BORROWER_SERVICE_APP  
+		   WHERE  CREDITAPPLICATION_ID =#creditapplicationId# AND VALID_STATE='1'
+		   <isNotEmpty property="leader" prepend="and">
+		   		LEADER=#leader#
+		   </isNotEmpty>
+	</select>
+	<select id="selectRlCreditApplication" parameterClass="rlCreditApplication" resultClass="rlCreditApplication"> 
+	 <![CDATA[
+           SELECT
+           		RA.CREDITAPPLICATION_ID creditapplicationId,
+           		RA.BUSINESS_NUMBER groupNumber,
+           		RA.REPAYMENT_PLAN_NAME repaymentPlanName,
+           		RA.LOAN_OFFICER_NAME loanOfficerName,
+           		RA.ADDRESS address,
+           		RA.COMPANY_ID companyId,
+           		RA.ACCOUNT_INFO_ID accountInfoId,
+           		RA.BUSINESS_TYPE businessType,
+           		RA.COMPANY_NAME companyName,
+           		RA.CAPITAL_UPPER_LIMIT capitalUpperLimit,
+           		RA.CAPITAL_LOWER_LIMIT capitalLowerLimit,
+           		RC.CREDIT_INVESTIGATIO_ID creditInvestigatioId
+		   FROM 
+		   		RL_CREDIT_APPLICATION RA,RL_CREDIT_INVESTIGATIO RC
+		   WHERE
+         		RA.CREDITAPPLICATION_ID=RC.CREDITAPPLICATION_ID AND 
+		   		RA.CREDITAPPLICATION_ID =#creditapplicationId# 
+       ]]>
+	</select>
+	<update id="updateLoanDate" parameterClass="rlCreditApplication">
+		<![CDATA[
+			UPDATE RL_CREDIT_APPLICATION SET
+				EXPECT_LOAN_DATE=#expectLoanDate#
+			WHERE CREDITAPPLICATION_ID=#creditapplicationId#	
+		]]>
+	</update>
+</sqlMap>

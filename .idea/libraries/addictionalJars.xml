@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="addictionalJars">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/quartz-all-1.7.3.jar!/" />
+      <root url="jar://D:/Program Files (x86)/Tomcat6/lib/jsp-api.jar!/" />
+      <root url="jar://D:/Program Files (x86)/Tomcat6/lib/servlet-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/neethi-3.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/sms_client2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/sia-client-3.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

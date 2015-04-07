@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="oldCustomerInfo">
+
+	<!-- 根据借款人省份证号查询产品列表 SQL-->
+	<sql id="queryProductListByidCardSQL" >
+		select rp.repayment_plan_name                                             
+		  from  borrower_service_app bsa, credit_application c,repayment_plan rp  
+		 where 1 = 1                                                              
+		   and c.creditapplication_id = bsa.creditapplication_id                  
+		   and rp.repayment_plan_id=c.repayment_plan_id                           
+		   and bsa.credentials_number=#idCard#                                
+		   group by rp.repayment_plan_name 
+	</sql>
+	<!-- 根据借款人省份证号查询产品列表 分页查询-->
+	<select id="queryProductListByidCard" resultClass="java.util.HashMap"    parameterClass="java.lang.String">
+		<include refid="queryProductListByidCardSQL"/>
+	</select>
+	<!-- 根据借款人省份证号查询产品列表 分页数-->
+	<select id="queryProductListCountByidCardCount"  resultClass ="java.lang.Integer" parameterClass="java.lang.String">
+		 select count(*) from
+	      (
+		    <include refid="queryProductListByidCardSQL" />
+		  )   
+	
+	</select>
+	<!-- 根据借款人省份证号查询审查审批记录SQL  -->
+	<sql id="queryApplyAuditTableListByidCardSQL">
+		select distinct ca.group_number,
+						ca.GROUP_NAME,
+	                to_char(aat.creditapplication_id) creditapplication_id,
+	                to_char(aat.applyaudittable_id) applyaudittable_id,
+	                case when aat.EXAM_RESULT='2'
+	                      then '审查通过'
+	                      when aat.EXAM_RESULT='3'
+	                       then '审查拒绝'
+	                      else ''
+	                 end   EXAM_RESULT ,
+	                 to_char(aat.exam_amount)  exam_amount,
+	                 aat.exam_paerson,
+	                 to_char(aat.exam_date,'yyyy-mm-dd hh24:mi:ss') exam_date,
+	                 aat.exam_note,               
+	                  case when aat.AUDIT_RESULT='4'
+	                      then '审批通过'
+	                      when aat.AUDIT_RESULT='17'
+	                       then '额度变更'
+	                      when aat.AUDIT_RESULT='18'
+	                       then '额度拒绝'
+	                      when aat.AUDIT_RESULT='5'
+	                       then '补换资料'
+	                      else ''
+	                 end   AUDIT_RESULT ,
+	                 to_char(aat.audit_amount) audit_amount,
+	                 aat.auditor,
+	                 to_char(aat.audit_date,'yyyy-mm-dd hh24:mi:ss') audit_date ,
+	                 aat.borr_remark              
+		  from apply_audit_table    aat,
+		       borrower_service_app bsa,
+		       credit_application   ca
+		 where 1 = 1
+		   and ca.creditapplication_id = aat.creditapplication_id
+		   and ca.creditapplication_id = bsa.creditapplication_id
+		   and bsa.credentials_number = #idCard#
+		
+	</sql>
+	
+	<!-- 根据借款人省份证号查询审查审批记录 分页查询  -->
+	<select id="queryApplyAuditTableListByidCard" resultClass="java.util.HashMap"    parameterClass="java.lang.String">
+		<include refid="queryApplyAuditTableListByidCardSQL"/>
+	</select>
+	<!-- 根据借款人省份证号查询审查审批记录 分页查询  -->
+	<select id="queryApplyAuditTableListCountByidCard" resultClass="java.lang.Integer"    parameterClass="java.lang.String">
+		select count(*) from
+	      (
+		    <include refid="queryApplyAuditTableListByidCardSQL"/>
+		  ) 
+	</select>
+	<!-- 根据借款人省份证号查询还款记录SQL -->
+	<sql id="queryFinanceListByidCardSQL">
+		select distinct c.GROUP_NUMBER AS GROUP_NUMBER,
+                c.GROUP_NAME AS GROUP_NAME,
+                '' as BORROWER_NAME,
+                c.GROUP_APP_TOTAL AS GROUP_APP_TOTAL,
+                to_char(c.SIGNAGREEMENT_DATE, 'yyyy-MM-dd') AS SIGNAGREEMENT_DATE,
+                to_char(p.REPAYMENT_DATE, 'yyyy-MM-dd') AS REPAYMENT_DATE,
+                to_char(p.RECIEVE_DATE, 'yyyy-MM-dd hh24:mi:ss') AS RECIEVE_DATE,
+                f.FS_MONEY AS FS_MONEY,
+                c.LOAN_OFFICER_NAME AS LOAN_OFFICER_NAME,
+                f.FS_TYPE AS FS_TYPE,
+                nvl(f.FS_GROUPFLAG, '') AS FS_GROUPFLAG,
+                f.FS_STATUS AS FS_STATUS,
+                c.CREDITAPPLICATION_ID AS CREDITAPPLICATION_ID,
+                f.FINANCE_STATE_ID AS FINANCE_STATE_ID,
+                g.BREACH_FLAG AS SWITCH,
+                g.GROUP_BREACH_SWITCH_ID AS GROUP_BREACH_SWITCH_ID,
+                decode(f.FS_STATUS, '3', 1, '0', 2, '1', 3, '2', 4, 5) AS MY_ORDER,
+                f.FS_CAPITAL_SOURCE FS_CAPITAL_SOURCE
+		  from CREDIT_APPLICATION c, borrower_service_app bsa,FINANCE_STATE f, PAYMENT_REGIST p
+		  left join GROUP_BREACH_SWITCH g
+		    on g.GROUP_NUMBER = p.GROUP_NUMBER
+		   and g.REPAYMENT_DATE = p.REPAYMENT_DATE
+		 where c.creditapplication_id = p.creditapplication_id
+		   and f.association_id = p.recieverecode_id
+		   and f.fs_type = '3'
+		   and c.creditapplication_id = bsa.creditapplication_id
+		   and bsa.credentials_number = #idCard#
+		UNION
+		select distinct c.GROUP_NUMBER AS GROUP_NUMBER,
+		                c.GROUP_NAME AS GROUP_NAME,
+		                '' as BORROWER_NAME,
+		                c.GROUP_APP_TOTAL AS GROUP_APP_TOTAL,
+		                '' as SIGNAGREEMENT_DATE,
+		                '' as REPAYMENT_DATE,
+		                '' as RECIEVE_DATE,
+		                f.FS_MONEY AS FS_MONEY,
+		                c.LOAN_OFFICER_NAME AS LOAN_OFFICER_NAME,
+		                f.FS_TYPE AS FS_TYPE,
+		                nvl(f.FS_GROUPFLAG, '') AS FS_GROUPFLAG,
+		                f.FS_STATUS AS FS_STATUS,
+		                c.CREDITAPPLICATION_ID AS CREDITAPPLICATION_ID,
+		                f.FINANCE_STATE_ID AS FINANCE_STATE_ID,
+		                '0' AS SWITCH,
+		                null AS GROUP_BREACH_SWITCH_ID,
+		                NULL AS MY_ORDER,
+		                f.FS_CAPITAL_SOURCE FS_CAPITAL_SOURCE
+		  from CREDIT_APPLICATION c,borrower_service_app bsa, FINANCE_STATE f
+		 where f.association_id = c.creditapplication_id
+		   and f.fs_type = '2'
+		   and c.creditapplication_id = bsa.creditapplication_id
+		   and bsa.credentials_number = #idCard#
+		UNION
+		select distinct b.GROUP_NUMBER AS GROUP_NUMBER,
+		                viewCredit.GROUP_NAME AS GROUP_NAME,
+		                b.BORROWER_NAME AS BORROWER_NAME,
+		                viewCredit.GROUP_APP_TOTAL AS GROUP_APP_TOTAL,
+		                to_char(viewCredit.SIGNAGREEMENT_DATE,
+		                        'yyyy-MM-dd hh24:mi:ss') AS SIGNAGREEMENT_DATE,
+		                '' as REPAYMENT_DATE,
+		                to_char(b.ACTUAL_REPAYMENT_DATE, 'yyyy-MM-dd hh24:mi:ss') AS RECIEVE_DATE,
+		                b.ACTUAL_REPAYMENT_AMOUNT AS FS_MONEY,
+		                b.LOAN_OFFICER AS LOAN_OFFICER_NAME,
+		                f.FS_TYPE AS FS_TYPE,
+		                nvl(f.FS_GROUPFLAG, '') AS FS_GROUPFLAG,
+		                f.FS_STATUS AS FS_STATUS,
+		                viewCredit.CREDITAPPLICATION_ID AS CREDITAPPLICATION_ID,
+		                f.FINANCE_STATE_ID AS FINANCE_STATE_ID,
+		                '0' AS SWITCH,
+		                null AS GROUP_BREACH_SWITCH_ID,
+		                NULL AS MY_ORDER,
+		                f.FS_CAPITAL_SOURCE FS_CAPITAL_SOURCE
+		  from BREACH_REGIST b,
+		       FINANCE_STATE f,
+		       (select distinct c.CREDITAPPLICATION_ID as CREDITAPPLICATION_ID,
+		                        c.GROUP_NUMBER as GROUP_NUMBER,
+		                        c.GROUP_NAME as GROUP_NAME,
+		                        c.ADDRESS as ADDRESS,
+		                        c.GROUP_APP_TOTAL as GROUP_APP_TOTAL,
+		                        (c.GROUP_APP_TOTAL * r.FIRST_SERVICE_FREE) as serviceAmount,
+		                        (c.GROUP_APP_TOTAL -
+		                        (c.GROUP_APP_TOTAL * r.FIRST_SERVICE_FREE)) as realAmount,
+		                        c.SIGNAGREEMENT_DATE as SIGNAGREEMENT_DATE,
+		                        c.LOAN_OFFICER_NAME as LOAN_OFFICER_NAME
+		          from CREDIT_APPLICATION c, REPAYMENT_PLAN r
+		         where c.repayment_plan_id = r.repayment_plan_id
+		         order by c.creditapplication_id) viewCredit
+		 where 1 = 1
+		   and viewCredit.GROUP_NUMBER = b.GROUP_NUMBER
+		   and b.BREACH_REGIST_ID = f.ASSOCIATION_ID
+		   and f.FS_TYPE = '4'
+		   and b.CREDENTIALS_NUMBER = #idCard#
+		UNION
+		select distinct ca.GROUP_NUMBER AS GROUP_NUMBER,
+		                ca.GROUP_NAME AS GROUP_NAME,
+		                '' as BORROWER_NAME,
+		                ca.GROUP_APP_TOTAL AS GROUP_APP_TOTAL,
+		                to_char(ca.signagreement_date, 'yyyy-MM-dd hh24:mi:ss') AS SIGNAGREEMENT_DATE,
+		                '' as REPAYMENT_DATE,
+		                to_char(gpr.opreate_date, 'yyyy-MM-dd HH24:mi:ss') AS RECIEVE_DATE,
+		                f.fs_money AS FS_MONEY,
+		                ca.loan_officer_name AS LOAN_OFFICER_NAME,
+		                f.fs_type AS FS_TYPE,
+		                nvl(f.FS_GROUPFLAG, '') AS FS_GROUPFLAG,
+		                f.FS_STATUS AS FS_STATUS,
+		                ca.creditapplication_id AS CREDITAPPLICATION_ID,
+		                f.FINANCE_STATE_ID AS FINANCE_STATE_ID,
+		                '0' AS SWITCH,
+		                null AS GROUP_BREACH_SWITCH_ID,
+		                NULL AS MY_ORDER,
+		                f.FS_CAPITAL_SOURCE FS_CAPITAL_SOURCE
+		  from finance_state f, credit_application ca,borrower_service_app bsa, group_pre_regist gpr
+		 where f.association_id = gpr.group_pre_regist_id
+		   and ca.group_number = gpr.group_number
+		   and f.fs_type = '6'
+		   and ca.creditapplication_id = bsa.creditapplication_id
+		   and bsa.credentials_number = #idCard#
+	  order by GROUP_NUMBER,REPAYMENT_DATE
+	</sql>
+	<!-- 根据借款人省份证号查询还款记录 分页查询 -->
+	<select id="queryFinanceListByidCard" resultClass="java.util.HashMap"    parameterClass="java.lang.String">
+	
+		<include refid="queryFinanceListByidCardSQL"/>
+	
+	</select>
+	<select id="queryFinanceListCountByidCard" resultClass="java.lang.Integer"    parameterClass="java.lang.String">
+		select count(*) from
+	      (
+			<include refid="queryFinanceListByidCardSQL"/>
+		  )	
+	</select>
+</sqlMap>

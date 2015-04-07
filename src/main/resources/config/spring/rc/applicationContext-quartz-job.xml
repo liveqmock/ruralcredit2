@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+  	http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-lazy-init="true">
+	<context:annotation-config />
+	<aop:aspectj-autoproxy />
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.creditease.rc" />
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"></bean>
+
+
+	<!-- spring 定时begin -->
+	<!-- 第一步 配置服务 -->
+	<!-- 收款登记相关 -->
+	<bean id="receivablesRegistrationService" class="com.creditease.rc.service.impl.ReceivablesRegistrationService"></bean>
+	<bean id="ReceivablesRegistrationController" class="com.creditease.rc.action.ReceivablesRegistrationController"></bean>
+	<bean id="returnPlanService" class="com.creditease.rc.service.impl.ReturnPlanService"></bean>
+	<bean id="laonBalanceDataService" class="com.creditease.rc.service.impl.LaonBalanceDataService"></bean>
+	<bean id="urgeService" class="com.creditease.rc.service.impl.UrgeService"></bean>
+	<bean id="businessStatusChangeService" class="com.creditease.rc.service.impl.BusinessStatusChangeService"></bean>
+    <bean id="blackListService" class="com.creditease.rc.service.impl.BlacklistService"></bean>
+    <bean id="overDueDataService" class="com.creditease.rc.service.impl.OverDueDataService"></bean>
+	<bean id="messageInfoDataService" class="com.creditease.rc.service.impl.MessageInfoService"></bean>
+	<!-- 第二步，定义任务。在Spring配置文件中配置代理类MethodInvokingJobDetailFactoryBean，定义任务的详细信息。 配置Test任务 -->
+	<bean id="mDistribution" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="receivablesRegistrationService"></property>
+		<property name="targetMethod" value="saveDistribution"></property>
+	</bean>
+	<bean id="automaticallyDeductedMisson" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="ReceivablesRegistrationController"></property>
+		<property name="targetMethod" value="automaticallyDeducted"></property>
+	</bean>
+	<bean id="clientMissionm" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="returnPlanService"></property>
+		<property name="targetMethod" value="updateClientMission"></property>
+	</bean>
+	<bean id="synchronizationLoanMissionm" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="laonBalanceDataService"></property>
+		<property name="targetMethod" value="insertSynchronization"></property>
+	</bean>
+	<bean id="insertCreateUrgem" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="urgeService"></property>
+		<property name="targetMethod" value="insertCreateUrge"></property>
+	</bean>
+    <bean id="updateOverDueGt180Job" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="businessStatusChangeService"></property>
+		<property name="targetMethod" value="updateOverDueGt180"></property>
+	</bean>
+    <bean id="generateBlackListJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="blackListService"></property>
+        <property name="targetMethod" value="insertBlackListJob"></property>
+    </bean>
+    <bean id="insertOverDueDataJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="overDueDataService"></property>
+        <property name="targetMethod" value="insertOverDueData"></property>
+    </bean>
+	<bean id="sendMsgsForThreeDaysBeforeReturnJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="messageInfoDataService"></property>
+		<property name="targetMethod" value="sendMsgsForThreeDaysBeforeReturn"></property>
+	</bean>
+	<bean id="sendMsgsForLoanClosedJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="messageInfoDataService"></property>
+		<property name="targetMethod" value="sendMsgsForLoanClosed"></property>
+	</bean>
+	<!-- 第三步，配置一个触发器。在Spring配置文件中配置触发器类CronTriggerBean 。 -->
+	<bean id="tDistribution" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="mDistribution"></property>
+		<!-- 每分钟触发一次 -->
+		<property name="cronExpression" value="1 * * * * ?"></property>
+	</bean>
+	<bean id="automaticallyDeductedTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="automaticallyDeductedMisson"></property>
+		<!-- 每分钟触发一次 -->
+		<property name="cronExpression" value="2 * * * * ?"></property>
+	</bean>
+	<bean id="clientMissiont" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="clientMissionm"></property>
+		<!-- 每分钟触发一次 -->
+		<property name="cronExpression" value="0 5 0 * * ?"></property>
+	</bean>
+	<bean id="synchronizationLoanMissiont" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="synchronizationLoanMissionm"></property>
+		<!-- 每分钟触发一次 -->
+		<property name="cronExpression" value="0 10 4 * * ?"></property>
+	</bean>
+	<bean id="insertCreateUrget" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="insertCreateUrgem"></property>
+		<!-- 每分钟触发一次 -->
+		<property name="cronExpression" value="0 30 2 * * ?"></property>
+	</bean>
+    <bean id="updateOverDueGt180Cron" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="updateOverDueGt180Job"></property>
+        <!--每晚 23:00-->
+		<property name="cronExpression" value="0 0 23 * * ?"></property>
+	</bean>
+	<!-- 已审批但从入户起已满30天未放款的业务，重回入户调查环节 liuli 2013-05-09 -->
+	<bean id="creditApplicationService" class="com.creditease.rc.service.impl.CreditApplicationService"></bean>
+	<!-- 定义任务 -->
+	<bean id="backToInvestigateTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="creditApplicationService"></property>
+		<property name="targetMethod" value="updateToInvestigate"></property>
+	</bean>
+	<!-- 贷后系统查询划扣结果更细本地收款预约状态 -->
+	<bean id="financeReceiveService" class="com.creditease.rc.service.impl.FinanceReceiveService"></bean>
+	<!-- 定义任务 -->
+	<bean id="qyReserveSearchTask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="financeReceiveService"></property>
+		<property name="targetMethod" value="updateQueryReserveResult"></property>
+	</bean>
+	<!-- 配置定时任务执行时间间隔，并指定任务 ,需要在triggers list下添加 -->
+	<bean id="backToInvestigateTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="backToInvestigateTask"></property>
+		<!-- 每天凌晨一点:0 0 1 * * ? 每隔一秒:*/1 * * * * ? 每隔一分钟:0 */1 * * * ? -->
+		<property name="cronExpression" value="0 0 1 * * ?"></property>
+	</bean>
+	<!-- 配置划扣查询结果的时间每小时执行一次 -->
+	<bean id="qyReserveSearchTime" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="qyReserveSearchTask"></property>
+		<!-- 每隔一个小时执行一次 -->
+		<property name="cronExpression" value="0 0 * * * ?"></property>
+		<!-- 测试用 每分钟执行一次 -->
+		<!--<property name="cronExpression" value="1 * * * * ?"></property> -->
+	</bean>
+	<!-- 同步smp员工start -->
+	<bean id="employeeServiceImpl" class="com.creditease.rc.service.impl.EmployeeServiceImpl"></bean>
+	<bean id = "employeeServiceImplJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="employeeServiceImpl"/>
+		</property>
+		<property name="targetMethod" value="dispatcher"/>
+		
+		<!-- <property name="concurrent" value="false" /> --> <!-- 不并发调度    -->
+	</bean>
+	<bean id="employeeServiceImplTask" class="org.springframework.scheduling.quartz.CronTriggerBean">  
+	<property name="jobDetail" ref="employeeServiceImplJob" />  
+	  <!-- 每天晚上12:00运行一次 -->       
+	<property name="cronExpression" value="0 0 0 * * ?" />  
+	</bean> 
+	<!-- 撤销撮合的定时任务start -->
+	<bean id="revokeMatchTaskImpl" class="com.creditease.rc.service.impl.RevokeMatchTaskImpl"/>
+
+	<bean id = "task1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="revokeMatchTaskImpl"/>
+		</property>
+		<property name="targetMethod" value="revokeMatch"/>
+		<!-- <property name="concurrent" value="false" /> --> <!-- 不并发调度    -->
+	</bean>
+
+	<!-- 配置定时器 -->
+	<bean id="revokeMatchTask" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="task1" />
+		<!-- 每天晚上12:00运行一次 -->
+		<property name="cronExpression" value="0 0 0 * * ?" />
+	</bean>
+
+	<!-- 黑名单生成定时器 -->
+	<bean id="generateBlackListTask" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="generateBlackListJob" />
+		<!-- 每天3点运行一次 -->
+		<property name="cronExpression" value="0 0 3 1/1 * ?" />
+	</bean>
+	<!-- 定时逾期跑批定时器 -->
+	<bean id="insertOverDueDataTask" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="insertOverDueDataJob" />
+		<!-- 每两个小时跑一次逾期 -->
+		<property name="cronExpression" value="0 0 0/2 1/1 * ?" />
+	</bean>
+
+	<!-- 提前三天还款提醒定时任务触发器 -->
+	<bean id="sendMsgsForThreeDaysBeforeReturnTask" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="sendMsgsForThreeDaysBeforeReturnJob" />
+		<!-- 每天的九点跑批 -->
+		<!--<property name="cronExpression" value="0 0 10 1/1 * ? *" />-->
+		<property name="cronExpression" value="0 0 10 1/1 * ?" />
+	</bean>
+	<!-- 还款结清短信定时任务触发器 -->
+	<bean id="sendMsgsForLoanClosedJobTask" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="sendMsgsForLoanClosedJob" />
+		<!-- 每天的10点及下午3点出发跑批 -->
+		<!--<property name="cronExpression" value="0 0 9 1/1 * ? *" />-->
+		<property name="cronExpression" value="0 0 9 1/1 * ?" />
+	</bean>
+
+
+    <!-- 第四步，配置一个调度器。在Spring配置文件中配置调度器类SchedulerFactoryBean。 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<!--<ref bean="tDistribution"></ref> <ref bean="automaticallyDeductedTime"></ref> --><!-- 已审批但从入户起已满30天未放款的业务，重回入户调查环节 liuli 2013-05-09 -->
+				<ref bean="backToInvestigateTime"></ref>
+				<!-- 贷后查询划扣结果定时任务，更新本地状态 -->
+				<ref bean="qyReserveSearchTime" />
+				<!-- <ref bean="clientMissiont" />-->
+				<ref bean="synchronizationLoanMissiont" />
+				<ref bean="insertCreateUrget" />
+				<ref bean="updateOverDueGt180Cron" />
+				<ref bean="revokeMatchTask" />
+				<ref bean="employeeServiceImplTask"/>
+                <!--黑名单生成任务-->
+                <ref bean="generateBlackListTask"/>
+                <!--获取逾期数据任务-->
+                <ref bean="insertOverDueDataTask"/>
+				<!-- 提前三天还款提醒定时任务 -->
+				<ref bean="sendMsgsForThreeDaysBeforeReturnTask"/>
+				<!-- 还款结清短信提醒定时任务 -->
+				<ref bean="sendMsgsForLoanClosedJobTask"/>
+			</list>
+		</property>
+	</bean>
+</beans>

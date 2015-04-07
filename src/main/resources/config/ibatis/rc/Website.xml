@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WEBSITE" >
+<typeAlias alias="websiteVo" type="com.creditease.rc.vo.WebsiteVo" />
+  <resultMap id="WebsiteMap" class="com.creditease.rc.domain.Website" >
+    <result column="WEBSITE_ID" property="websiteId" jdbcType="DECIMAL" />
+    <result column="BRANCHOFFICE_ID" property="branchofficeId" jdbcType="VARCHAR" />
+    <result column="BRANCHOFFICE_NAME" property="branchofficeName" jdbcType="VARCHAR" />
+    <result column="WORK_ADDRESS" property="workAddress" jdbcType="VARCHAR" />
+    <result column="BUSINESS_TIME" property="businessTime" jdbcType="VARCHAR" />
+    <result column="CONSULTING_TELEPHONE" property="consultingTelephone" jdbcType="VARCHAR" />
+    <result column="SEARCH_ADDRESS" property="searchAddress" jdbcType="VARCHAR" />
+    <result column="PROVINCEHOME" property="provincehome" jdbcType="VARCHAR" />
+    <result column="CITYHOME" property="cityhome" jdbcType="VARCHAR" />
+    <result column="COUNTYHOME" property="countyhome" jdbcType="VARCHAR" />
+  </resultMap>
+  <!-- 根据营业部id查询信息（综合信贷使用） -->
+  <select id="selectByCompanyId" parameterClass="string" resultMap="WebsiteMap">
+  	select t.* from rl_website t where t.BRANCHOFFICE_ID=#companyId#
+  </select>
+  
+  <!--查询方法-->
+  <select id="selectWebsiteInfo" resultMap="WebsiteMap" parameterClass="websiteVo" >
+    select WEBSITE_ID, BRANCHOFFICE_ID, BRANCHOFFICE_NAME, WORK_ADDRESS, BUSINESS_TIME,
+      CONSULTING_TELEPHONE,SEARCH_ADDRESS, PROVINCEHOME, CITYHOME, COUNTYHOME
+    from RL_WEBSITE
+    where WEBSITE_ID = #websiteId:DECIMAL#
+  </select>
+  
+  <!-- 按条件查询网点营业部 -->
+  <sql id="select_sql">
+  	 select web.website_id        websiteId,
+       web.branchoffice_id   branchOfficeId,
+       web.branchoffice_name branchOfficeName,
+       web.work_address      workAddress,
+       web.search_address	 searchAddress,
+       web.business_time     businessTime,
+       web.consulting_telephone consultingTelePhone,
+       web.provincehome         provincehome,
+       web.cityhome             cityhome,
+       web.countyhome           countyhome,
+       (select na.city_name from rl_national_standard_code na where na.city_code = web.provincehome) as provinceName,
+       (select na.city_name from rl_national_standard_code na where na.city_code = web.cityhome) as cityName,
+       (select na.city_name from rl_national_standard_code na where na.city_code = web.countyhome) as countyName       
+    from rl_website web
+    where 1=1
+    <dynamic>
+      <isNotEmpty property="branchofficeId" prepend="and">
+        web.BRANCHOFFICE_ID=#branchofficeId#
+            </isNotEmpty>
+      <isNotEmpty property="provincehome" prepend="and">
+        web.PROVINCEHOME=#provincehome#
+            </isNotEmpty>
+      <isNotEmpty property="cityhome" prepend="and">
+        web.CITYHOME=#cityhome#
+            </isNotEmpty>
+      <isNotEmpty property="countyhome" prepend="and">
+        web.COUNTYHOME=#countyhome#
+            </isNotEmpty>
+		</dynamic>
+		order by  nlssort(workAddress,'NLS_SORT=SCHINESE_PINYIN_M') asc
+  </sql>
+  
+  <select id="qyWebsiteByMap" parameterClass="com.creditease.rc.vo.WebsiteInfoRequestParam"
+		resultClass="websiteVo">
+		<include refid="select_sql" />
+	</select>
+  
+  
+  <!--删除方法-->
+  <delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.Website" >
+    delete from RL_WEBSITE
+    where WEBSITE_ID = #websiteId:DECIMAL#
+  </delete>
+  
+  <!--批量    添加方法-->
+  <insert id="batchInsert" parameterClass="com.creditease.rc.domain.Website" >
+    <selectKey  keyProperty="websiteId" resultClass="long" type="pre">
+      select SEQ_BASIC_INFO.NEXTVAL as value from dual
+    </selectKey>
+    insert into RL_WEBSITE (WEBSITE_ID,BRANCHOFFICE_ID, BRANCHOFFICE_NAME, WORK_ADDRESS, BUSINESS_TIME,
+      CONSULTING_TELEPHONE,SEARCH_ADDRESS, PROVINCEHOME, CITYHOME, COUNTYHOME)
+    values (#websiteId:DECIMAL#,#branchofficeId:VARCHAR#, #branchofficeName:VARCHAR#, #workAddress:VARCHAR#,
+      #businessTime:VARCHAR#, #consultingTelephone:VARCHAR#,#searchAddress:VARCHAR#, #provincehome:VARCHAR#,
+      #cityhome:VARCHAR#, #countyhome:VARCHAR#)
+  </insert>
+  <!--根据主键 更新方法-->
+  <update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.Website" >
+    update RL_WEBSITE
+    set BRANCHOFFICE_ID = #branchofficeId:VARCHAR#,
+      BRANCHOFFICE_NAME = #branchofficeName:VARCHAR#,
+      WORK_ADDRESS = #workAddress:VARCHAR#,
+      BUSINESS_TIME = #businessTime:VARCHAR#,
+      CONSULTING_TELEPHONE = #consultingTelephone:VARCHAR#,
+      SEARCH_ADDRESS = #searchAddress:VARCHAR#,
+      PROVINCEHOME = #provincehome:VARCHAR#,
+      CITYHOME = #cityhome:VARCHAR#,
+      COUNTYHOME = #countyhome:VARCHAR#
+    where WEBSITE_ID = #websiteId:DECIMAL#
+  </update>
+  <!--根据条件  更新方法-->
+  <update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.Website" >
+    update RL_WEBSITE
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="branchofficeId" >
+        BRANCHOFFICE_ID = #branchofficeId:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="branchofficeName" >
+        BRANCHOFFICE_NAME = #branchofficeName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="workAddress" >
+        WORK_ADDRESS = #workAddress:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="businessTime" >
+        BUSINESS_TIME = #businessTime:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="consultingTelephone" >
+        CONSULTING_TELEPHONE = #consultingTelephone:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="consultingTelephone" >
+        SEARCH_ADDRESS = #searchAddress:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="provincehome" >
+        PROVINCEHOME = #provincehome:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="cityhome" >
+        CITYHOME = #cityhome:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="countyhome" >
+        COUNTYHOME = #countyhome:VARCHAR#
+      </isNotNull>
+    </dynamic>
+    where WEBSITE_ID = #websiteId:DECIMAL#
+  </update>
+</sqlMap>

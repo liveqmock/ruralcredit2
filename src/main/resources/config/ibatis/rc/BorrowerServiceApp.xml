@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BORROWERSERVICE">
+
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="BorrowerServiceApp" type="com.creditease.rc.domain.BorrowerServiceApp" />
+	<typeAlias alias="borrowerInfoVo" type="com.creditease.rc.vo.BorrowerInfoVo" />
+	<typeAlias alias="customerBasicInfoVo" type="com.creditease.rc.vo.CustomerBasicInfoVo" />
+	<typeAlias alias="creditApplicationSearch" type="com.creditease.rc.vo.CreditApplicationSearch" />
+	<resultMap class="com.creditease.rc.domain.BorrowerServiceApp" id="BorrowerServiceAppMap">
+		<result property="borrowerServiceAppId" column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" />
+		<result property="name" column="NAME" jdbcType="VARCHAR" />
+		<result property="leader" column="LEADER" jdbcType="VARCHAR" />
+		<result property="former" column="FORMER" jdbcType="VARCHAR" />
+		<result property="gender" column="GENDER" jdbcType="VARCHAR" />
+		<result property="homeAddress" column="HOME_ADDRESS" jdbcType="VARCHAR" />
+		<result property="age" column="AGE" jdbcType="VARCHAR" />
+		<result property="residenceAddress" column="RESIDENCE_ADDRESS" jdbcType="VARCHAR" />
+		<result property="credentialsNumber" column="CREDENTIALS_NUMBER" jdbcType="VARCHAR" />
+		<result property="credentialsType" column="CREDENTIALS_TYPE" jdbcType="VARCHAR" />
+		<result property="mobilephone" column="MOBILEPHONE" jdbcType="VARCHAR" />
+		<result property="borrRemark" column="BORR_REMARK" jdbcType="VARCHAR" />
+		<result property="applyDate" column="APPLY_DATE" jdbcType="DATE" />
+		<result property="paymentSource" column="PAYMENT_SOURCE" jdbcType="VARCHAR" />
+		<result property="applyLimit" column="APPLY_LIMIT" jdbcType="DOUBLE" />
+		<result property="maxMonthlyPayment" column="MAX_MONTHLY_PAYMENT" jdbcType="DOUBLE" />
+		<result property="detailsLoansUse" column="DETAILS_LOANS_USE" jdbcType="VARCHAR" />
+		<result property="detailsLoansuseType" column="DETAILS_LOANS_USE_TYPE" jdbcType="VARCHAR" />
+		<result property="livingCommercial" column="LIVING_COMMERCIAL" jdbcType="VARCHAR" />
+		<result property="livingSelf" column="LIVING_SELF" jdbcType="VARCHAR" />
+		<result property="livingRent" column="LIVING_RENT" jdbcType="VARCHAR" />
+		<result property="livingRelative" column="LIVING_RELATIVE" jdbcType="VARCHAR" />
+		<result property="livingOther" column="LIVING_OTHER" jdbcType="VARCHAR" />
+		<result property="livingDate" column="LIVING_DATE" jdbcType="DATE" />
+		<result property="livingArea" column="LIVING_AREA" jdbcType="VARCHAR" />
+		<result property="creditContract" column="CREDIT_CONTRACT" jdbcType="VARCHAR" />
+		<result property="familyIncome" column="FAMILY_INCOME" jdbcType="DOUBLE" />
+
+		<result property="customerBasicId" column="CUSTOMER_BASIC_ID" jdbcType="INTEGER" />
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="INTEGER" />
+		<result property="auditStatus" column="AUDIT_STATUS" jdbcType="VARCHAR" />
+
+		<result property="villageId" column="VILLAGE_ID" jdbcType="INTEGER" />
+		<result property="countyId" column="COUNTY_ID" jdbcType="INTEGER" />
+		<result property="townId" column="TOWN_ID" jdbcType="INTEGER" />
+
+		<result property="consulteSource" column="CONSULTE_SOURCE" jdbcType="CHAR" />
+		<result property="detailsConsulteSource" column="DETAILS_CONSULTE_SOURCE" jdbcType="VARCHAR" />
+
+		<result property="firstFlag" column="FIRST_FLAG" jdbcType="CHAR" />
+		<result property="secondFlag" column="SECOND_FLAG" jdbcType="CHAR" />
+		<result property="thirdFlag" column="THIRD_FLAG" jdbcType="CHAR" />
+		<result property="validState" column="VALID_STATE" jdbcType="CHAR" />
+
+		<result property="birthday" column="BIRTHDAY" jdbcType="VARCHAR" />
+		<result property="hourseholdAddress" column="HOUSEHOLD_ADDRESS" jdbcType="VARCHAR" />
+
+	</resultMap>
+
+
+	<insert id="insert" parameterClass="BorrowerServiceApp">
+		<selectKey keyProperty="borrowerServiceAppId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_BORROWER_SERVICE_APP 
+        		(BORROWER_SERVICE_APP_ID,
+				NAME,
+				LEADER,
+				FORMER,
+				GENDER,
+				HOME_ADDRESS,
+				AGE,
+				RESIDENCE_ADDRESS,
+				CREDENTIALS_NUMBER,
+				CREDENTIALS_TYPE,
+				MOBILEPHONE,
+				BORR_REMARK,
+				APPLY_DATE,
+				PAYMENT_SOURCE,
+				APPLY_LIMIT,
+				MAX_MONTHLY_PAYMENT,
+				DETAILS_LOANS_USE,
+				DETAILS_LOANS_USE_TYPE,
+				LIVING_COMMERCIAL,
+				LIVING_SELF,
+				LIVING_RENT,
+				LIVING_RELATIVE,
+				LIVING_OTHER,
+				LIVING_DATE,
+				LIVING_AREA,
+				CREDIT_CONTRACT,
+				FAMILY_INCOME,
+				CUSTOMER_BASIC_ID,
+				CREDITAPPLICATION_ID,
+				AUDIT_STATUS,
+				VILLAGE_ID,
+				COUNTY_ID,
+				TOWN_ID,
+				CONSULTE_SOURCE,
+				DETAILS_CONSULTE_SOURCE,
+				birthday,
+				HOUSEHOLD_ADDRESS	
+					)
+        	values(
+        			#borrowerServiceAppId:INTEGER#,
+					#name:VARCHAR#,
+					#leader:VARCHAR#,
+					#former:VARCHAR#,
+					#gender:VARCHAR#,
+					#homeAddress:VARCHAR#,
+					#age:VARCHAR#,
+					#residenceAddress:VARCHAR#,
+					#credentialsNumber:VARCHAR#,
+					#credentialsType:VARCHAR#,
+					#mobilephone:VARCHAR#,
+					#borrRemark:VARCHAR#,
+					#applyDate:DATE#,
+					#paymentSource:VARCHAR#,
+					#applyLimit:INTEGER#,
+					#maxMonthlyPayment:INTEGER#,
+					#detailsLoansUse:VARCHAR#,
+					#detailsLoansuseType:VARCHAR#,
+					#livingCommercial:VARCHAR#,
+					#livingSelf:VARCHAR#,
+					#livingRent:VARCHAR#,
+					#livingRelative:VARCHAR#,
+					#livingOther:VARCHAR#,
+					#livingDate:DATE#,
+					#livingArea:VARCHAR#,
+					#creditContract:VARCHAR#,
+					#familyIncome:INTEGER#,
+					#customerBasicId:INTEGER#,
+					#creditapplicationId:INTEGER#,
+					#auditStatus:VARCHAR#,
+				    #villageId:INTEGER#,
+				    #countyId:INTEGER#,
+				    #townId:INTEGER#,
+				    #consulteSource#,
+				    #detailsConsulteSource#,
+				    #birthday#,
+				    #hourseholdAddress#)
+        ]]>
+	</insert>
+
+	<select id="selectByCreditapplicationId" parameterClass="int" resultMap="BorrowerServiceAppMap">
+    	<![CDATA[
+    		SELECT * FROM RL_BORROWER_SERVICE_APP
+    			WHERE
+    			CREDITAPPLICATION_ID =#creditapplicationId:INTEGER#
+    			and VALID_STATE = '1'
+    			ORDER BY LEADER DESC
+    	]]>
+	</select>
+	<select id="selectByCreditapplicationIdForPerson" parameterClass="int" resultMap="BorrowerServiceAppMap">
+    	<![CDATA[
+    		SELECT * FROM RL_BORROWER_SERVICE_APP
+    			WHERE 
+    			VALID_STATE = '1'
+    			AND LEADER = '1'
+    			AND 
+    			CREDITAPPLICATION_ID =#creditapplicationId:INTEGER#
+    			ORDER BY LEADER DESC
+    	]]>
+	</select>
+	<select id="countByCreditapplicationId" parameterClass="int" resultClass="int">
+    	<![CDATA[
+    		SELECT count(*) FROM RL_BORROWER_SERVICE_APP
+    			WHERE CREDITAPPLICATION_ID =#creditapplicationId:INTEGER#
+    			AND VALID_STATE = 1
+    	]]>
+	</select>
+
+
+	<select id="selectByBorrowerServiceAppId" parameterClass="int" resultMap="BorrowerServiceAppMap">
+    	<![CDATA[
+    		SELECT * FROM RL_BORROWER_SERVICE_APP
+    			WHERE BORROWER_SERVICE_APP_ID =#borrowerServiceAppId:INTEGER#
+    			AND VALID_STATE = 1
+    	]]>
+	</select>
+
+	<select id="selectByCustomerId" parameterClass="int" resultMap="BorrowerServiceAppMap">
+		<![CDATA[
+			SELECT * FROM RL_BORROWER_SERVICE_APP WHERE BORROWER_SERVICE_APP_ID =(SELECT MAX(BORROWER_SERVICE_APP_ID) FROM RL_BORROWER_SERVICE_APP
+    			WHERE CUSTOMER_BASIC_ID =#customerBasicId:INTEGER#
+    			AND VALID_STATE = 1)
+		]]>
+	</select>
+
+	<update id="update" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		NAME= #name:VARCHAR#,
+		LEADER=#leader:VARCHAR#,
+		FORMER=#former:VARCHAR#,
+		GENDER=#gender:VARCHAR#,
+		HOME_ADDRESS=#homeAddress:VARCHAR#,
+		HOUSEHOLD_ADDRESS = #hourseholdAddress#,
+		AGE=#age:VARCHAR#,
+		RESIDENCE_ADDRESS=#residenceAddress:VARCHAR#,
+		CREDENTIALS_NUMBER=#credentialsNumber:VARCHAR#,
+		CREDENTIALS_TYPE=#credentialsType:VARCHAR#,
+		MOBILEPHONE=#mobilephone:VARCHAR#,
+		BORR_REMARK=#borrRemark:VARCHAR#,
+		APPLY_DATE=to_date(#applyDate:DATE#),
+		PAYMENT_SOURCE=#paymentSource:VARCHAR#,
+		APPLY_LIMIT=#applyLimit:INTEGER#,
+		MAX_MONTHLY_PAYMENT=#maxMonthlyPayment:INTEGER#,
+		DETAILS_LOANS_USE=#detailsLoansUse:VARCHAR#,
+		DETAILS_LOANS_USE_TYPE=#detailsLoansuseType:VARCHAR#,
+		LIVING_COMMERCIAL=#livingCommercial:VARCHAR#,
+		LIVING_SELF=#livingSelf:VARCHAR#,
+		LIVING_RENT=#livingRent:VARCHAR#,
+		LIVING_RELATIVE=#livingRelative:VARCHAR#,
+		LIVING_OTHER=#livingOther:VARCHAR#,
+		LIVING_DATE=#livingDate:DATE#,
+		LIVING_AREA=#livingArea:VARCHAR#,
+		CREDIT_CONTRACT=#creditContract:VARCHAR#,
+		FAMILY_INCOME=#familyIncome:INTEGER#,
+		CREDITAPPLICATION_ID=#creditapplicationId:INTEGER#,
+		VILLAGE_ID=
+		#villageId:INTEGER#,
+		COUNTY_ID= #countyId:INTEGER#,
+		TOWN_ID=
+		#townId:INTEGER#,
+		CONSULTE_SOURCE=#consulteSource:CHAR#,
+		DETAILS_CONSULTE_SOURCE=#detailsConsulteSource:VARCHAR#,
+		<dynamic prepend=" ">
+			<isNotEmpty prepend=" " property="customerBasicId">
+				CUSTOMER_BASIC_ID=#customerBasicId:INTEGER#,
+			</isNotEmpty>
+		</dynamic>
+		FIRST_FLAG =
+		#firstFlag#
+
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+
+	</update>
+
+	<delete id="delete" parameterClass="int">
+		DELETE FROM
+		RL_BORROWER_SERVICE_APP
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#		
+     </delete>
+	<!-- //不用的方法 -->
+	<update id="updateDeleteFlag" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		FIRST_FLAG = #firstFlag#
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#		
+     </update>
+
+	<!-- 修改 申请单 标记 -->
+	<update id="updateFirstFlag" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		FIRST_FLAG = #firstFlag#
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#		
+     </update>
+	<!-- 修改入户二标记 -->
+	<update id="updateSecondFlag" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		SECOND_FLAG = #secondFlag#
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#		
+     </update>
+	<!-- 修改入户三标记 -->
+	<update id="updateThirdFlag" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		THIRD_FLAG = #thirdFlag#
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#		
+     </update>
+	<!-- 查询借款人列表 -->
+	<select id="selectBorrowerInfoVo" parameterClass="int" resultClass="borrowerInfoVo">
+		SELECT
+		MOBILEPHONE as mobilephone,
+		LEADER as leader,
+		NAME as
+		name,
+		CREDENTIALS_NUMBER as credentialsNumber,
+		FIRST_FLAG as firstFlag,
+		SECOND_FLAG as secondFlag,
+		THIRD_FLAG as contactFlag,
+		BORROWER_SERVICE_APP_ID as borrowerServiceAppId
+		FROM
+		RL_BORROWER_SERVICE_APP
+		WHERE CREDITAPPLICATION_ID
+		=#creditapplicationId:INTEGER#
+		AND VALID_STATE = 1
+		AND LEADER= 1
+		ORDER BY
+		LEADER DESC
+     </select>
+	<!-- 修改 人员的状态 借款人标记 -->
+	<update id="updateValidState" parameterClass="BorrowerServiceApp">
+		UPDATE
+		RL_BORROWER_SERVICE_APP SET
+		VALID_STATE = #validState#,
+		LEADER =
+		#leader#
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+	</update>
+
+	<!-- 根据身份证号 信贷申请id查询 该组 人员信息 -->
+	<select id="selectByIdentityCard" parameterClass="java.util.Map" resultMap="BorrowerServiceAppMap">
+    	<![CDATA[
+    		SELECT * FROM RL_BORROWER_SERVICE_APP
+    			WHERE upper(CREDENTIALS_NUMBER) = upper(#credentialsNumber:VARCHAR#)
+    			AND CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+    	]]>
+	</select>
+
+	<!-- 查询小组下 所有人 借款总金额 -->
+	<select id="countGroupAppTotal" parameterClass="int" resultClass="Double">
+     	<![CDATA[
+     		SELECT SUM(APPLY_LIMIT) FROM RL_BORROWER_SERVICE_APP
+     		WHERE CREDITAPPLICATION_ID =#creditapplicationId:INTEGER#
+    		AND VALID_STATE = 1
+     	]]>
+	</select>
+	<!-- 根据身份证号 查询状态 -->
+	<select id="selectByNumber" parameterClass="STRING" resultClass="STRING">
+     		<![CDATA[
+     		SELECT  distinct C.AUDIT_STATUS FROM RL_BORROWER_SERVICE_APP B,RL_CREDIT_APPLICATION C
+     		WHERE B.CREDENTIALS_NUMBER =#credentialsNumber:INTEGER#
+     		AND B.CREDITAPPLICATION_ID = C.CREDITAPPLICATION_ID
+    		AND B.VALID_STATE = 1
+     	]]>
+	</select>
+	<!-- 根据信贷申请 更新状态 -->
+	<update id="updateAuditing" parameterClass="BorrowerServiceApp">
+     	<![CDATA[
+     	UPDATE RL_BORROWER_SERVICE_APP SET
+		AUDIT_STATUS = #auditStatus#
+		WHERE
+		CREDITAPPLICATION_ID=#creditapplicationId#		
+     	]]>
+	</update>
+	<!-- 增加按客户基本信息id查询的条件 -->
+	<select id="selectByBorrowerServiceApp" parameterClass="borrowerInfoVo" resultMap="BorrowerServiceAppMap">
+     	<![CDATA[
+     		SELECT * FROM RL_BORROWER_SERVICE_APP
+     	]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="creditapplicationId">
+				CREDITAPPLICATION_ID =
+				#creditapplicationId#
+     		</isNotEmpty>
+			<isNotEmpty prepend="AND" property="leader">
+				LEADER =#leader#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="customerBasicId">
+				CUSTOMER_BASIC_ID =#customerBasicId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 根据申请id查询借款人 -->
+	<select id="selectBorrowerLeaderByCreditApplicationId" parameterClass="java.lang.Integer" resultMap="BorrowerServiceAppMap">
+		SELECT * FROM
+		RL_BORROWER_SERVICE_APP
+		WHERE CREDITAPPLICATION_ID
+		=#creditapplicationId:INTEGER#
+		and leader='1'
+		and valid_state = '1'
+	</select>
+
+	<!-- manzhang 根据借款人id 查询配偶 -->
+	<select id="selectPartner" parameterClass="familymember" resultMap="familymember.familymemberMap">
+		select fm.*,ct.code_value
+		BORROWERRE_RATIONSHIP_VIEW,ct1.code_value PROFESSION_VIEW
+		from
+		RL_FAMILY_MEMBER fm
+		left join rl_codetable ct on (ct.code_key =
+		fm.borrowerre_rationship and ct.section='borrowerreRationship')
+		left
+		join rl_codetable ct1 on (ct1.code_key = fm.profession and
+		ct1.section='profession')
+		where fm.BORROWER_SERVICE_APP_ID =
+		#borrowerServiceAppId#
+		and fm.BORROWERRE_RATIONSHIP =
+		#borrowerreRationship#
+     </select>
+
+	<!-- 郝强上传=========== 根据业务单号和身份证号查询担保人是否为借款人或者借款人配偶 -->
+	<select id="forGuaranorProfile" parameterClass="borrowerInfoVo" resultClass="customerBasicInfoVo">
+		select cbi.name as name, cbi.credentials_number as
+		credentialsNumber, '0' as auditStatus
+		from rl_customer_basic_info cbi
+		where upper(cbi.credentials_number) not in
+		(select upper(bsa.credentials_number) as
+		credentialsNumber
+		from rl_credit_application ca,
+		rl_borrower_service_app bsa
+		where ca.creditapplication_id =
+		bsa.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		and bsa.creditapplication_id = #creditapplicationId#
+		and
+		upper(bsa.credentials_number) = upper(#credentialsNumber#)
+		union
+		select
+		upper(bsa.credentials_number) as credentialsNumber
+		from
+		rl_credit_application
+		ca, rl_borrower_service_app bsa
+		where ca.creditapplication_id =
+		bsa.creditapplication_id
+		and bsa.leader = '0'
+		and bsa.valid_state = '1'
+		and bsa.creditapplication_id = #creditapplicationId#
+		and
+		upper(bsa.credentials_number) = upper(#credentialsNumber#)
+		union
+		select fm.idnumber as
+		credentialsNumber
+		from rl_credit_application ca,
+		rl_borrower_service_app
+		bsa,
+		rl_family_member fm
+		where
+		ca.creditapplication_id = bsa.creditapplication_id
+		and
+		bsa.borrower_service_app_id = fm.borrower_service_app_id
+		and bsa.leader
+		= '1'
+		and bsa.valid_state = '1'
+		and fm.borrowerre_rationship = '2'
+		and
+		bsa.creditapplication_id = #creditapplicationId#
+		and upper(fm.idnumber) =
+		upper(#credentialsNumber#))
+		and upper(cbi.credentials_number) =
+		upper(#credentialsNumber#)
+		union
+		select bsa.name as name,
+		bsa.credentials_number as
+		credentialsNumber,
+		'1' as auditStatus
+		from
+		rl_credit_application ca,
+		rl_borrower_service_app bsa
+		where ca.creditapplication_id =
+		bsa.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		and bsa.creditapplication_id = #creditapplicationId#
+		and
+		upper(bsa.credentials_number) = upper(#credentialsNumber#)
+		union
+		select bsa.name as
+		name,
+		bsa.credentials_number as credentialsNumber,
+		'2' as auditStatus
+		from
+		rl_credit_application ca, rl_borrower_service_app bsa
+		where
+		ca.creditapplication_id = bsa.creditapplication_id
+		and bsa.leader = '0'
+		and bsa.valid_state = '1'
+		and
+		bsa.creditapplication_id =
+		#creditapplicationId#
+		and upper(bsa.credentials_number) = upper(#credentialsNumber#)
+		union
+		select fm.name as name, fm.idnumber as credentialsNumber, '3' as
+		auditStatus
+		from rl_credit_application ca,
+		rl_borrower_service_app bsa,
+		rl_family_member fm
+		where ca.creditapplication_id =
+		bsa.creditapplication_id
+		and bsa.borrower_service_app_id =
+		fm.borrower_service_app_id
+		and bsa.leader = '1'
+		and bsa.valid_state =
+		'1'
+		and fm.borrowerre_rationship = '2'
+		and bsa.creditapplication_id =
+		#creditapplicationId#
+		and fm.idnumber = #credentialsNumber#
+     </select>
+
+	<!-- 借款人 和 配偶 -->
+	<select id="selectExportExcelBorrower" resultClass="java.util.HashMap">
+		<![CDATA[select b.borrower_service_app_id,
+               b.creditapplication_id,
+               b.customer_basic_id,
+               b.name,
+               b.leader,
+               b.former,
+               (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'gender'
+                   and co.code_key = b.gender) gender,
+               b.home_address,
+               b.age,
+               b.residence_address,
+               b.credentials_number,
+               b.borr_remark,
+               decode(b.living_commercial, '1', '是') living_commercial,
+               decode(b.living_self, '1', '是') living_self,
+               decode(b.living_rent, '1', '是') living_rent,
+               decode(b.living_relative, '1', '是') living_relative,
+               decode(b.living_other, '1', '是') living_other,
+               b.living_year,
+               b.mobilephone,
+               decode(b.BUSINESS_COMMERCIAL, '1', '是', '') BUSINESS_COMMERCIAL,
+               decode(b.BUSINESS_SELF, '1', '是', '') BUSINESS_SELF,
+               decode(b.BUSINESS_RENT, '1', '是', '') BUSINESS_RENT,
+               decode(b.BUSINESS_RELATIVE, '1', '是', '') BUSINESS_RELATIVE,
+               decode(b.BUSINESS_OTHER, '1', '是', '') BUSINESS_OTHER,
+               b.living_date,
+               b.living_area,
+               b.APPLY_DATE,
+               b.mobilephone,
+               b.PAYMENT_SOURCE,
+               b.APPLY_LIMIT,
+               b.MAX_MONTHLY_PAYMENT,
+               b.DETAILS_LOANS_USE,
+               b.DETAILS_LOANS_USE_TYPE,
+               
+               b.CREDIT_CONTRACT,
+               b.FAMILY_INCOME,
+              
+               b.COUNTY_ID,
+               b.TOWN_ID,
+               b.VILLAGE_ID,
+               b.CONSULTE_SOURCE,
+               b.DETAILS_CONSULTE_SOURCE,
+               b.VALID_STATE,
+               (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'national'
+                   and co.code_key =    b.NATIONALITY) NATIONALITY,
+               b.BUSINESS_DATE,
+               b.BUSINESS_AREA,
+               b.BUSINESS_YEAR,
+               b.OFFICE_PHONE,
+                (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'maritalStatus'
+                   and co.code_key =  b.MARITAL_STATUS) MARITAL_STATUS,
+                    (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'jobStatus'
+                   and co.code_key = b.JOB_STATUS) JOB_STATUS,
+               b.BIRTHDAY,
+               b.HOUSEHOLD_ADDRESS,
+               f.family_member_id,
+               f.borrower_service_app_id,
+               f.age fage,
+               f.telphone,
+               f.borrowerre_rationship,
+               f.work_unit,
+               f.year_income,
+               f.education,
+               f.gender,
+               f.name fname,
+               (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'profession'
+                   and co.code_key = f.profession)||'/'|| f.profession_detail   profession,
+               f.idnumber,
+               
+                (select co.code_value
+                  from rl_codetable co
+                 where co.section = 'auditStatus'
+                   and co.code_key = c.AUDIT_STATUS)  AUDIT_STATUS,
+                  c.business_number,
+                  c.company_name
+               
+        
+          from rl_borrower_service_app b
+          left join rl_family_member f
+            on f.borrower_service_app_id = b.borrower_service_app_id
+           and f.borrowerre_rationship = '2'
+          left join rl_credit_application c
+            on c.creditapplication_id = b.creditapplication_id
+         where b.leader = '1'
+           and b.valid_state = '1'
+           and c.valid_state = '1'
+           and c.audit_status <> '00'
+           and c.audit_status is not null
+             order by substr(c.business_number,length(c.business_number)-5) desc
+       ]]>
+	</select>
+
+	<!-- 客户信息 导出报表 -->
+
+
+	<sql id="exportCustomerInformation_condition">
+		select b.name
+		as 客户姓名,
+		null 城市,
+
+		(select co.code_value
+		from rl_codetable co
+		where co.section = 'gender'
+		and co.code_key = b.gender) 性别,
+		b.credentials_number 身份证号,
+		b.age 年龄,
+		b.mobilephone 联系方式,
+		a.amount 借款金额,
+		a.real_amount 财务付款额，
+		to_char(c.signagreement_date,'yyyy-MM-dd') 放款时间,
+		to_char(add_natural_months(c.signagreement_date ,3),'yyyy-MM-dd') 还款时间,
+		b.home_address 家庭住址,
+		(select co.code_value
+		from rl_codetable co
+		where co.section = 'borroerUserConsult'
+		and co.code_key = cc.borrow_use)
+		借款用途,
+		c.company_name 营业部,
+		c.repayment_plan_name 产品名称,
+		c.loan_officer_name 客户经理
+
+		from rl_credit_application c
+		left join rl_borrower_service_app b
+		on c.creditapplication_id = b.creditapplication_id
+		left join rl_amount_confirm a
+		on a.credit_application_id = c.creditapplication_id
+		and a.history_flag = '0'
+		left join rl_customer_consult cc
+		on cc.customer_consult_id = c.customer_consult_id
+		where b.leader = '1'
+		and b.valid_state = '1'
+		and c.valid_state = '1'
+		and c.audit_status = '15'
+		<dynamic prepend="and">
+			<isNotEmpty property="creditApplication.beginLoanDate" prepend="AND">
+				c.SIGNAGREEMENT_DATE >= #creditApplication.beginLoanDate#
+                </isNotEmpty>
+			<isNotEmpty prepend="AND" property="creditApplication.endLoanDate">
+				#creditApplication.endLoanDate# >=
+				c.SIGNAGREEMENT_DATE 
+                </isNotEmpty>
+		</dynamic>
+		order by c.signagreement_date,b.name
+	</sql>
+
+	<select id="exportCustomerInformation" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+		<include refid="exportCustomerInformation_condition" />
+	</select>
+
+	<select id="exportCustomerInformation_count" parameterClass="java.util.Map" resultClass="int">
+		select count(*) from (
+		<include refid="exportCustomerInformation_condition" />
+		)
+	</select>
+
+	<update id="update_dynamic" parameterClass="BorrowerServiceApp">
+		UPDATE RL_BORROWER_SERVICE_APP
+		SET BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+		<dynamic prepend=", ">
+			<isNotEmpty prepend=" ," property="customerBasicId">
+				CUSTOMER_BASIC_ID=#customerBasicId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty prepend=" ," property="credentialsNumber">
+				CREDENTIALS_NUMBER=#credentialsNumber:VARCHAR#
+			</isNotEmpty>
+		</dynamic>
+		WHERE
+		BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+	</update>
+
+	<!-- 在新增咨询中 查询与该电话有关的借款人的借款结清次数 hongjieluo -->
+	<select id="selectBorrowerAuditListByTel" resultClass="creditApplicationSearch" parameterClass="String">
+	  <![CDATA[
+			  select c.business_number as businessnumber,
+		       b.name as borrower,
+		       c.audit_status as auditstatus,
+		       (select ct.code_value
+		          from rl_codetable ct
+		         where ct.code_key = c.audit_status
+		           and ct.section = 'auditStatus') as auditstatusShow,
+		       c.company_name as company,
+		       c.CREATE_LOAN_OFFICER_NAME as createloanofficername,
+		       c.SIGNAGREEMENT_DATE as signagreementdate,
+		       c.loan_officer_name as loanofficername,
+		       b.apply_limit as borrowmoney,
+		       f.name as partner,
+		       (select wm_concat(b1.name)
+		          from rl_borrower_service_app b1
+		         where b1.creditapplication_id = c.creditapplication_id
+		           and b1.leader = '0'
+		           and b1.valid_state = '1') as guarantor
+		  from rl_credit_application c
+		  left join rl_borrower_service_app b
+		    on b.creditapplication_id = c.creditapplication_id
+		  left join rl_family_member f
+		    on f.borrower_service_app_id = b.borrower_service_app_id
+		   and f.borrowerre_rationship = '2'
+		 where (b.mobilephone = #telphone# or f.telphone = #telphone#)
+		   and b.leader = '1'
+		   and B.Valid_State = '1'
+		   and c.valid_state = '1'
+	  ]]>
+	</select>
+
+	<!-- 在新增咨询中 查询与该电话有关作为担保人的借款结清次数 hongjieluo -->
+	<select id="selectBorrowerListByTel" resultClass="creditApplicationSearch" parameterClass="String">
+	   <![CDATA[
+	      select c.business_number as businessnumber,b.name as borrower,c.audit_status as auditstatus,
+       (select ct.code_value from rl_codetable ct where ct.code_key = c.audit_status and ct.section = 'auditStatus') as auditstatusShow,
+       c.company_name as company,
+      c.CREATE_LOAN_OFFICER_NAME as createloanofficername,
+      c.SIGNAGREEMENT_DATE as signagreementdate,
+       c.loan_officer_name as loanofficername,
+       b.apply_limit as borrowmoney,f.name as partner,
+         b2.name ||','|| (select wm_concat(b1.name)
+          from rl_borrower_service_app b1
+          where b1.creditapplication_id = c.creditapplication_id
+           and b1.leader = '0' and b1.valid_state = '1'
+           and b1.name <> b2.name) as guarantor
+ 		   from rl_credit_application c
+  		   left join rl_borrower_service_app b
+    	   on b.creditapplication_id = c.creditapplication_id
+    	   and b.leader = '1'
+		   and B.Valid_State = '1'
+  		   left join rl_family_member f
+           on f.borrower_service_app_id = b.borrower_service_app_id
+           and f.borrowerre_rationship = '2'
+           left join rl_borrower_service_app b2
+           on b2.creditapplication_id = c.creditapplication_id
+           where b2.mobilephone =#telphone#
+		   and c.valid_state = '1'
+		   and b2.leader = '0'
+		   and b2.valid_state = '1'
+	   ]]>
+	</select>
+	<select id="checkBorrowerSave" resultClass="com.creditease.rc.domain.BorrowerServiceApp" parameterClass="java.lang.Long">
+		select bsa.borrower_service_app_id as borrowerServiceAppId
+		from rl_borrower_service_app bsa
+		where bsa.creditapplication_id = #creditapplicationId#
+		and bsa.first_flag = '1'
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+	</select>
+</sqlMap>

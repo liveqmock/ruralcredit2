@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="EVERYDAYOPERCSIN">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="operAverageCsIn" type="com.creditease.rc.domain.OperAverageCsIn" />
+    <resultMap class="com.creditease.rc.domain.OperAverageCsIn" id="OperAverageCsInMap">
+		<result property="operAverageCsInId" column="OPER_AVERAGE_CSIN_ID" jdbcType="INTEGER"/>
+	    <result property="item1" column="ITEM1" jdbcType="VARCHAR"/>
+	    <result property="item2" column="ITEM2" jdbcType="VARCHAR"/>
+	    <result property="item3" column="ITEM3" jdbcType="VARCHAR"/>
+	    <result property="itemSort" column="ITEM_SORT" jdbcType="INTEGER"/>
+	    <result property="belongId" column="BELONG_ID" jdbcType="INTEGER"/>
+	    <result property="timeCycle" column="TIME_CYCLE" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="operAverageCsIn" >
+    	 <selectKey keyProperty="operAverageCsInId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_OPER_AVERAGE_CSIN
+        		(
+					OPER_AVERAGE_CSIN_ID,
+					ITEM1,
+					ITEM2,
+					ITEM3,
+					ITEM_SORT,
+					BELONG_ID,
+					TIME_CYCLE
+					)
+        	values(
+					#operAverageCsInId:INTEGER#,
+					#item1:VARCHAR#,
+					#item2:VARCHAR#,
+					#item3:VARCHAR#,
+					#itemSort:INTEGER#,
+					#belongId:INTEGER#,
+					#timeCycle:VARCHAR#
+				  )
+        ]]>
+    </insert>
+
+     <update id="update" parameterClass="operAverageCsIn">
+     	update RL_OPER_AVERAGE_CSIN
+			set 
+				ITEM1 = #item1:VARCHAR#,
+				ITEM2 = #item2:VARCHAR#,
+				ITEM3 = #item3:VARCHAR#
+			where
+				OPER_AVERAGE_CSIN_ID = #operAverageCsInId:INTEGER#
+     </update>
+     
+     <select id="selectByBelongId" parameterClass="int" resultMap="OperAverageCsInMap">
+     	<![CDATA[
+     		SELECT * 
+     			FROM 
+     				RL_OPER_AVERAGE_CSIN 
+     		where 
+     			BELONG_ID = #belongId:INTEGER#
+     		order by ITEM_SORT
+     	]]>
+     </select>
+     
+    <select id="selectCountByBelongId" parameterClass="int" resultClass="int">
+     	<![CDATA[
+     		SELECT count(*) 
+     			FROM RL_OPER_AVERAGE_CSIN 
+     				where BELONG_ID = #belongId:INTEGER#
+     	]]>
+    </select>
+    
+    <delete id="deleteByBelongId" parameterClass="int">
+    	<![CDATA[
+    		DELETE FROM RL_OPER_AVERAGE_CSIN WHERE BELONG_ID=#belongId:INTEGER#
+    	]]>
+    </delete>
+     
+</sqlMap>

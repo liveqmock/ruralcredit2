@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="AmountConfirm">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="AmountConfirmClass" type="com.creditease.rc.domain.AmountConfirm"/>
+	<typeAlias alias="AmountConfirmClassVo" type="com.creditease.rc.vo.AmountConfirmVo"/>
+	<resultMap class="com.creditease.rc.domain.AmountConfirm" id="AmountConfirmMap">
+		<result property="amountConfirmId" column="amount_Confirm_Id" jdbcType="LONG"/>
+		<result property="creditapplicationId" column="CREDIT_APPLICATION_ID" jdbcType="INTEGER"/>
+		<result property="historyFlag" column="HISTORY_FLAG" jdbcType="CHAR"/>
+		<result property="operator" column="OPERATOR" jdbcType="VARCHAR"/>
+		<result property="operatorId" column="OPERATOR_ID" jdbcType="INTEGER"/>
+		<result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP"/>
+		<result property="amount" column="AMOUNT" jdbcType="DOUBLE"/>
+		<result property="serviceCharge" column="SERVICE_CHARGE" jdbcType="DOUBLE"/>
+		<result property="realAmount" column="REAL_AMOUNT" jdbcType="DOUBLE"/>
+		<result property="loanTime" column="LOAN_TIME" jdbcType="TIMESTAMP"/>
+		<result property="lastDownloadContractTime" column="LAST_DOWNLOAD_CONTRACT_TIME" jdbcType="TIMESTAMP" />
+		<result property="beginInterestTime" column="BEGIN_INTEREST_TIME" jdbcType="DATE" />
+		<result property="lendingChannel" column="LENDINGCHANNEL" jdbcType="VARCHAR" />
+	</resultMap>
+	<insert id="insert" parameterClass="AmountConfirmClass">
+		<selectKey keyProperty="amountConfirmId" resultClass="LONG" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+		</selectKey>
+		INSERT INTO RL_AMOUNT_CONFIRM
+			(amount_Confirm_Id,
+			CREDIT_APPLICATION_ID,
+			HISTORY_FLAG,
+			OPERATOR,
+			OPERATOR_ID,
+			CREATE_TIME,
+			AMOUNT,
+			SERVICE_CHARGE,
+			REAL_AMOUNT,
+			LOAN_TIME,
+			LAST_DOWNLOAD_CONTRACT_TIME,
+			BEGIN_INTEREST_TIME,
+			LENDINGCHANNEL)
+		VALUES
+			(#amountConfirmId:LONG#,
+			#creditapplicationId:INTEGER#,
+			#historyFlag:CHAR#,
+			#operator:VARCHAR#,
+			#operatorId:INTEGER#,
+			#createTime:TIMESTAMP#,
+			#amount:DOUBLE#,
+			#serviceCharge#,
+			#realAmount#,
+			#loanTime:TIMESTAMP#,
+			#lastDownloadContractTime:TIMESTAMP#,
+			#beginInterestTime:DATE#,
+			#lendingChannel:VARCHAR#)
+	</insert>
+	<update id="updateBycreditapplicationId" parameterClass="int">
+		UPDATE RL_AMOUNT_CONFIRM 
+			SET HISTORY_FLAG = '1'
+		WHERE CREDIT_APPLICATION_ID = #creditapplicationId#
+	</update>
+	<select id="selectNew" parameterClass="int" resultMap="AmountConfirmMap">
+		<![CDATA[
+			SELECT * FROM RL_AMOUNT_CONFIRM
+			WHERE CREDIT_APPLICATION_ID = #creditapplicationId#
+			AND   HISTORY_FLAG = '0'
+		]]>
+	</select>
+	
+	<select id="selectAmount" parameterClass="int" resultClass="AmountConfirmClassVo">
+		<![CDATA[
+			SELECT distinct c.creditapplication_id as creditapplicationId,
+			       b.name                 as groupName,
+			       c.business_number      as groupNumber,
+			       b.apply_limit          as groupAppTotal,
+			       c.amount               as loanAmount
+			  FROM  
+			       rl_credit_application   c,
+			       rl_borrower_service_app b
+			 WHERE c.creditapplication_id = #creditapplicationId#
+			 
+			   and c.creditapplication_id = b.creditapplication_id
+			   and b.valid_state = '1'
+			   and b.leader = '1'
+		]]>
+	</select>
+	
+	 <select id="selectFinanceMoneyBack" parameterClass="AmountConfirmClass" resultMap="AmountConfirmMap">
+	    SELECT 
+	     A.*
+	    FROM RL_AMOUNT_CONFIRM A 
+	    WHERE 
+	    A.HISTORY_FLAG='0' AND A.AMOUNT_CONFIRM_ID =#amountConfirmId#
+  </select>
+  
+  	<select id="selectAmounts" parameterClass="AmountConfirmClass" resultMap="AmountConfirmMap">
+  		SELECT * FROM RL_AMOUNT_CONFIRM 
+		      WHERE CREDIT_APPLICATION_ID = #creditapplicationId#
+  	</select>
+  	
+  	<!-- 根据业务单号查询相应的额度确认数据 liuli 2013-05-20 -->
+  	<select id="selectAmountsByCreditAppId" parameterClass="Integer" resultMap="AmountConfirmMap">
+  		SELECT * FROM RL_AMOUNT_CONFIRM 
+		      WHERE CREDIT_APPLICATION_ID = #creditApplicationId#
+  	</select>
+  	
+  	<update id="updateToHisByAmountConfirmId" parameterClass="int">
+		UPDATE RL_AMOUNT_CONFIRM 
+			SET HISTORY_FLAG = '1'
+		WHERE AMOUNT_CONFIRM_ID = #amountConfirmId#
+	</update>
+  	<select id="queryAmountConfirmByPrimaryKey" parameterClass="java.lang.Long" resultMap="AmountConfirmMap">
+  		select * from rl_amount_confirm ac where ac.amount_confirm_id = #value#
+  	</select>
+  		<!--上传合同资料的时候   更新起息日期 -->
+	<update id="updateBeginInterestTime" parameterClass="AmountConfirmClass">
+	 update rl_amount_confirm am set am.begin_interest_time=#beginInterestTime#
+	 where am.credit_application_id=#creditapplicationId#
+	</update>
+	<!-- 根据申请id查询放款配置 -->
+	<select id="selectLendingChannel" parameterClass="long" resultClass="string">
+		select am.lendingchannel from rl_amount_confirm am where am.credit_application_id=#creditapplicationId# and am.history_flag = '0'
+	</select>
+	<!-- 根据贷后信息查询该笔数据时信托还是债权转让 -->
+	<select id="selectLendingChannelByApplyId" parameterClass="string" resultClass="string">
+		select rac.lendingchannel from rl_amount_confirm rac where rac.history_flag = '0' and
+       rac.credit_application_id=(select rca.creditapplication_id  from rl_credit_application rca where rca.sys_guid =#applyId# )
+	</select>
+	<!-- 打印合同的时候更新金额确认表，如果存在数据更新，否则插入 -->
+	<!--<insert id="saveOrUpdate" parameterClass="AmountConfirmClass" >
+	
+	merge into rl_amount_confirm r1
+	using (select count(*) con from  rl_amount_confirm t where t.credit_application_id=#creditapplicationId# and t.history_flag = '0') a
+	on(a.con != 0)
+	when matched then
+		<selectKey keyProperty="amountConfirmId" resultClass="LONG" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+		</selectKey>
+  		update 
+  		<dynamic prepend="set" >
+  			<isNotNull prepend="," property="amountConfirmId" >
+	        amount_Confirm_Id = #amountConfirmId:LONG#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="historyFlag" >
+	        historyFlag = #historyFlag:CHAR#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="creditapplicationId" >
+	        creditapplicationId = #creditapplicationId:INTEGER#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="operator" >
+	        operator = #operator:VARCHAR#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="operatorId" >
+	        operatorId = #operatorId:INTEGER#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="createTime" >
+	        createTime = #createTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="amount" >
+	        amount = #amount:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="serviceCharge" >
+	        serviceCharge = #serviceCharge:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="realAmount" >
+	        realAmount = #realAmount:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="loanTime" >
+	        loanTime = #loanTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="lastDownloadContractTime" >
+	        lastDownloadContractTime = #lastDownloadContractTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="beginInterestTime" >
+	        beginInterestTime = #beginInterestTime:DATE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="lendingChannel" >
+	        lendingChannel = #lendingChannel:VARCHAR#
+	  		</isNotNull>
+  		</dynamic>
+  		 where r1.credit_application_id=#creditapplicationId:INTEGER#
+	when not matched then 
+		<selectKey keyProperty="amountConfirmId" resultClass="LONG" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+		</selectKey>
+		INSERT 
+			(amount_Confirm_Id,
+			CREDIT_APPLICATION_ID,
+			HISTORY_FLAG,
+			OPERATOR,
+			OPERATOR_ID,
+			CREATE_TIME,
+			AMOUNT,
+			SERVICE_CHARGE,
+			REAL_AMOUNT,
+			LOAN_TIME,
+			LAST_DOWNLOAD_CONTRACT_TIME,
+			BEGIN_INTEREST_TIME,
+			LENDINGCHANNEL)
+		VALUES
+			(#amountConfirmId:LONG#,
+			#creditapplicationId:INTEGER#,
+			'0',
+			#operator:VARCHAR#,
+			#operatorId:INTEGER#,
+			#createTime:TIMESTAMP#,
+			#amount:DOUBLE#,
+			#serviceCharge#,
+			#realAmount#,
+			#loanTime:TIMESTAMP#,
+			#lastDownloadContractTime:TIMESTAMP#,
+			#beginInterestTime:DATE#,
+			#lendingChannel:VARCHAR#)
+	</insert>
+	--><!-- 查询是否有该笔数据 -->
+	<select id="selectIsExist" parameterClass="AmountConfirmClass" resultClass="int">
+		select count(*) con from rl_amount_confirm t  where t.credit_application_id=#creditapplicationId# and t.history_flag = '0'
+	</select>
+	<update id="updateAmountConfirmClass" parameterClass="AmountConfirmClass">
+		update rl_amount_confirm
+  		<dynamic prepend="set" >
+  			<isNotNull prepend="," property="amountConfirmId" >
+	        amount_Confirm_Id = #amountConfirmId:LONG#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="historyFlag" >
+	        	HISTORY_FLAG = #historyFlag:CHAR#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="creditapplicationId" >
+	        CREDIT_APPLICATION_ID = #creditapplicationId:INTEGER#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="operator" >
+	        operator = #operator:VARCHAR#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="operatorId" >
+	        OPERATOR_ID = #operatorId:INTEGER#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="createTime" >
+	        CREATE_TIME = #createTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="amount" >
+	        amount = #amount:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="serviceCharge" >
+	        SERVICE_CHARGE = #serviceCharge:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="realAmount" >
+	        REAL_AMOUNT = #realAmount:DOUBLE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="loanTime" >
+	        LOAN_TIME = #loanTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="lastDownloadContractTime" >
+	        LAST_DOWNLOAD_CONTRACT_TIME = #lastDownloadContractTime:TIMESTAMP#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="beginInterestTime" >
+	        BEGIN_INTEREST_TIME = #beginInterestTime:DATE#
+	  		</isNotNull>
+	  		<isNotNull prepend="," property="lendingChannel" >
+	        lendingChannel = #lendingChannel:VARCHAR#
+	  		</isNotNull>
+  		</dynamic>
+  		 where credit_application_id=#creditapplicationId:INTEGER# and HISTORY_FLAG='0'
+	
+	</update>
+</sqlMap>

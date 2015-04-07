@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CONTRACTANDLOAN">
+	<sql id="contractAndLoanList">
+
+	  select ca.creditapplication_id as creditapplicationId,
+       ca.account_info_id as accountInfoId,
+       ca.business_number as businessNumber,
+       bsa.name as name,
+       ca.producttypeid as productTypeId,
+       ca.repayment_plan_name as productName,
+       ac.amount as loanAmount,
+       ac.service_charge as serviceCharge,
+       ac.real_amount as rLoanAmount,
+       glr.loan_time as loanDate,
+       glr.loan_regist_date as submitTime,
+       glr.loan_confirm_time as loanConfirmDate,
+       ca.loan_officer_name as customerManager,
+       ca.audit_status as status,
+       (select t.code_value
+          from rl_codetable t
+         where t.section = 'auditStatus'
+           and t.code_key = ca.audit_status) as auditStatusShow,
+           (select t.code_value
+          from rl_codetable t
+         where t.section = 'lendingChannel'
+           and t.code_key = ac.lendingChannel) as lendingConfigurationShow,
+           (select decode((select r.trust_lending from rl_lending_configuration r where r.area_department_id=ca.COMPANY_ID),'0','信托放款','债权转让')
+ 					from rl_lending_configuration x where x.area_department_id=ca.COMPANY_ID) as lendingConfiguration
+  from rl_credit_application ca
+  left join rl_borrower_service_app bsa
+    on bsa.creditapplication_id = ca.creditapplication_id
+   and bsa.leader = '1'
+   and bsa.valid_state = '1'
+  left join rl_amount_confirm ac
+    on ac.credit_application_id = ca.creditapplication_id
+   and ac.history_flag = '0'
+  left join rl_group_loan_regist glr
+    on glr.creditapplication_id = ca.creditapplication_id
+   and glr.history_flag = 'F',
+ (select v.object_id_identity
+          from sid_view v
+         where v.class = 'com.creditease.rc.domain.CreditApplication'
+           and v.ace_sid  in ($authList$)
+         group by v.object_id_identity) v
+ where ca.creditapplication_id = v.object_id_identity
+           and ca.audit_status in ('04', '33', '34', '35', '36', '37', '38')
+           
+           <isNotEmpty prepend="and" property="creditIdListLoanStr">
+      ca.creditapplication_id in ($creditIdListLoanStr$)
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="fuzzy">
+      (ca.business_number like '%$fuzzy$%' or bsa.name like '%$fuzzy$%' or ca.loan_officer_name like
+      '%$fuzzy$%' or ca.company_name like '%$fuzzy$%' )
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="businessNumber">
+      ca.business_number = #businessNumber#
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="name">
+      bsa.name = #name#
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="companyId">
+      ca.company_id in (#companyId#)
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="status">
+      <isNotEqual property="status" compareValue="0">
+        ca.audit_status = #status#
+      </isNotEqual>
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="loanDateS">
+      trunc(glr.loan_time, 'dd') >= to_date(#loanDateS#, 'yyyy-MM-dd')
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="loanDateE">
+      to_date(#loanDateE#, 'yyyy-MM-dd') >= trunc(glr.loan_time, 'dd')
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="loanConfirmDateS">
+      trunc(glr.loan_confirm_time, 'dd') >= to_date(#loanConfirmDateS#, 'yyyy-MM-dd')
+      </isNotEmpty>
+    <isNotEmpty prepend="and" property="loanConfirmDateE">
+      to_date(#loanConfirmDateE#, 'yyyy-MM-dd') >= trunc(glr.loan_confirm_time, 'dd')
+      </isNotEmpty>
+      <isNotEmpty prepend="and" property="lendingChannel">
+      ac.lendingchannel = #lendingChannel#
+      </isNotEmpty>
+    <isEmpty property="order">
+      order by glr.loan_regist_date asc nulls first,ca.creditapplication_id desc
+    </isEmpty>
+    <isNotEmpty property="order">
+      <isEqual property="sort" compareValue="submitTime">
+        order by submitTime $order$,ca.creditapplication_id $order$
+      </isEqual>
+    </isNotEmpty>
+	</sql>
+	<select id="queryContractDateGrid" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.ContractAndLoan">
+		<include refid="contractAndLoanList" />
+	</select>
+	<select id="countContractDateGrid" parameterClass="java.util.HashMap" resultClass="int">
+		select count(*) from (
+		<include refid="contractAndLoanList" />
+		)
+	</select>
+
+	<select id="qyContractRateForQYResult" parameterClass="java.lang.Long" resultClass="com.creditease.rc.vo.ContractRateForQYResult">
+		select ca.department_id as departmentId,
+		ca.audit_status  as auditStatus,
+		ca.producttypeid as
+		catagoryId,
+		sysdate as auditDate,
+		sysdate as reqDate,
+		ca.repayment_plan_id as productInfoId,
+		aat.exam_amount as contractMoney,
+		ca.instalments as
+		periodCount,
+		sysdate as lenderDate,
+		'0' as paymentTypeCode,
+		bsa.name as clientName,
+		bsa.borrower_service_app_id borrowerServiceAppId,
+		c0.code_value || c1.code_value as borrowUseText,
+		cc.borrow_use||ccp.borrow_use as borrowUse,
+		ca.repayment_plan_name
+		as productName
+		from rl_credit_application ca
+		left join (select min(t_outer.exam_amount) as exam_amount,t_outer.creditapplication_id as creditapplication_id
+  		from rl_apply_audit_table t_outer
+ 		where t_outer.applyaudittable_id in
+       (select max(t.applyaudittable_id)
+          from rl_apply_audit_table t
+         where t.creditapplication_id = #creditapplicationId#
+         group by t.audit_type)
+         group by t_outer.creditapplication_id) aat
+		on aat.creditapplication_id = ca.creditapplication_id
+		left join
+		rl_borrower_service_app bsa
+		on
+		bsa.creditapplication_id = ca.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		left join
+		rl_customer_consult cc
+		on
+		cc.customer_consult_id = ca.customer_consult_id
+		left join rl_customer_consult_pool ccp
+		on ccp.consult_pool_id =
+		ca.consult_pool_id
+		left join
+		rl_codetable c0
+		on c0.code_key = cc.borrow_use
+		and c0.section = 'borroerUserConsult'
+		left join rl_customer_consult_pool ccp
+		on ccp.consult_pool_id =
+		ca.consult_pool_id
+		left join rl_codetable c1
+		on c1.code_key = ccp.borrow_use
+		and c1.section = 'borroerUserConsult'
+		where
+		ca.creditapplication_id =
+		#creditapplicationId#
+	</select>
+	<!-- 查询当前的业务状态 -->
+	<select id="selectAuditStatus" parameterClass="java.lang.Long">
+		select * from rl_credit_application ca where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+	</select>
+	<!-- 罗红杰 更新业务状态状态 为“等待上传合同” -->
+	<update id="updatePrintContractState" parameterClass="java.lang.Long">
+		update rl_credit_application ca set AUDIT_STATUS='33' where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+  <!-- 罗红杰 更新业务状态状态 为“等待重新打印合同” -->
+	<update id="updateFailContractState" parameterClass="java.lang.Long">
+		update rl_credit_application ca set AUDIT_STATUS='34' where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+  <!-- 罗红杰 更新业务状态状态 为“等待合同复核” -->
+	<update id="updateUploadingContractState" parameterClass="java.lang.Long">
+		update rl_credit_application ca set AUDIT_STATUS='35' where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+   <!-- 罗红杰 更新业务状态状态 为“等待放款” -->
+	<update id="updateWaitLoanContractState" parameterClass="java.lang.Long">
+		update rl_credit_application ca set AUDIT_STATUS='38' where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+   <!-- 罗红杰 更新放款登记表里的数据为历史数据” -->
+	<update id="updateSupplementaryDataContractStateHistryFlag" parameterClass="java.lang.Long">
+		update rl_group_loan_regist grl set grl.history_flag='T' where grl.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+   <!-- 罗红杰 更新业务状态为：“等待合同重新复核” -->
+	<update id="updateWaitContractAgainCheckState" parameterClass="java.lang.Long">
+		update rl_credit_application ca set AUDIT_STATUS='37' where ca.creditapplication_id=#creditapplicationId:DECIMAL#
+  </update>
+  
+   <!-- 罗红杰 放款确认  查询基本信息   关联共借人表 -->
+  <select id="searchForConfirm" parameterClass="java.lang.Long" resultClass="com.creditease.rc.vo.LoanConfirmMessageVo">
+  	select ca.creditapplication_id as creditapplicationId,
+       bsa.name               as borrowName,
+        COALESCE(cb.name,fam.name) as famName,
+       bsa.credentials_number as credentialsNumber,
+       COALESCE(cb.idnumber,fam.idnumber)  as idNumber,
+       ca.business_number     as businessNumber,
+       ca.repayment_plan_name as repaymentPlanName,
+       ca.repayment_plan_id   as repaymentPlanId,
+       ca.loan_officer_id     as loanOfficerId,
+       ca.loan_officer_name   as loanOfficerName,
+       ca.contact_number      as contactNumber,
+       ca.company_id          as companyId,
+       ca.company_name        as companyName,
+        (select wmsys.wm_concat(ba.name)
+          from rl_borrower_service_app ba
+         where ba.leader = '0'
+           and ba.creditapplication_id = #creditapplicationId#) as guarantorName
+         from rl_borrower_service_app bsa left join 
+       (select * from  rl_family_member   fam where fam.borrowerre_rationship = '2') fam on bsa.borrower_service_app_id = fam.borrower_service_app_id 
+       join  rl_credit_application   ca on ca.creditapplication_id = bsa.creditapplication_id
+    left join rl_credit_coborrower cb on cb.borrower_service_app_id = bsa.borrower_service_app_id
+ 	where 
+   bsa.leader = '1'
+   and bsa.creditapplication_id =#creditapplicationId#
+  </select>
+  <select id="searchForConfirmAmount" parameterClass="java.lang.Long" resultClass="com.creditease.rc.domain.AmountConfirm">
+  select co.amount amount, co.real_amount as realAmount,
+  	   co.last_download_contract_time as lastDownloadContractTime,
+       co.begin_interest_time as beginInterestTime,
+       co.loan_time as loanTime,
+       co.lendingchannel as lendingChannel
+  from rl_amount_confirm co
+ where co.credit_application_id =#creditapplicationId#
+   and co.history_flag = '0'
+  </select>
+  
+  <!-- 查询业务状态where 条件 -->
+	<select id="searchForCreditApplicationStates" parameterClass="java.lang.Long" resultClass="com.creditease.rc.domain.CreditApplication">
+		select ca.audit_status as auditStatus from rl_credit_application ca where ca.creditapplication_id= #creditapplicationId#
+  		</select>
+  		<select id="queryCreditIdListLoan" resultClass = "java.lang.Long">
+  			select ca.creditapplication_id  from rl_credit_application  ca where ca.audit_status = '33'
+  		</select>
+  		
+	<!-- *********罗红杰  合同复核历史******************* -->
+	<sql id="selectContractHistory">
+     		select ca.creditapplication_id as creditapplicationId,
+       ca.business_number as groupNumber,
+       t1.LOAN_PERSON,
+       t1.LOAN_CONFIRM_TIME,
+       bsa.name as groupName,
+       ca.company_name as companyName,
+       ca.producttypeid as productTypeId,
+       ca.repayment_plan_name as repaymentPlanName,
+       ac.amount as loanAmount,
+       ac.service_charge as serviceCharge,
+       ac.real_amount as rLoanAmount,
+       t1.loan_time as loanDate,
+       t1.loan_regist_date as submitTime,
+       t1.loan_confirm_time as loanConfirmDate,
+       t1.loan_person as loanPerson,
+       ca.loan_officer_name as customerManager,
+       (select t.code_value
+          from rl_codetable t
+         where t.section = 'lendingChannel'
+           and t.code_key = ac.lendingChannel) as lendingConfigurationShow,
+       (select t.code_value
+          from rl_codetable t
+         where t.section = 'compoundNucleusResults'
+           and t.code_key = (decode(t1.regist_status, '1', '0', '2', '1'))) as compoundNucleusResultsShow
+
+  from rl_credit_application ca
+  left join rl_borrower_service_app bsa
+    on (bsa.creditapplication_id = ca.creditapplication_id and
+       bsa.leader = '1' and bsa.valid_state = '1')
+  left join rl_amount_confirm ac
+    on (ac.credit_application_id = ca.creditapplication_id and
+       ac.history_flag = '0')
+
+ inner join (select *
+               from rl_group_loan_regist
+              where GROUP_LOAN_REGIST_ID in
+                    (select max(group_loan_regist_id)
+                       from rl_group_loan_regist
+                      group by creditapplication_id)) t1
+    on t1.creditapplication_id = ca.creditapplication_id
+
+ where t1.regist_status in ('1', '2')
+     
+		<isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			bsa.name = #name#
+		</isNotEmpty>
+		<isNotEmpty property="loanConfirmDateBegin" prepend="and">
+			trunc(t1.loan_confirm_time,'dd') >=
+			to_date(#loanConfirmDateBegin#,'YYYY-MM-DD')
+		</isNotEmpty>
+		<isNotEmpty property="loanConfirmDateEnd" prepend="and">
+			to_date(#loanConfirmDateEnd#,'YYYY-MM-DD') >= trunc(t1.loan_confirm_time,'dd')
+		</isNotEmpty>
+		<isNotEmpty property="loanPerson" prepend="and">
+			t1.loan_person = #loanPerson#
+		</isNotEmpty>
+		<isNotEmpty property="repaymentPlanName" prepend="and">
+			ca.repayment_plan_name =#repaymentPlanName#
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lendingChannel">
+      ac.lendingchannel = #lendingChannel#
+      </isNotEmpty>
+		<isNotEmpty property="compoundNucleusResults" prepend="and">
+			t1.regist_status =decode( #compoundNucleusResults#, 0,1,1,2)
+		</isNotEmpty>
+		<isEmpty property="sort" prepend="ORDER BY">
+				t1.loan_confirm_time DESC
+			</isEmpty>
+		<!-- 放款渠道的where条件还没有加哦 -->
+	</sql>
+	<select id="selectContractHistoryList" parameterClass="java.util.Map" resultClass="creditApplication">
+		<include refid="selectContractHistory" />
+	</select>
+	<!-- *********罗红杰********* -->
+	<select id="countContractHistoryList" parameterClass="java.util.Map" resultClass="int">
+		SELECT count(*) from (
+		<include refid="selectContractHistory" />
+		)
+	</select>
+	<!-- 查询业务状态where 条件 -->
+	<select id="searchForCompanyNameAndMobilePhone" parameterClass="java.lang.Long" resultClass="com.creditease.rc.domain.AccountInfo">
+		select ca.company_name as branchName,ca.company_id as companyId,boa.mobilephone as mobilephone from rl_credit_application ca,rl_borrower_service_app boa where ca.creditapplication_id=boa.creditapplication_id 
+and boa.leader='1' and ca.creditapplication_id= #creditapplicationId#
+  		</select>
+	<!-- 查询是否配置过放款渠道 -->
+	<select id="searchConfigureChannel" parameterClass="java.lang.Long" resultClass="com.creditease.rc.domain.LendingConfiguration">
+  		select led.trust_lending      as trustLending,
+       led.debenture_transfer as debentureTransfer
+  	   from rl_lending_configuration led
+      left join rl_credit_application ca
+      on ca.company_id = led.area_department_id where ca.creditapplication_id=#creditapplicationId#
+  		</select>
+  		
+  		
+  	
+  	<!-- 根据信贷申请id查询放款渠道 -->
+  	<select id="selectByCaIdLf" parameterClass="java.lang.Long" resultClass="string">
+  		select decode((select r.trust_lending
+                from rl_lending_configuration r
+               where r.area_department_id =
+                     (select t.company_id
+                        from rl_credit_application t
+                       where t.creditapplication_id = #creditapplicationId#)), '0', '1','0') as a
+  from rl_lending_configuration b  where b.area_department_id=(select t.company_id
+                        from rl_credit_application t
+                       where t.creditapplication_id = #creditapplicationId#)
+  	</select>
+  	<!-- 变更放款渠道 罗红杰，没有使用  -->
+  	<update id="updateChangeLoanChannelXinTuo" parameterClass="java.lang.Long">
+		 update rl_amount_confirm am set am.lendingchannel='0' am.credit_application_id=#creditapplicationId:DECIMAL#
+  </update>
+</sqlMap>

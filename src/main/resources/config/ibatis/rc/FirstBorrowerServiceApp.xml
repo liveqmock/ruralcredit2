@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="firstBorrower">
+	<select id="selectCountUndone" resultClass="int" parameterClass="java.lang.String">
+		select count(*) from borrower_service_app bsa,return_plan rp,credit_application ca
+		where 1=1 and bsa.borrower_service_app_id = rp.borrower_service_app_id
+		and UPPER(bsa.credentials_number)=UPPER(#credentialsNumber:VARCHAR#)
+		and (rp.collection_status='2'or rp.collection_status is null)
+		and ca.creditapplication_id = bsa.creditapplication_id
+	</select>
+	<select id="selectAuditStatus" resultClass="java.lang.String" parameterClass="java.lang.String">
+	 select ca.audit_status
+      from borrower_service_app bsa, credit_application ca
+     where 1 = 1
+       and UPPER(bsa.credentials_number) = UPPER(#credentialsNumber:VARCHAR#)
+       and ca.creditapplication_id = bsa.creditapplication_id
+       and ca.creditapplication_id =
+    (
+      select max(ca1.creditapplication_id)
+        from borrower_service_app bsa1, credit_application ca1
+       where 1 = 1
+         and UPPER(bsa1.credentials_number) = UPPER(#credentialsNumber:VARCHAR#)
+         and ca1.creditapplication_id = bsa1.creditapplication_id
+         group by bsa1.credentials_number
+      )
+	</select>
+	
+	<!-- 根据身份证查询是否是一期借款人 -->
+	<select id="selectBorrowerCredentialsNumberCount" resultClass="int" parameterClass="java.lang.String">
+		    select count(bsa.credentials_number) 
+		      from borrower_service_app bsa,credit_application ca
+			 where 1=1
+				 and ca.creditapplication_id = bsa.creditapplication_id
+				 <!-- audit_status  '16':'还款完成  ','20':'提前还款完成  ' -->
+				 and ca.audit_status in ('16','20')
+				 <!-- BORROWER_TYPE  1:实际借款人,0:担保人 -->
+				 and bsa.BORROWER_TYPE = '1' 
+				 and bsa.credentials_number is not null
+				 and UPPER(bsa.credentials_number)=UPPER(#credentialsNumber:VARCHAR#)
+	</select>
+	<!-- 根据借款人身份证和配偶身份证查询一期数据：新借款人是不是以前借款人的配偶，且本次借款人配偶为以前借款人；（互为配偶）-->
+	<select id="selectSpouseCredentialsNumberCount" resultClass="int" parameterClass="java.util.Map">
+		    select count(f.credentials_number)			       
+			  from credit_application   c,
+			       borrower_service_app app,
+			       BORROWER_SURVEY      b,
+			       family_member_his    f
+			 where 1 = 1
+			   and c.creditapplication_id = app.creditapplication_id
+			   and app.borrower_service_app_id = b.borrower_service_app_id
+			   and b.borrowersurvey_id = f.borrowersurvey_id
+			   and f.BORROWERRE_RATIONSHIP = '2'
+			    <!-- BORROWER_TYPE  1:实际借款人,0:担保人 -->
+			   and app.BORROWER_TYPE = '1' 
+			    <!-- audit_status  '16':'还款完成  ','20':'提前还款完成  ' -->
+			   and c.audit_status in ('16','20')
+			   and f.credentials_number is not null
+			   and app.credentials_number is not null
+			   and UPPER(f.credentials_number)=UPPER(#credentialsNumber#)
+			   and UPPER(app.credentials_number)=UPPER(#spouseCredentialsNumber#)
+	</select>
+	
+	
+</sqlMap>

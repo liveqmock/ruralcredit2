@@ -1,0 +1,103 @@
+Index: src/main/resources/config/log/rc/log4j.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/log/rc/log4j.xml	(revision 8348)
++++ src/main/resources/config/log/rc/log4j.xml	(revision )
+@@ -109,8 +109,8 @@
+ 		</layout>
+ 		<!--滤镜设置输出的级别 -->
+ 		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+-			<param name="levelMin" value="ERROR" />
+-			<param name="levelMax" value="ERROR" />
++			<param name="levelMin" value="debug" />
++			<param name="levelMax" value="debug" />
+ 			<param name="AcceptOnMatch" value="true" />
+ 		</filter>
+ 	</appender>
+@@ -126,7 +126,7 @@
+ 	</appender>
+ 
+ 	<!--通过<category></category>的定义可以将各个包中的类日志输出到不同的日志文件中 -->
+-	<category name="com.creditease.rc">
++	<category name="com.creditease.rc" additivity="false">
+ 		<level value="DEBUG" />
+ 		<appender-ref ref="CONSOLE" />
+ 		<appender-ref ref="FILE" />
+@@ -139,34 +139,35 @@
+ 	</logger>
+ 
+ 	<logger name="com.creditease.rc.framework.dao" additivity="true">
+-		<level value="WARN" />
++		<level value="debug" />
+ 	</logger>
+ 
+ 	<logger name="java.sql.Connection" additivity="false">
+-		<level value="DEBUG" />
++		<level value="debug" />
+ 	</logger>
+ 
+ 	<logger name="java.sql.Statement" additivity="false">
+-		<level value="DEBUG" />
++		<level value="debug" />
++		<appender-ref ref="IBatis" />
+ 	</logger>
+ 
+ 	<logger name="java.sql.PreparedStatement" additivity="false">
+-		<level value="DEBUG" />
+-		<appender-ref ref="FILE_IBATIS" />
++		<level value="debug" />
++		<appender-ref ref="IBatis" />
+ 	</logger>
+ 
+ 	<logger name="java.sql.ResultSet" additivity="false">
+-		<level value="DEBUG" />
+-		<appender-ref ref="FILE_IBATIS" />
++		<level value="debug" />
++		<appender-ref ref="IBatis" />
+ 	</logger>
+ 	
+     <logger name="com.creditease.rc.framework.log.LogAspect" additivity="false">
+-        <level value="INFO" />
++        <level value="info" />
+         <appender-ref ref="FILE_OP" />
+     </logger>
+ 	
+     <logger name="com.creditease.rc.framework.exception.interceptor.ExceptionInterceptor" additivity="true">
+-        <level value="DEBUG" />
++        <level value="info" />
+         <appender-ref ref="FILE_ERROR" />
+     </logger>
+      <!-- webService调试日志 -->
+\ No newline at end of file
+Index: src/main/resources/config/spring/smp/smp.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/spring/smp/smp.properties	(revision 8348)
++++ src/main/resources/config/spring/smp/smp.properties	(revision )
+@@ -1,8 +1,8 @@
+ #smp 测试环境
+ casserver.url=http://10.100.30.79:9080/casServer
+ smp.url=http://10.100.30.79:9080/smp
+-#rc.url=http\://localhost\:8080/ruralcredit2
+-rc.url=http\://10.100.30.72\:9080/RuralCredit2
++rc.url=http\://10.100.129.128\:8080
++#rc.url=http\://10.100.30.72\:9080/RuralCredit2
+ 
+ #smp UAT环境
+ #casserver.url=http://onlinetest.creditease.cn:28080/casServer
+\ No newline at end of file
+Index: src/main/resources/config/spring/comprehensive/comprehensive.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>GBK
+===================================================================
+--- src/main/resources/config/spring/comprehensive/comprehensive.properties	(revision 8348)
++++ src/main/resources/config/spring/comprehensive/comprehensive.properties	(revision )
+@@ -1,1 +1,2 @@
+-comprehensive.url=http\://10.100.31.65\:7001/ICPlatform
++#comprehensive.url=http\://10.100.31.65\:7001/ICPlatform
++comprehensive.url=http\://10.100.30.214\:7001/ICPlatform/

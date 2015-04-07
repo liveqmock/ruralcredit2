@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PAYINFO">
+	<typeAlias alias="payInfo" type="com.creditease.rc.domain.PayInfo" />
+	<insert id="insertPayInfo" parameterClass="payInfo">
+		<selectKey keyProperty="payInfoId" resultClass="int"
+			type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_PAY_INFO (
+				PAY_INFO_ID,
+				CREDITAPPLICATION_ID,
+				IMPORT_BANK,
+				IMPORT_ACCOUNT_NAME,
+				IMPORT_ACCOUNT,
+				EXPORT_ACCOUNT,
+				PAY_WAY,
+				PAY_MONEY,
+				PAY_DATE,
+				PAY_CONFIM_DATE,
+				PAY_CONFIM_PERSON,
+				PAY_OPERATOR,
+				PAY_REMARK
+			)
+			values (
+				#payInfoId#,            
+				#creditapplicationId#,  
+				#importBank#,            
+				#importAccountName#,     
+				#importAccount#,         
+				#exportAccount#,         
+				#payWay#,                
+				#payMoney#,              
+				#payDate#,              
+				#payConfimDate#,         
+				#payConfimPerson#,       
+				#payOperator#,           
+				#payRemark#             
+			)
+		]]>
+	</insert>
+	<select id="selectPayInfo" parameterClass="payInfo" resultClass="payInfo">
+		<![CDATA[
+			select * from RL_PAY_INFO where 1=1
+		]]>
+			<isNotEmpty property="payInfoId" prepend="AND">
+				PAY_INFO_ID=#payInfoId#
+			</isNotEmpty>
+	</select>
+</sqlMap>

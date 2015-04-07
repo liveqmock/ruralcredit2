@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="PURCHACECOST">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="purchaceCost" type="com.creditease.rc.domain.PurchaceCost" />
+    <resultMap class="com.creditease.rc.domain.PurchaceCost" id="PurchaceCostMap">
+		<result property="purchaceCostId" column="PURCHACE_COST_ID" jdbcType="INTEGER"/>
+	    <result property="consumables" column="CONSUMABLES" jdbcType="VARCHAR"/>
+	    <result property="unit" column="UNIT" jdbcType="VARCHAR"/>
+	    <result property="unitPrice" column="UNIT_PRICE" jdbcType="DOUBLE"/>
+	    <result property="purchaceNum" column="PURCHACE_NUM" jdbcType="INTEGER"/>
+	    <result property="everyDay" column="EVERY_DAY" jdbcType="DOUBLE"/>
+	    <result property="everyWeek" column="EVERY_WEEK" jdbcType="DOUBLE"/>
+	    <result property="everyMonth" column="EVERY_MONTH" jdbcType="DOUBLE"/>
+	    <result property="everyQuarter" column="EVERY_QUARTER" jdbcType="DOUBLE"/>
+	    <result property="everyHalfYear" column="EVERY_HALF_YEAR" jdbcType="DOUBLE"/>
+	    <result property="everyYear" column="EVERY_YEAR" jdbcType="DOUBLE"/>
+	    <result property="belongId" column="BELONG_ID" jdbcType="INTEGER"/>
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="purchaceCost" >
+    	 <selectKey keyProperty="purchaceCostId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_PURCHACE_COST
+        		(
+					PURCHACE_COST_ID,
+					CONSUMABLES,
+					UNIT,
+					UNIT_PRICE,
+					PURCHACE_NUM,
+					EVERY_DAY,
+					EVERY_WEEK,
+					EVERY_MONTH,
+					EVERY_QUARTER,
+					EVERY_HALF_YEAR,
+					EVERY_YEAR,
+					BELONG_ID
+					)
+        	values(
+					#purchaceCostId:INTEGER#,
+					#consumables:VARCHAR#,
+					#unit:VARCHAR#,
+					#unitPrice:DOUBLE#,
+					#purchaceNum:INTEGER#,
+					#everyDay:DOUBLE#,
+					#everyWeek:DOUBLE#,
+					#everyMonth:DOUBLE#,
+					#everyQuarter:DOUBLE#,
+					#everyHalfYear:DOUBLE#,
+					#everyYear:DOUBLE#,
+					#belongId:INTEGER#
+				  )
+        ]]>
+    </insert>
+
+     <update id="update" parameterClass="purchaceCost">
+     	update RL_PURCHACE_COST
+			set 
+				CONSUMABLES = #consumables:VARCHAR#,
+				UNIT = #unit:VARCHAR#,
+				UNIT_PRICE = #unitPrice:DOUBLE#,
+				PURCHACE_NUM = #purchaceNum:INTEGER#,
+				EVERY_DAY = #everyDay:DOUBLE#,
+				EVERY_WEEK = #everyWeek:DOUBLE#,
+				EVERY_MONTH = #everyMonth:DOUBLE#,
+				EVERY_QUARTER = #everyQuarter:DOUBLE#,
+				EVERY_HALF_YEAR = #everyHalfYear:DOUBLE#,
+				EVERY_YEAR = #everyYear:DOUBLE#
+			where
+				PURCHACE_COST_ID = #purchaceCostId:INTEGER#
+     </update>
+     
+     <select id="selectByBelongId" parameterClass="int" resultMap="PurchaceCostMap">
+     	<![CDATA[
+     		SELECT * 
+     			FROM 
+     				RL_PURCHACE_COST 
+     		where 
+     			BELONG_ID = #belongId:INTEGER#
+     	]]>
+     </select>
+     
+    <select id="selectCountByBelongId" parameterClass="int" resultClass="int">
+     	<![CDATA[
+     		SELECT count(*) 
+     			FROM RL_PURCHACE_COST 
+     				where BELONG_ID = #belongId:INTEGER#
+     	]]>
+    </select>
+    
+    <delete id="deleteByBelongId" parameterClass="int">
+    	<![CDATA[
+    		DELETE FROM RL_PURCHACE_COST WHERE BELONG_ID=#belongId:INTEGER#
+    	]]>
+    </delete>
+     
+</sqlMap>

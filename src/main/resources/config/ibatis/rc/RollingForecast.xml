@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ROLLINGFORECAST">
+	<typeAlias alias="rollingForecast" type="com.creditease.rc.domain.RollingForecast" />
+	<typeAlias alias="rollingForecastVo" type="com.creditease.rc.vo.RollingForecastVo" />
+	<typeAlias alias="rollingForecastHistory" type="com.creditease.rc.vo.RollingForecastHistory" />
+	<resultMap class="rollingForecast" id="rollingForecastMAP">
+		<result property="rollingForecastId" column="ROLLING_FORECAST_ID" />
+		<result property="year" column="YEAR" />
+		<result property="month" column="MONTH" />
+		<result property="type" column="TYPE" />
+		<result property="areaDepartmentId" column="AREA_DEPARTMENT_ID" />
+		<result property="areaDepartmentName" column="AREA_DEPARTMENT_NAME" />
+		<result property="firstMonth" column="FIRST_MONTH" />
+		<result property="secondMonth" column="SECOND_MONTH" />
+		<result property="thirdMonth" column="THIRD_MONTH" />
+		<result property="operateTime" column="OPERATE_TIME" />
+		<result property="operatorId" column="OPERATOR_ID" />
+		<result property="operatorName" column="OPERATOR_NAME" />
+		<result property="historyFlag" column="HISTORY_FLAG" />
+	</resultMap>
+
+	<insert id="dynamicInsert" parameterClass="rollingForecast">
+		<selectKey keyProperty="rollingForecastId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into rl_rolling_forecast(
+			rolling_forecast_id
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="year">
+				,year
+			</isNotEmpty>
+			<isNotEmpty property="month">
+				,month
+			</isNotEmpty>
+			<isNotEmpty property="type">
+				,type
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentId">
+				,area_department_id
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentName">
+				,area_department_name
+			</isNotEmpty>
+			<isNotEmpty property="firstMonth">
+				,first_month
+			</isNotEmpty>
+			<isNotEmpty property="secondMonth">
+				,second_month
+			</isNotEmpty>
+			<isNotEmpty property="thirdMonth">
+				,third_month
+			</isNotEmpty>
+			<isNotEmpty property="operateTime">
+				,operate_time
+			</isNotEmpty>
+			<isNotEmpty property="operatorId">
+				,operator_id
+			</isNotEmpty>
+			<isNotEmpty property="operatorName">
+				,operator_name
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,history_flag
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#rollingForecastId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="year">
+				,#year#
+			</isNotEmpty>
+			<isNotEmpty property="month">
+				,#month#
+			</isNotEmpty>
+			<isNotEmpty property="type">
+				,#type#
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentId">
+				,#areaDepartmentId#
+			</isNotEmpty>
+			<isNotEmpty property="areaDepartmentName">
+				,#areaDepartmentName#
+			</isNotEmpty>
+			<isNotEmpty property="firstMonth">
+				,#firstMonth#
+			</isNotEmpty>
+			<isNotEmpty property="secondMonth">
+				,#secondMonth#
+			</isNotEmpty>
+			<isNotEmpty property="thirdMonth">
+				,#thirdMonth#
+			</isNotEmpty>
+			<isNotEmpty property="operateTime">
+				,#operateTime#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId">
+				,#operatorId#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName">
+				,#operatorName#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,#historyFlag#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="rollingForecast">
+		<![CDATA[
+			update rl_rolling_forecast
+		]]>
+		<dynamic prepend="set">
+			<isNotNull property="year" prepend=",">
+				year = #year#
+			</isNotNull>
+			<isNotNull property="month" prepend=",">
+				month = #month#
+			</isNotNull>
+			<isNotNull property="type" prepend=",">
+				type = #type#
+			</isNotNull>
+			<isNotNull property="areaDepartmentId" prepend=",">
+				area_department_id = #areaDepartmentId#
+			</isNotNull>
+			<isNotNull property="areaDepartmentName" prepend=",">
+				area_department_name = #areaDepartmentName#
+			</isNotNull>
+			<isNotNull property="firstMonth" prepend=",">
+				first_month = #firstMonth#
+			</isNotNull>
+			<isNotNull property="secondMonth" prepend=",">
+				second_month = #secondMonth#
+			</isNotNull>
+			<isNotNull property="thirdMonth" prepend=",">
+				third_month = #thirdMonth#
+			</isNotNull>
+			<isNotNull property="operateTime" prepend=",">
+				operate_time = #operateTime#
+			</isNotNull>
+			<isNotNull property="operatorId" prepend=",">
+				operator_id = #operatorId#
+			</isNotNull>
+			<isNotNull property="operatorName" prepend=",">
+				operator_name = #operatorName#
+			</isNotNull>
+			<isNotNull property="historyFlag" prepend=",">
+				history_flag = #historyFlag#
+			</isNotNull>
+		</dynamic>
+		<![CDATA[
+			where
+			rolling_forecast_id = #rollingForecastId#
+		]]>
+	</update>
+	<sql id="queryRollingForecast">
+		select a.rolling_forecast_id as rollingForecastId,
+		a.year as year,
+		a.month as month,
+		a.type as type,
+		a.area_department_id as areaDepartmentId,
+		a.area_department_name as areaDepartmentName,
+		a.first_month as firstMonth,
+		a.second_month as secondMonth,
+		a.third_month as thirdMonth,
+		a.operate_time as operateTime,
+		a.operator_id as operatorId,
+		a.operator_name as operatorName,
+		a.history_flag as historyFlag,
+		decode(b.history_flag, 'T', '1', '0') as histroyShowFlag
+		from (select *
+		from (select *
+		from rl_rolling_forecast rf
+		where rf.history_flag = 'F'
+		and rf.type = '0'
+		<isNotNull property="year" prepend="and">
+			year = #year#
+			</isNotNull>
+		<isNotNull property="month" prepend="and">
+			month = #month#
+			</isNotNull>
+		<isNotNull property="areaDepartmentIds" prepend="and">
+			area_department_id in ($areaDepartmentIds$)
+			</isNotNull>
+		) rff) a
+		left join (select *
+		from (select max(rf.rolling_forecast_id) as rolling_forecast_id,
+		rf.history_flag,
+		rf.area_department_id
+		from rl_rolling_forecast rf
+		where rf.history_flag = 'T'
+		and rf.type = '0'
+		<isNotNull property="year" prepend="and">
+			year = #year#
+			</isNotNull>
+		<isNotNull property="month" prepend="and">
+			month = #month#
+			</isNotNull>
+		<isNotNull property="areaDepartmentIds" prepend="and">
+			area_department_id in ($areaDepartmentIds$)
+			</isNotNull>
+		group by (rf.rolling_forecast_id, rf.history_flag,
+		rf.area_department_id)) rft) b
+		on a.area_department_id = b.area_department_id
+		union
+		select a.rolling_forecast_id as rollingForecastId,
+		a.year as year,
+		a.month as month,
+		a.type as type,
+		a.area_department_id as areaDepartmentId,
+		a.area_department_name as areaDepartmentName,
+		a.first_month/10000 as firstMonth,
+		a.second_month/10000 as secondMonth,
+		a.third_month/10000 as thirdMonth,
+		a.operate_time as operateTime,
+		a.operator_id as operatorId,
+		a.operator_name as operatorName,
+		a.history_flag as historyFlag,
+		decode(b.history_flag, 'T', '1', '0') as histroyShowFlag
+		from (select *
+		from (select *
+		from rl_rolling_forecast rf
+		where rf.history_flag = 'F'
+		and rf.type = '1'
+		<isNotNull property="year" prepend="and">
+			year = #year#
+			</isNotNull>
+		<isNotNull property="month" prepend="and">
+			month = #month#
+			</isNotNull>
+		<isNotNull property="areaDepartmentIds" prepend="and">
+			area_department_id in ($areaDepartmentIds$)
+			</isNotNull>
+		) rff) a
+		left join (select *
+		from (select max(rf.rolling_forecast_id) as rolling_forecast_id,
+		rf.history_flag,
+		rf.area_department_id
+		from rl_rolling_forecast rf
+		where rf.history_flag = 'T'
+		and rf.type = '1'
+		<isNotNull property="year" prepend="and">
+			year = #year#
+			</isNotNull>
+		<isNotNull property="month" prepend="and">
+			month = #month#
+			</isNotNull>
+		<isNotNull property="areaDepartmentIds" prepend="and">
+			area_department_id in ($areaDepartmentIds$)
+			</isNotNull>
+		group by (rf.rolling_forecast_id, rf.history_flag,
+		rf.area_department_id)) rft) b
+		on a.area_department_id = b.area_department_id
+	</sql>
+	<select id="queryRollingForecastForInit" resultClass="rollingForecastVo" parameterClass="java.util.HashMap">
+		<include refid="queryRollingForecast" />
+	</select>
+	<select id="queryRollingForecastForHistory" resultClass="rollingForecastHistory" parameterClass="java.util.HashMap">
+		select k.thisYearAndMonth as thisYearAndMonth,
+		k.year as year,
+		k.month as month,
+		k.type as type,
+		sum(k.firstmonth) as firstMonthTolal,
+		sum(k.secondmonth) as secondMonthTolal,
+		sum(k.thirdmonth) as thirdMonthTolal
+		from
+		(select m.*,
+		m.year || '年' || m.month || '月' as thisYearAndMonth,
+		trunc(to_date(m.year || '-' || m.month || '-01', 'yyyy-MM-dd'), 'mm') as mydate
+		from (
+		<include refid="queryRollingForecast" />
+		) m
+		) k
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="forecsatTimeBegin">
+				mydate >= trunc( to_date(#forecsatTimeBegin#, 'yyyy-MM-dd'), 'mm')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="forecsatTimeEnd">
+				trunc( to_date(#forecsatTimeEnd#, 'yyyy-MM-dd'), 'mm') >= mydate
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="editHistory">
+				histroyShowFlag = #editHistory#
+			</isNotEmpty>
+		</dynamic>
+		group by (k.thisYearAndMonth,k.type,k.year,k.month)
+	</select>
+	<select id="rollingForecastIdList" resultClass="java.lang.Long" parameterClass="java.util.HashMap">
+		select rf.rolling_forecast_id
+		from rl_rolling_forecast rf
+		where rf.year = #year#
+		and rf.month = #month#
+		and rf.type = #type#
+		and rf.area_department_id = #areaDepartmentId#
+	</select>
+	<update id="updateHistoryFlag" parameterClass="java.lang.Long">
+		update rl_rolling_forecast rf
+		set rf.history_flag = 'T'
+		where rf.rolling_forecast_id = #value#
+	</update>
+	<select id="queryRollingForecastEditHistory" parameterClass="rollingForecast" resultClass="rollingForecast">
+		select rf.rolling_forecast_id as rollingForecastId,
+		rf.year as year,
+		rf.month as month,
+		rf.type as type,
+		rf.area_department_id as areaDepartmentId,
+		rf.area_department_name as areaDepartmentName,
+		<isEqual property="type" compareValue="0">
+			rf.first_month as firstMonth,
+			rf.second_month as secondMonth,
+			rf.third_month as thirdMonth,
+		</isEqual>
+		<isEqual property="type" compareValue="1">
+			rf.first_month/10000 as firstMonth,
+			rf.second_month/10000 as secondMonth,
+			rf.third_month/10000 as thirdMonth,
+		</isEqual>
+		rf.operate_time as operateTime,
+		rf.operator_id as operatorId,
+		rf.operator_name as operatorName,
+		rf.history_flag as historyFlag
+		from rl_rolling_forecast rf
+		where rf.year = #year#
+		and rf.month = #month#
+		and rf.type = #type#
+		and rf.area_department_id = #areaDepartmentId#
+		order by rf.operate_time desc
+	</select>
+	<select id="rorecastHistoryDetailList" parameterClass="java.util.HashMap" resultClass="rollingForecast">
+		select * from (
+		<include refid="queryRollingForecast" />
+		) m
+		<dynamic prepend="where">
+			<isNotEmpty property="type" prepend="and">
+				m.type = #type#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

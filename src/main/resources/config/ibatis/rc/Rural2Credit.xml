@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 贷后接口用！ -->
+<sqlMap namespace="RURAL2CREDIT">
+	<typeAlias alias="creditApplication" type="com.creditease.rc.domain.CreditApplication" />
+	<typeAlias alias="creditApplicationVo" type="com.creditease.rc.vo.CreditApplicationVo" />
+	<!-- LocalClientApplyRequest 郝强上传 查询本地数据组装对象用于调用webservice接口用 -->
+	<typeAlias alias="localClientApplyRequest" type="com.creditease.rc.domain.LocalClientApplyRequest" />
+	<typeAlias alias="localReturnDTO" type="com.creditease.rc.domain.LocalReturnDTO" />
+	<typeAlias alias="localApplyDTO" type="com.creditease.rc.domain.LocalApplyDTO" />
+	<typeAlias alias="localChgReturnTypeRequest" type="com.creditease.rc.domain.LocalChgReturnTypeRequest" />
+
+
+	<resultMap class="com.creditease.rc.domain.CreditApplication" id="CreditApplicationMap">
+		<result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="INTEGER" />
+		<result property="repaymentPlanId" column="REPAYMENT_PLAN_ID" jdbcType="INTEGER" />
+		<result property="accountInfoId" column="ACCOUNT_INFO_ID" jdbcType="INTEGER" />
+		<result property="contactNumber" column="CONTACT_NUMBER" jdbcType="VARCHAR" />
+		<result property="groupNumber" column="BUSINESS_NUMBER" jdbcType="VARCHAR" />
+		<result property="groupName" column="BORROWER_NAME" jdbcType="VARCHAR" />
+		<result property="address" column="ADDRESS" jdbcType="VARCHAR" />
+		<result property="loanOfficerId" column="LOAN_OFFICER_ID" jdbcType="VARCHAR" />
+		<result property="loanOfficerName" column="LOAN_OFFICER_NAME" jdbcType="VARCHAR" />
+		<result property="auditStatus" column="AUDIT_STATUS" jdbcType="CHAR" />
+		<result property="createDate" column="CREATE_DATE" jdbcType="TIMESTAMP" />
+		<result property="submitDate" column="SUBMIT_DATE" jdbcType="TIMESTAMP" />
+		<result property="firstSubmitDate" column="FIRST_SUBMIT_DATE" jdbcType="TIMESTAMP" />
+		<result property="uploadFile" column="UPLOAD_FILE" jdbcType="VARCHAR" />
+		<result property="loansStatus" column="LOANS_STATUS" jdbcType="CHAR" />
+		<result property="reasonType" column="REASON_TYPE" jdbcType="CHAR" />
+		<result property="revokeReason" column="REVOKE_REASON" jdbcType="VARCHAR" />
+		<result property="groupAppTotal" column="AMOUNT" jdbcType="DOUBLE" />
+		<result property="signagreementDate" column="SIGNAGREEMENT_DATE" jdbcType="DATE" />
+		<result property="applyRevokePerson" column="APPLY_REVOKE_PERSON" jdbcType="VARCHAR" />
+		<result property="applyRevokeTime" column="APPLY_REVOKE_TIME" jdbcType="DATE" />
+		<result property="expectLoanDate" column="EXPECT_LOAN_DATE" jdbcType="DATE" />
+		<result property="businessType" column="BUSINESS_TYPE" jdbcType="CHAR" />
+		<result property="villageId" column="VILLAGE_ID" jdbcType="INTEGER" />
+		<result property="countyId" column="COUNTY_ID" jdbcType="INTEGER" />
+		<result property="townId" column="TOWN_ID" jdbcType="INTEGER" />
+		<result property="validState" column="VALID_STATE" jdbcType="CHAR" />
+		<result property="customerConsultId" column="CUSTOMER_CONSULT_ID" jdbcType="LONG" />
+		<result property="defaultReturnmentWay" column="DEFAULT_RETURNMENT_WAY" jdbcType="CHAR" />
+		<result property="departmentId" column="DEPARTMENT_ID" jdbcType="VARCHAR" />
+		<result property="repaymentPlanName" column="REPAYMENT_PLAN_NAME" jdbcType="VARCHAR" />
+		<result property="returnAccountInfoId" column="RETURN_ACCOUNT_INFO_ID" jdbcType="INTEGER" />
+		<result property="companyName" column="COMPANY_NAME" jdbcType="VARCHAR" />
+		<result property="instalments" column="INSTALMENTS" jdbcType="VARCHAR" />
+		<result property="repaymentType" column="REPAYMENT_TYPE" jdbcType="VARCHAR" />
+		<result property="companyId" column="COMPANY_ID" jdbcType="VARCHAR" />
+		<result property="capitalUpperLimit" column="CAPITAL_UPPER_LIMIT" jdbcType="DOUBLE" />
+		<result property="capitalLowerLimit" column="CAPITAL_LOWER_LIMIT" jdbcType="DOUBLE" />
+		<result property="producttypeid" column="PRODUCTTYPEID" jdbcType="DOUBLE" />
+		<result property="createLoanOfficerId" column="CREATE_LOAN_OFFICER_ID" jdbcType="DOUBLE" />
+		<result property="createLoanOfficerName" column="CREATE_LOAN_OFFICER_NAME" jdbcType="DOUBLE" />
+	</resultMap>
+	<!-- 查询UUID -->
+	<select id="queryUUid" resultClass="java.lang.String" parameterClass="java.lang.Long">
+		<![CDATA[
+			select c.SYS_GUID from rl_credit_application c where c.CREDITAPPLICATION_ID = #value#
+		]]>
+	</select>
+
+
+	<!-- LocalClientApplyRequest 郝强上传 查询本地数据组装对象用于调用webservice接口用 -->
+	<select id="queryLocalClientApplyRequest" resultClass="localClientApplyRequest" parameterClass="java.lang.Long">
+		<![CDATA[
+			select *
+  from (select ca.sys_guid as applyId,
+               cocc.code_value as loanType,
+               ai.account as loanBankAccount,
+               ai.account_name as loanBankClientName,
+               ai.pay_branchno as bankNumber,
+               (select nscpp.city_name
+                  from rl_national_standard_code nscpp
+                 where nscpp.city_code =
+                       (select nscp.parent_id
+                          from rl_national_standard_code nscp
+                         where nsc.parent_id = nscp.city_code)) as loanBankProvince,
+               (select nscp.city_name
+                  from rl_national_standard_code nscp
+                 where nsc.parent_id = nscp.city_code) as loanBankCity,
+               ai.bank_name as loanBankName,
+               ac.amount as applyAmount,
+               ca.repayment_plan_id as productId,
+               ca.instalments as amortisation,
+               cc.borrow_use as borrowPurpose,
+               ca.loan_officer_id as sellId,
+               ca.loan_officer_name as sellName,
+               ca.company_id as officeId,
+               ca.company_name as officeName,
+               bsa.name as clientName,
+               bsa.credentials_number as idNumber,
+               bsa.mobilephone as mobilePhone,
+               ac.real_amount as loanAmount,
+               ca.signagreement_date as loanTime,
+               ca.producttypeid as productTypeId,
+               rglr.CONTRACT_SIGNED_TIME as contractTime
+          from rl_credit_application ca
+          left join rl_account_info ai
+            on ca.account_info_id = ai.account_info_id
+          left join (select *
+                      from rl_group_loan_regist x
+                     where x.group_loan_regist_id =
+                           (select max(y.group_loan_regist_id)
+                              from rl_group_loan_regist y
+                             where y.creditapplication_id =
+                                   x.creditapplication_id)) rglr
+            on rglr.creditapplication_id = ca.creditapplication_id
+          left join rl_customer_consult cc
+            on ca.customer_consult_id = cc.customer_consult_id
+          left join rl_codetable c
+            on c.code_key = cc.borrow_use
+           and c.section = 'borroerUserConsult'
+          left join rl_codetable coc
+            on coc.code_key = ai.bank_num
+           and coc.section = 'bankNum'
+          left join rl_codetable cocc
+            on cocc.code_key = ai.bank_num
+           and cocc.section = 'creditBankNum'
+          left join rl_amount_confirm ac
+            on ac.credit_application_id = ca.creditapplication_id
+           and ac.history_flag = '0'
+          left join rl_national_standard_code nsc
+            on ai.district_id = nsc.city_code
+          left join rl_borrower_service_app bsa
+            on bsa.creditapplication_id = ca.creditapplication_id
+           and bsa.leader = '1'
+           and bsa.valid_state = '1'
+         where ca.creditapplication_id = #value#),
+       (select ai.card_flag as bankBook,
+               decode(ca.default_returnment_way, '1', '4', cocc.code_value) returnType,
+               ai.account as bankAccount,
+               ai.account_name as bankClientName,
+               ai.bank_name as bankName
+          from rl_credit_application ca
+          left join rl_account_info ai
+            on ca.return_account_info_id = ai.account_info_id
+          left join rl_codetable coc
+            on coc.code_key = ai.bank_num
+           and coc.section = 'bankNum'
+          left join rl_codetable cocc
+            on cocc.code_key = ai.bank_num
+           and cocc.section = 'creditBankNum'
+         where ca.creditapplication_id = #value#)  		
+		]]>
+	</select>
+	<!-- queryLocalReturnDTOList 郝强上传 查询本地数据组装对象用于调用webservice接口用 -->
+	<select id="queryLocalReturnDTOList" resultClass="localReturnDTO" parameterClass="java.util.List">
+		<![CDATA[
+		select rr.received_record_id as receivedRecordId, ca.sys_guid as applyId,
+		ca.business_number as businessNumber,
+	       rr.received_amount as destineAmount,
+	       rr.received_type as ifPayAhead,
+               cocc.code_value as returnType,
+               ai.bank_num as bankId,
+		       ai.card_flag as bankBook,
+		       ai.account_name as bankAccountName,
+		       ai.account as bankAccount,
+		       coc.code_value as bankName,
+		       ai.credentials_number as bankIdnumber,
+		       ca.loan_officer_id as sellId,
+		       ca.repayment_plan_id	as productId，
+		       ai.mobilephone as mobile,
+		       ai.credentials_number as idCard
+		  from rl_received_record rr
+		  left join rl_account_info ai
+		    on rr.account_info_id = ai.account_info_id
+		   left join rl_codetable coc
+            on coc.code_key = ai.bank_num
+          and coc.section = 'bankNum'
+          left join rl_codetable cocc
+          on cocc.code_key = ai.bank_num
+          and cocc.section = 'creditBankNum'
+		  left join rl_credit_application ca
+		    on rr.creditapplication_id = ca.creditapplication_id
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="or">
+			rr.received_record_id = #receivedRecordIdList[]#
+		</iterate>
+	</select>
+
+	<select id="queryUUidList" resultClass="java.lang.String" parameterClass="java.util.List">
+
+	<![CDATA[
+		select ca.sys_guid as applyId
+  		from rl_credit_application ca
+  	]]>
+		<iterate prepend="where" open="(" close=")" conjunction="or">
+			ca.creditapplication_id = #creditapplicationIdList[]#
+		</iterate>
+	</select>
+
+	<select id="queryLocalChgReturnTypeRequest" resultClass="localChgReturnTypeRequest" parameterClass="java.lang.Long">
+		<![CDATA[
+			select ca.sys_guid as applyId,
+       		decode(ai.account_type,
+              '0',
+              '4',
+              cocc.code_value) returnType,
+          ai.account as bankAccount,
+          ai.account_name as bankClientName,
+          coc.code_value as bankName
+		  from rl_credit_application ca
+		  left join rl_account_info ai
+		    on ca.return_account_info_id = ai.account_info_id
+		  left join rl_codetable coc
+            on coc.code_key = ai.bank_num
+          and coc.section = 'bankNum'
+          left join rl_codetable cocc
+          on cocc.code_key = ai.bank_num
+          and cocc.section = 'creditBankNum'
+		 where ca.creditapplication_id = #value#
+		]]>
+	</select>
+	<!-- 查询信贷申请 idList by UUIdList -->
+	<select id="queryCreditApplicationVoListByUUIdList" resultClass="java.lang.Long" parameterClass="java.util.List">
+		<![CDATA[
+		select ca.creditapplication_id as creditapplicationId
+  		from rl_credit_application ca
+  		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="or">
+			ca.sys_guid = #UUIdList[]#
+		</iterate>
+	</select>
+	<select id="queryBizIdAndSysguId" resultClass="java.util.HashMap" parameterClass="java.util.List">
+		<![CDATA[
+		select fm.reserve_id as RESERVEID, ca.sys_guid as APPLYID
+  		from rl_finance_money fm, rl_received_record rr, rl_credit_application ca
+ 		where fm.type = 'S'
+   		and fm.history_flag = 'F'
+   		and fm.reserve_id is not null
+   		and fm.association_id = rr.received_record_id
+   		and rr.history_flag = 'F'
+   		and rr.creditapplication_id = ca.creditapplication_id
+   		and ca.valid_state = '1'
+  		]]>
+		<iterate prepend="and" open="(" close=")" conjunction="or">
+			fm.biz_id = #bizIdList[]#
+		</iterate>
+	</select>
+	<select id="queryBizIdAndSysguIdByBusinessNumber" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+		<![CDATA[
+		select fm.reserve_id as RESERVEID, ca.sys_guid as APPLYID
+  		from rl_finance_money fm, rl_received_record rr, rl_credit_application ca
+ 		where fm.type = 'S'
+   		and fm.history_flag = 'F'
+   		and fm.reserve_id is not null
+   		and fm.association_id = rr.received_record_id
+   		and rr.history_flag = 'F'
+   		and rr.creditapplication_id = ca.creditapplication_id
+   		and ca.valid_state = '1'
+   		and ca.business_number = #value#
+  		]]>
+	</select>
+	<select id="querySysGuidByBusinessNumber" resultClass="java.lang.String" parameterClass="java.lang.String">
+	<![CDATA[
+		select ca.sys_guid
+		from rl_credit_application ca
+		where ca.business_number = #value#
+	]]>
+	</select>
+	<select id="querySysGuidListByAccountInfoId" resultClass="java.lang.String" parameterClass="java.lang.Integer">
+		select ca.sys_guid
+		from rl_credit_application ca
+		where ca.audit_status = '15'and ca.return_account_info_id = #value#
+	</select>
+	<update id="updateStatusByReceiveCreditMsg" parameterClass="creditApplicationVo">
+		update rl_credit_application ca
+		set ca.audit_status = #auditStatus#
+		where ca.sys_guid = #sysGuid#
+	</update>
+</sqlMap>

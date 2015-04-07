@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="RuralCredit2" default="war" basedir=".">
+	
+	<!-- Initialization -->
+	<property name="project.name" value="RuralCredit2"/>
+	<property environment="env" />
+	<property name="src.dir" location="${basedir}/src/main/java" />
+	<property name="conf.dir" location="${basedir}/src/main/resources" />
+	<property name="test.dir" location="${basedir}/src/test/java" />
+	
+	<property name="webdir.name" value="WebContent" />
+
+	<property name="compilelib.dir" location="${basedir}/${webdir.name}/WEB-INF/lib" />
+	<property name="tomcatlib.dir" location="${env.TOMCAT_HOME}/lib" />
+
+	<property name="build.dir" location="../build" />
+	<property name="build.src" location="${build.dir}/src"/>
+    <property name="build.dist" location="${build.dir}/classes"/>
+	<property name="test.class.dir" location="${build.dir}/test-classes" />
+
+	<!-- CheckStyle configuration -->
+	<property name="checkstyleReport.dir" location="${build.dir}/checkstyle" />
+	<property name="checkstyle.result" location="${checkstyleReport.dir}/checkstyle-result.xml" />
+	<property name="checkstyle.report" location="${checkstyleReport.dir}/checkstyle-report.html" />
+
+	<property name="checkstyle.jar" location="${env.ANT_HOME}/lib/checkstyle-5.3-all.jar" />
+	<property name="checkstyle.config" location="${env.ANT_HOME}/lib/check.xml" />
+	<property name="checkstyle.report.style" location="${env.ANT_HOME}/lib/contrib/checkstyle-frames.xsl" />
+	
+	<!-- Findbugs configuration -->
+	<property name="findbugs.home" location="${env.FINDBUGS_HOME}" />
+	<property name="findbugs.report.dir" location="${build.dir}/findbugs" />
+	<property name="findbugs.file" location="${findbugs.report.dir}/findbugs.xml" />
+	
+	<!-- PMD configuration -->
+	<property name="pmd.home" location="${env.PMD_HOME}" />
+	<property name="pmd.report.dir" location="${build.dir}/pmd" />
+	<property name="cpd.file" location="${pmd.report.dir}/cpd.xml" />
+	
+	<!-- Emma configuration -->
+	<property name="emma.home" location="${env.EMMA_HOME}" />
+	<property name="emma.enabled" value="true" />
+	<property name="emma.dir" location="${build.dir}/emma" />
+	<property name="out.instr.dir" location="${emma.dir}/outinstr" />
+	<property name="emma.report.src" location="${emma.dir}/src" />
+
+	<!-- Statsvn configuration -->
+	<property name="statsvn.home" location="/opt/statsvn" />
+	<property name="statsvn.report" value="${build.dir}/statsvn" />
+
+	<!-- test environment configuration -->
+	<property file="../env_ruralcredit/${ci.properties}" />
+
+
+	<!-- =================================================================== -->
+	<!-- setup classpath                                                     -->
+	<!-- =================================================================== -->
+	
+	<path id="classpath.common">
+		<fileset dir="${compilelib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${tomcatlib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="findbugs.classpath">
+		<fileset dir="${findbugs.home}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="classpath.test.compile">
+		<path refid="classpath.common" />
+		<pathelement location="${test.class.dir}" />
+		<pathelement location="${build.dist}" />
+	</path>
+	
+	<path id="emma.lib">
+		<pathelement location="${emma.home}/lib/emma.jar" />
+		<pathelement location="${emma.home}/lib/emma_ant.jar" />
+	</path>
+	
+	<path id="pmd.path">
+		<fileset dir="${pmd.home}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="statsvn.path">
+		<fileset dir="${statsvn.home}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- =================================================================== -->
+	<!-- Compiles the source directory                                       -->
+	<!-- =================================================================== -->
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="prepare">	
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.src}"/>
+		<mkdir dir="${build.dist}"/>
+		<copy todir="${build.src}">
+			<fileset dir="${src.dir}"/>
+        </copy>
+	</target>
+	
+	<target name="compile" >
+		<javac srcdir="${build.src}" 
+			destdir="${build.dist}" 
+			deprecation="off" 
+			debug="on" 
+			encoding="UTF-8" 
+			includeantruntime="on">
+			<classpath refid="classpath.common"/>
+		</javac>
+
+		<copy todir="${build.dist}">
+			<fileset dir="${conf.dir}"/>
+			<fileset dir="${build.src}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- checkstyle                                                          -->
+	<!-- =================================================================== -->
+
+	<taskdef resource="checkstyletask.properties" classpath="${checkstyle.jar}" />
+	<target name="checkstyle"  description="Generates a report of code convention violations.">
+
+		<echo>开始用checkstyle检查代码规范..............</echo>
+		<delete dir="${checkstyleReport.dir}" quiet="true" />
+		<mkdir dir="${checkstyleReport.dir}" />
+		<checkstyle config="${checkstyle.config}" failureProperty="checkstyle.failure" failOnViolation="false">
+			<formatter type="xml" tofile="${checkstyle.result}" />
+			<fileset dir="${build.src}" includes="**/*.java" />
+		</checkstyle>
+		<echo>检查代码完成..............</echo>
+
+		<xslt in="${checkstyle.result}" out="${checkstyle.report}" style="${checkstyle.report.style}" />
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Compiles the test directory                                         -->
+	<!-- =================================================================== -->
+
+	<target name="test-init">
+		<mkdir dir="${test.class.dir}" />
+	</target>
+
+	<target name="test-compile" depends="test-init">
+		<javac destdir="${test.class.dir}" debug="true" includeAntRuntime="yes" encoding="utf-8">
+			<classpath refid="classpath.test.compile" />
+			<src path="${test.dir}" />
+		</javac>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Unit Testing Targets                                                -->
+	<!-- =================================================================== -->
+
+	<target name="test-run" depends="test-compile">
+		<mkdir dir="${build.dir}/test-results/xml" />
+		<junit dir="${build.dist}" printsummary="yes" haltonfailure="no" fork="true" forkmode="once">
+			<classpath>
+				<pathelement location="${out.instr.dir}" />
+				<path refid="emma.lib" />
+			</classpath>
+			<jvmarg value="-Demma.coverage.out.file=${emma.dir}/coverage.emma" />
+			<jvmarg value="-Demma.coverage.out.merge=true" />
+
+			<classpath refid="classpath.test.compile" />
+			<formatter type="xml" />
+			<formatter type="brief" usefile="false" />
+			<test name="${testcase}" todir="${build.dir}/test-results/xml" if="testcase" />
+			<batchtest todir="${build.dir}/test-results/xml" unless="testcase">
+				<fileset dir="${test.class.dir}">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="test-report" depends="test-run">
+
+		<junitreport todir="${build.dir}/test-results">
+			<fileset dir="${build.dir}/test-results/xml">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${build.dir}/test-results" />
+		</junitreport>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Emma coverage      	                                             -->
+	<!-- =================================================================== -->
+
+	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+
+	<target name="instr"  description="Emma add bytecode to classes">
+		<mkdir dir="${out.instr.dir}" />
+		<emma enabled="${emma.enabled}">
+			<instr instrpath="${build.dist}" destdir="${out.instr.dir}" metadatafile="${emma.dir}/metadata.emma" merge="true">
+			</instr>
+		</emma>
+	</target>
+	
+	<target name="emma-report" depends="test-run" description="Generate the emma report">
+		<mkdir dir="${emma.report.src}" />
+		<copy todir="${emma.report.src}">
+			<fileset  dir="${build.src}" />
+		</copy>
+		<emma enabled="${emma.enabled}">
+			<report sourcepath="${emma.report.src}" encoding="utf-8">
+				<fileset dir="${emma.dir}">
+					<include name="*.emma" />
+				</fileset>
+				<xml outfile="${emma.dir}/coverage.xml" />
+				<html outfile="${emma.dir}/coverage.html" />
+			</report>
+		</emma>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- configure properties for test environment                           -->
+	<!-- =================================================================== -->
+
+	<target name="configure" >
+		
+		<replaceregexp file="${build.dist}/picture.properties" match="picStorageDir( *)=(.*)" replace="picStorageDir=${picStorageDir}" byline="true"/>  
+		<replaceregexp file="${build.dist}/picture.properties" match="zipPicStorageDir( *)=(.*)" replace="zipPicStorageDir=${zipPicStorageDir}" byline="true"/>
+		<replaceregexp file="${build.dist}/picture.properties" match="pdfPtotocalDir( *)=(.*)" replace="pdfPtotocalDir=${pdfPtotocalDir}" byline="true"/>
+	</target>
+	
+	<target name="configureUat" >
+		<replaceregexp file="${build.dist}/config/jdbc.properties" match="jdbc.url( *)=(.*)" replace="jdbc.url=${jdbc.url}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/jdbc.properties" match="jdbc.username( *)=(.*)" replace="jdbc.username=${jdbc.username}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/jdbc.properties" match="jdbc.password( *)=(.*)" replace="jdbc.password=${jdbc.password}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/picture.properties" match="picStorageDir( *)=(.*)" replace="picStorageDir=${picStorageDir}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/picture.properties" match="zipPicStorageDir( *)=(.*)" replace="zipPicStorageDir=${zipPicStorageDir}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/picture.properties" match="pdfPtotocalDir( *)=(.*)" replace="pdfPtotocalDir=${pdfPtotocalDir}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/spring/cm/cm.properties" match="cm.url( *)=(.*)" replace="cm.url=${cm.url}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/spring/cm/cm.properties" match="cm.ws_url( *)=(.*)" replace="cm.ws_url=${cm.ws_url}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/spring/credit/credit.properties" match="credit.url( *)=(.*)" replace="credit.url=${credit.url}" byline="true"/>
+		<replaceregexp file="${build.dist}/config/spring/pdf/pdf.properties" match="pdf.url( *)=(.*)" replace="pdf.url=${pdf.url}" byline="true"/>
+        <replaceregexp file="${build.dist}/config/spring/settle/settle.properties" match="payplatform.url( *)=(.*)" replace="payplatform.url=${payplatform.url}" byline="true"/>
+        <replaceregexp file="${build.dist}/config/spring/smp/smp.properties" match="casserver.url( *)=(.*)" replace="casserver.url=${casserver.url}" byline="true"/>	
+        <replaceregexp file="${build.dist}/config/spring/smp/smp.properties" match="smp.url( *)=(.*)" replace="smp.url=${smp.url}" byline="true"/>
+        <replaceregexp file="${build.dist}/config/spring/smp/smp.properties" match="rc.url( *)=(.*)" replace="rc.url=${rc.url}" byline="true"/>
+        <replaceregexp file="${build.dist}/config/spring/icp/icp.properties" match="icp.url( *)=(.*)" replace="icp.url=${icp.url}" byline="true"/>		
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Package application as a WAR file                                   -->
+	<!-- =================================================================== -->
+
+	<target name="war" >
+		<war destfile="${build.dir}/${project.name}.war" webxml="${basedir}/${webdir.name}/WEB-INF/web.xml">
+			<fileset dir="${basedir}/${webdir.name}" />
+			<classes dir="${build.dist}" />
+		</war>				
+	</target>
+	
+	<target name="scp" >
+		<sshexec host="${remote.ip}" username="${remote.username}" port="${remote.port}" password="${remote.password}" command="${remote.tomcat}/bin/shutdown.sh" trust="yes"/>
+		<sshexec host="${remote.ip}" username="${remote.username}" port="${remote.port}" password="${remote.password}" command="sleep 20" trust="yes"/>
+		<sshexec host="${remote.ip}" username="${remote.username}" port="${remote.port}" password="${remote.password}" command="rm -rf ${remote.tomcat}/webapps/${project.name}*" trust="yes"/>
+		<scp file="${build.dir}/${project.name}.war" port="${remote.port}" todir="${remote.username}:${remote.password}@${remote.ip}:${remote.tomcat}/webapps" trust="yes"/>
+		<sshexec host="${remote.ip}" username="${remote.username}" port="${remote.port}" password="${remote.password}" command="${remote.tomcat}/bin/startup.sh" trust="yes"/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- findbugs                                                            -->
+	<!-- =================================================================== -->
+
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="findbugs.classpath" />
+	<target name="findbugs" depends="compile">
+		<echo>开始用Findbugs检查代码潜在缺陷..............</echo>
+		<mkdir dir="${findbugs.report.dir}" />
+		<findbugs home="${findbugs.home}" 
+			output="xml" 
+			outputFile="${findbugs.file}" 
+			excludeFilter="${findbugs.home}/myExcludeFilter.xml"
+			jvmargs="-Xmx512m" 
+			reportLevel="medium" 
+			effort="max">
+			<auxClasspath refid="classpath.common" />
+			<sourcePath path="${build.src}" />				
+			<class location="${build.dist}" />
+		</findbugs>
+		<echo>检查代码完成................</echo>
+	</target>
+	
+	<target name="cpd">
+    <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="pmd.path"/>
+		<mkdir dir="${pmd.report.dir}" />
+		<cpd minimumTokenCount="100" encoding="utf-8" ignoreLiterals="false" ignoreIdentifiers="false" outputFile="${cpd.file}" format="xml">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java"/>
+				<exclude name="**/model/*.java"/>
+			</fileset>
+		</cpd>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- statsvn report LOC&commitor                                         -->
+	<!-- =================================================================== -->
+
+	<taskdef name="statsvn" classname="net.sf.statsvn.ant.StatSvnTask" classpathref="statsvn.path"/>
+    <!-- this will generate a SVN log file from the working copy -->
+    <target name="buildlog">
+    <!-- create a log file for the statsvn to use -->
+		<mkdir dir="${statsvn.report}" />
+		<exec executable = "svn"  output = "${statsvn.report}/svn.log">
+			<arg  line = "log . --xml -v"/>
+        </exec>
+	</target>
+
+	<!-- this will use the statsvn plugin to generate a report and copy it to the developement server -->
+	<target name="buildreport" >
+		<statsvn path="." exclude="**/*.js;**/*.css"
+				log="${statsvn.report}/svn.log"
+				outputDir="${statsvn.report}"
+				title="statsvn"/>
+	</target>
+
+	<!-- =================================================================== -->
+    <!-- CI target                                                           -->
+    <!-- =================================================================== -->
+
+	<target name="nightly-build" depends="clean,prepare,checkstyle,findbugs,instr,emma-report,cpd,buildlog,buildreport"/>
+        
+	<target name="package" depends="clean,prepare,compile,war"/>
+        
+	<target name="env_package" depends="clean,prepare,compile,configure,war"/>
+	
+	<target name="uat_scp_deploy" depends="clean,prepare,compile,configureUat,war,scp"/>
+
+</project>

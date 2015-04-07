@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+	xsi:schemaLocation="http://cxf.apache.org/jaxws 
+						http://cxf.apache.org/schemas/jaxws.xsd 
+						http://cxf.apache.org/core 
+						http://cxf.apache.org/schemas/core.xsd 
+						http://cxf.apache.org/transports/http/configuration 
+						http://cxf.apache.org/schemas/configuration/http-conf.xsd
+						http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	default-autowire="byType" default-lazy-init="true">
+
+	<description>WebService服务器端配置</description>
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<!-- 综合信贷 webservice -->
+	<jaxws:client id="overdueServiceWS" serviceClass="com.creditease.rc.app.icp.OverdueServiceWS"
+		address="${icp.url1}/services/OverdueServiceWS">
+		<jaxws:properties>
+               <entry key="jaxb-validation-event-handler" value-ref="ignoreUnexpectedElementsHandler"/>
+        </jaxws:properties>
+	</jaxws:client>
+</beans>

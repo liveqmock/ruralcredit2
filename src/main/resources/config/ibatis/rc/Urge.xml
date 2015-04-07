@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="URGE">
+	<typeAlias alias="urge" type="com.creditease.rc.domain.Urge" />
+	<typeAlias alias="urgeVo" type="com.creditease.rc.vo.UrgeVo" />
+	<resultMap id="urgeMap" class="urge">
+		<result column="URGE_ID" property="urgeId" jdbcType="DECIMAL" />
+		<result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL" />
+		<result column="OPERATOR_NAME" property="operatorName" jdbcType="VARCHAR" />
+		<result column="OPERATOR_ID" property="operatorId" jdbcType="DECIMAL" />
+		<result column="OPERATE_TIME" property="operateTime" jdbcType="TIMESTAMP" />
+		<result column="REPAYMENT_CYCLE" property="repaymentCycle" jdbcType="VARCHAR" />
+		<result column="URGE_SUMMARIZE" property="urgeSummarize" jdbcType="VARCHAR" />
+		<result column="URGE_WAY" property="urgeWay" jdbcType="VARCHAR" />
+		<result column="REGIN_MONEY" property="reginMoney" jdbcType="DECIMAL" />
+		<result column="MONEY_SOURCE" property="moneySource" jdbcType="VARCHAR" />
+		<result column="URGE_STATE" property="urgeState" jdbcType="VARCHAR" />
+		<result column="URGE_DATE" property="urgeDate" jdbcType="TIMESTAMP" />
+		<result column="REFUND_DATE" property="refundDate" jdbcType="TIMESTAMP" />
+		<result column="URGE_LONG_TIME" property="urgeLongTime" jdbcType="VARCHAR" />
+		<result column="URGE_REMARK" property="urgeRemark" jdbcType="VARCHAR" />
+		<result column="BIG_WARNING" property="bigWarning" jdbcType="VARCHAR" />
+		<result column="URGE_DESCRIBE" property="urgeDescribe" jdbcType="VARCHAR" />
+		<result column="YN_PROMISE" property="ynPromise" jdbcType="VARCHAR" />
+		<result column="PREVIOUS_PROMISE_MONEY" property="previousPromiseMoney" jdbcType="DECIMAL" />
+		<result column="PREVIOUS_PROMISE_TIME" property="previousPromiseTime" jdbcType="TIMESTAMP" />
+		<result column="CURRENT_PROMISE_MONEY" property="currentPromiseMoney" jdbcType="DECIMAL" />
+		<result column="CURENT_PROMISE_TIME" property="curentPromiseTime" jdbcType="TIMESTAMP" />
+		<result column="BREAK_BEGIN_DATE" property="breakbegindate" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<select id="select" resultMap="urgeMap" parameterClass="urge">
+		select
+		URGE_ID, CREDITAPPLICATION_ID, OPERATOR_NAME, OPERATOR_ID,
+		OPERATE_TIME, REPAYMENT_CYCLE,
+		URGE_SUMMARIZE, URGE_WAY, REGIN_MONEY,
+		MONEY_SOURCE, URGE_STATE, URGE_DATE, REFUND_DATE,
+		URGE_LONG_TIME,
+		URGE_REMARK, BIG_WARNING, URGE_DESCRIBE, YN_PROMISE,
+		PREVIOUS_PROMISE_MONEY,
+		PREVIOUS_PROMISE_TIME, CURRENT_PROMISE_MONEY,
+		CURENT_PROMISE_TIME,BREAK_BEGIN_DATE
+		from RL_URGE
+		where URGE_ID =
+		#urgeId:DECIMAL#
+	</select>
+	<delete id="delete" parameterClass="urge">
+		delete from RL_URGE
+		where
+		URGE_ID = #urgeId:DECIMAL#
+	</delete>
+	<insert id="insert" parameterClass="urge">
+		<selectKey keyProperty="urgeId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		insert into RL_URGE (URGE_ID,CREDITAPPLICATION_ID, OPERATOR_NAME,
+		OPERATOR_ID, OPERATE_TIME,
+		REPAYMENT_CYCLE, URGE_SUMMARIZE, URGE_WAY,
+		REGIN_MONEY, MONEY_SOURCE, URGE_STATE, URGE_DATE,
+		REFUND_DATE,
+		URGE_LONG_TIME, URGE_REMARK, BIG_WARNING, URGE_DESCRIBE, YN_PROMISE,
+		PREVIOUS_PROMISE_MONEY, PREVIOUS_PROMISE_TIME, CURRENT_PROMISE_MONEY,
+		CURENT_PROMISE_TIME,
+		BREAK_BEGIN_DATE)
+		values
+		(#urgeId:DECIMAL#,#creditapplicationId:DECIMAL#,
+		#operatorName:VARCHAR#, #operatorId:DECIMAL#,
+		#operateTime:TIMESTAMP#,
+		#repaymentCycle:VARCHAR#, #urgeSummarize:VARCHAR#, #urgeWay:VARCHAR#,
+		#reginMoney:DECIMAL#, #moneySource:VARCHAR#, #urgeState:VARCHAR#,
+		#urgeDate:TIMESTAMP#,
+		#refundDate:TIMESTAMP#, #urgeLongTime:VARCHAR#,
+		#urgeRemark:VARCHAR#, #bigWarning:VARCHAR#,
+		#urgeDescribe:VARCHAR#,
+		#ynPromise:VARCHAR#, #previousPromiseMoney:DECIMAL#,
+		#previousPromiseTime:TIMESTAMP#, #currentPromiseMoney:DECIMAL#,
+		#curentPromiseTime:TIMESTAMP#,
+		#breakbegindate:TIMESTAMP#)
+	</insert>
+	<update id="update" parameterClass="urge">
+		update RL_URGE
+		set
+		CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#,
+		OPERATOR_NAME =
+		#operatorName:VARCHAR#,
+		OPERATOR_ID = #operatorId:DECIMAL#,
+		OPERATE_TIME = #operateTime:TIMESTAMP#,
+		REPAYMENT_CYCLE =
+		#repaymentCycle:VARCHAR#,
+		URGE_SUMMARIZE = #urgeSummarize:VARCHAR#,
+		URGE_WAY = #urgeWay:VARCHAR#,
+		REGIN_MONEY = #reginMoney:DECIMAL#,
+		MONEY_SOURCE = #moneySource:VARCHAR#,
+		URGE_STATE = #urgeState:VARCHAR#,
+		URGE_DATE = #urgeDate:TIMESTAMP#,
+		REFUND_DATE = #refundDate:TIMESTAMP#,
+		URGE_LONG_TIME = #urgeLongTime:VARCHAR#,
+		URGE_REMARK =
+		#urgeRemark:VARCHAR#,
+		BIG_WARNING = #bigWarning:VARCHAR#,
+		URGE_DESCRIBE
+		= #urgeDescribe:VARCHAR#,
+		YN_PROMISE = #ynPromise:VARCHAR#,
+		PREVIOUS_PROMISE_MONEY = #previousPromiseMoney:DECIMAL#,
+		PREVIOUS_PROMISE_TIME = #previousPromiseTime:TIMESTAMP#,
+		CURRENT_PROMISE_MONEY = #currentPromiseMoney:DECIMAL#,
+		CURENT_PROMISE_TIME = #curentPromiseTime:TIMESTAMP#,
+		BREAK_BEGIN_DATE =
+		#breakbegindate:TIMESTAMP#
+		where URGE_ID = #urgeId:DECIMAL#
+	</update>
+	<update id="dynamicUpdate" parameterClass="urge">
+		update RL_URGE
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="creditapplicationId">
+				CREDITAPPLICATION_ID =
+				#creditapplicationId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="operatorName">
+				OPERATOR_NAME =
+				#operatorName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="operatorId">
+				OPERATOR_ID =
+				#operatorId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="operateTime">
+				OPERATE_TIME =
+				#operateTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="repaymentCycle">
+				REPAYMENT_CYCLE =
+				#repaymentCycle:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeSummarize">
+				URGE_SUMMARIZE =
+				#urgeSummarize:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeWay">
+				URGE_WAY =
+				#urgeWay:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="reginMoney">
+				REGIN_MONEY =
+				#reginMoney:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="moneySource">
+				MONEY_SOURCE =
+				#moneySource:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeState">
+				URGE_STATE =
+				#urgeState:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeDate">
+				URGE_DATE =
+				#urgeDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="refundDate">
+				REFUND_DATE =
+				#refundDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeLongTime">
+				URGE_LONG_TIME =
+				#urgeLongTime:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeRemark">
+				URGE_REMARK =
+				#urgeRemark:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="bigWarning">
+				BIG_WARNING =
+				#bigWarning:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="urgeDescribe">
+				URGE_DESCRIBE =
+				#urgeDescribe:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="ynPromise">
+				YN_PROMISE =
+				#ynPromise:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="previousPromiseMoney">
+				PREVIOUS_PROMISE_MONEY =
+				#previousPromiseMoney:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="previousPromiseTime">
+				PREVIOUS_PROMISE_TIME =
+				#previousPromiseTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="currentPromiseMoney">
+				CURRENT_PROMISE_MONEY =
+				#currentPromiseMoney:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="curentPromiseTime">
+				CURENT_PROMISE_TIME =
+				#curentPromiseTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="breakbegindate">
+				BREAK_BEGIN_DATE =
+				#breakbegindate:TIMESTAMP#
+      </isNotNull>
+		</dynamic>
+		where URGE_ID = #urgeId:DECIMAL#
+	</update>
+	<sql id="queryUrgeList">
+		select u.urge_id as urgeId,
+		ca.business_number as businessNumber,
+		bsa.name as name,
+		ca.company_name as companyName,
+		ca.company_id as
+		companyId,
+		ca.loan_officer_name as loanOfficerName,
+		u.urge_date as
+		urgeDate,
+		u.creditapplication_Id as creditapplicationId,
+		u.urge_remark
+		as urgeRemark,
+		u.big_warning as bigWarning,
+		u.urge_describe as
+		urgeDescribe,
+		u.yn_promise as ynPromise,
+		u.refund_date as refundDate,
+		u.urge_summarize as urgeSummarize,
+		u.urge_way as urgeWay,
+		u.urge_state
+		as urgeState,
+		u.regin_money as reginMoney,
+		u.money_source as
+		moneySource,
+		u.urge_long_time as urgeLongTime,
+		u.current_promise_money
+		as currentPromiseMoney,
+		u.previous_promise_money as
+		previousPromiseMoney,
+		u.curent_promise_time as curentPromiseTime,
+		u.previous_promise_time as previousPromiseTime,
+		u.break_begin_date as
+		breakbegindate,
+		u.operate_time as operateTime
+		from rl_credit_application
+		ca,
+		rl_urge u,
+		rl_borrower_service_app bsa,
+		sid_view v
+		where
+		ca.creditapplication_id = v.object_id_identity
+		and v.class =
+		'com.creditease.rc.domain.CreditApplication'
+		and
+		v.ace_sid in
+		($authList$)
+		and u.creditapplication_id = ca.creditapplication_id
+		and
+		bsa.creditapplication_id = ca.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		<isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			bsa.name = #name#
+		</isNotEmpty>
+		<isNotEmpty property="loanOfficerName" prepend="and">
+			ca.loan_officer_name = #loanOfficerName#
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty property="loanOfficerName" prepend="and">
+			ca.loan_officer_name = #loanOfficerName#
+		</isNotEmpty>
+		<isNotEmpty property="urgeDateBegin" prepend="and">
+			u.urge_date >=
+			to_date(#urgeDateBegin#,'YYYY-MM-DD')
+		</isNotEmpty>
+		<isNotEmpty property="urgeDateEnd" prepend="and">
+			to_date(#urgeDateEnd#,'YYYY-MM-DD') >= u.urge_date
+		</isNotEmpty>
+		<isNotEmpty property="promiseRefundDateBegin" prepend="and">
+			u.curent_promise_time >=
+			to_date(#promiseRefundDateBegin#,'YYYY-MM-DD')
+		</isNotEmpty>
+		<isNotEmpty property="promiseRefundDateEnd" prepend="and">
+			to_date(#promiseRefundDateEnd#,'YYYY-MM-DD') >=
+			u.curent_promise_time
+		</isNotEmpty>
+		order by u.operate_time desc, u.urge_id desc
+	</sql>
+	<select id="queryUrgeListEntity" resultClass="urgeVo" parameterClass="java.util.HashMap">
+		<include refid="queryUrgeList" />
+	</select>
+	<select id="queryUrgeListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="queryUrgeList" />
+		)
+	</select>
+	<select id="queryUrgeListByUrgeId" resultClass="urgeVo" parameterClass="java.lang.Long">
+		select u.urge_id as urgeId,
+		u.urge_date as urgeDate,
+		u.creditapplication_Id as creditapplicationId,
+		u.urge_remark as urgeRemark,
+		u.big_warning as bigWarning,
+		u.urge_describe as urgeDescribe,
+		u.yn_promise as ynPromise,
+		u.refund_date as refundDate,
+		u.urge_summarize as urgeSummarize,
+		u.urge_way as urgeWay,
+		u.urge_state as urgeState,
+		u.regin_money as reginMoney,
+		u.money_source as moneySource,
+		u.urge_long_time as urgeLongTime,
+		u.current_promise_money as currentPromiseMoney,
+		u.previous_promise_money as previousPromiseMoney,
+		u.curent_promise_time as curentPromiseTime,
+		u.previous_promise_time as previousPromiseTime,
+		u.break_begin_date as breakbegindate,
+		u.operate_time as operateTime
+		from rl_urge u
+		where u.urge_id=#urgeId:DECIMAL#
+	</select>
+	<select id="selectUrgeByCreditApplicationId" resultClass="urgeVo" parameterClass="java.lang.Long">
+		select t.creditapplication_id as creditapplicationId,
+		t.current_promise_money as previousPromiseMoney,
+		t.curent_promise_time as previousPromiseTime,
+		t.operate_time as operateTime
+		from rl_urge t
+		where t.operate_time =
+		(select distinct max(r.operate_time) over(partition by
+		r.creditapplication_id) as operateTime
+		from rl_urge r
+		where r.creditapplication_id=#creditapplicationId:DECIMAL#)
+		</select>
+	<!--<select id="querUrgeCountByPromiseTime" resultClass="urgeVo" parameterClass="java.lang.Date"> select count(*) from rl_urge r where r.curent_promise_time =to_date(#curentPromiseTime:TIMESTAMP#,'YYYY-MM-DD') </select> -->
+	<select id="querUrgeCountList" resultClass="urgeVo" parameterClass="java.util.HashMap">
+		select u.urge_id as urgeId,
+		u.urge_date as urgeDate,
+		u.creditapplication_Id as creditapplicationId,
+		u.urge_remark as urgeRemark,
+		u.big_warning as bigWarning,
+		u.urge_describe as urgeDescribe,
+		u.yn_promise as ynPromise,
+		u.refund_date as refundDate,
+		u.urge_summarize as urgeSummarize,
+		u.urge_way as urgeWay,
+		u.urge_state as urgeState,
+		u.regin_money as reginMoney,
+		u.money_source as moneySource,
+		u.urge_long_time as urgeLongTime,
+		u.current_promise_money as currentPromiseMoney,
+		u.previous_promise_money as previousPromiseMoney,
+		u.curent_promise_time as curentPromiseTime,
+		u.previous_promise_time as previousPromiseTime,
+		u.break_begin_date as breakbegindate,
+		u.operate_time as operateTime
+		from rl_urge u
+		</select>
+	<!-- 郝强添加 -->
+	<select id="queryUrgeBycreditapplicationIds" resultMap="urgeMap" parameterClass="java.lang.String">
+		select * from rl_urge u where u.urge_id in ($creditapplicationIds$)
+		</select>
+
+	<select id="queryInThePayment" resultClass="java.lang.Long">
+		select ca.creditapplication_id from rl_credit_application ca where (ca.audit_status = '15' or ca.audit_status = '30') and ca.valid_state = '1'
+	</select>
+	<select id="queryUrgeListByMap" resultClass="urge" parameterClass="java.util.HashMap">
+		select * from rl_urge u where u.creditapplication_id = #creditapplicationId# and u.repayment_cycle = #repaymentCycle#
+	</select>
+	<delete id="deleteUrgeForSave" parameterClass="urge">
+		delete rl_urge u
+		where u.creditapplication_id = #creditapplicationId#
+		and u.urge_date = #urgeDate#
+		and u.repayment_cycle = #repaymentCycle#
+		and u.break_begin_date = #breakbegindate#
+		and u.refund_date = #refundDate#
+		and u.operator_id is null
+	</delete>
+</sqlMap>

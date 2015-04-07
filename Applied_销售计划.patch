@@ -1,0 +1,2647 @@
+Index: src/main/java/com/creditease/rc/service/IEasyUIService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/IEasyUIService.java	(revision 8428)
++++ src/main/java/com/creditease/rc/service/IEasyUIService.java	(revision )
+@@ -1,15 +1,13 @@
+ package com.creditease.rc.service;
+ 
+-import java.util.List;
+ import java.util.Map;
+ 
+ import com.creditease.rc.vo.DepartmentEntityVo;
+-import com.creditease.rc.vo.EasyUITree;
+ 
+ public interface IEasyUIService {
+ 
+ 	public void constructDepartmentMap();
+ 
+ 	public Map<String, DepartmentEntityVo> getDepartmentMapByAuthority();
+-	public List<EasyUITree> constructUsersForDeparmentTree(List<EasyUITree> easyUITrees);
++
+ }
+Index: WebContent/jsp/rc/sales/salesPlanningTable_common_month.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanningTable_common_month.jsp	(revision )
++++ WebContent/jsp/rc/sales/salesPlanningTable_common_month.jsp	(revision )
+@@ -0,0 +1,45 @@
++<%--
++  Created by IntelliJ IDEA.
++  User: v-weizhang
++  Date: 2015-1-27
++  Time: 16:20
++  To change this template use File | Settings | File Templates.
++--%>
++<%@ page contentType="text/html;charset=UTF-8" language="java" %>
++<th class="myTH">
++    1月
++</th>
++<th class="myTH">
++    2月
++</th>
++<th class="myTH">
++    3月
++</th>
++<th class="myTH">
++    4月
++</th>
++<th class="myTH">
++    5月
++</th>
++<th class="myTH">
++    6月
++</th>
++<th class="myTH">
++    7月
++</th>
++<th class="myTH">
++    8月
++</th>
++<th class="myTH">
++    9月
++</th>
++<th class="myTH">
++    10月
++</th>
++<th class="myTH">
++    11月
++</th>
++<th class="myTH">
++    12月
++</th>
++
+Index: src/main/java/com/creditease/rc/dao/ISalesPlanningDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/dao/ISalesPlanningDao.java	(revision 8428)
++++ src/main/java/com/creditease/rc/dao/ISalesPlanningDao.java	(revision )
+@@ -20,4 +20,12 @@
+ 
+ 	public boolean updateSalesPlanningList(List<SalesPlanning> updateList);
+ 
++    public List<Integer> searchSalesPlanningDel(Map m);
++
++    public boolean saveSalesPlannings(List<SalesPlanning> list);
++
++    public void deleteSalesPlannings(List<Integer> ids);
++
++    public List<SalesPlanning> searchSalesPlanningByCase(Map<String, Object> map);
++
+ }
+Index: src/main/java/com/creditease/rc/action/EasyUIController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/action/EasyUIController.java	(revision 8428)
++++ src/main/java/com/creditease/rc/action/EasyUIController.java	(revision )
+@@ -8,13 +8,10 @@
+ import java.util.Set;
+ 
+ import javax.annotation.Resource;
++import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpSession;
+ 
+-import com.creditease.core.security.User;
+-import com.creditease.rc.domain.Employee;
+-import com.creditease.rc.service.EmployeeService;
+-import com.creditease.rc.service.ICreditApplicationService;
+-import org.springframework.beans.factory.annotation.Autowired;
++import org.apache.commons.lang.StringUtils;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
+@@ -39,8 +36,7 @@
+ 
+ 	@Resource
+ 	private IEasyUIService easyUIService;// 这个千万不能删在这里启动的时候调用这个类的初始化方法加载营业部tree
+-	@Resource
+-	private ICreditApplicationService creditApplicationService;
++
+ 	@RequestMapping(value = "getDepartmentComboboxTree")
+ 	public @ResponseBody
+ 	List<EasyUITree> getDepartmentComboboxTree(HttpSession session) {
+@@ -79,28 +75,7 @@
+ 		}
+ 		return easyUITrees;
+ 	}
+-	@RequestMapping(value = "getDepartmentAndUsersComboboxTree")
+-	public @ResponseBody
+-	List<EasyUITree> getDepartmentAndUsersComboboxTree(HttpSession session) {
+-		Integer getAreaDepartmentId = SpringSecurityUtils.getCurrentUser().getAreaDepartmentId();
+-		List<EasyUITree> easyUITrees = new ArrayList<EasyUITree>();
+-		if (getAreaDepartmentId == null) {
+-			// 如果没有getAreaDepartmentId说明是总部人员，或者大区经理，或者风险经理
+-			Integer getCityDepartmentId = SpringSecurityUtils.getCurrentUser().getCityDepartmentId();
+-			if (getCityDepartmentId == null) {
+-				// 如果没有getCityDepartmentId说明是总部人员
+-				easyUITrees = constructEasyUITreeList("0");
+-			} else {
+-				// 如果有getCityDepartmentId说明是区域级别的经理或者风险经理
+-				easyUITrees = constructEasyUITreeList(getCityDepartmentId.toString());
+-			}
+-		} else {
+-			// 如果有getAreaDepartmentId说明是 营业部经理或者信贷员
+-			easyUITrees = constructEasyUITreeList(getAreaDepartmentId.toString());
+-		}
+-		easyUIService.constructUsersForDeparmentTree(easyUITrees);
+-		return easyUITrees;
+-	}
++
+ 	private List<EasyUITree> constructEasyUITreeList(String departmentId) {
+ 
+ 		List<EasyUITree> easyUITrees = new ArrayList<EasyUITree>();
+@@ -245,5 +220,50 @@
+ 			comboboxs.add(combobox);
+ 		}
+ 		return comboboxs;
++	}
++
++    /**
++     * 分别获取（操作人-对应）大区、分中心、营业部
++     *
++     * @param request
++     * @return 大区 或 分中心 或 营业部
++     */
++    @RequestMapping(value = "departmentTreeByType")
++    public
++    @ResponseBody
++    List<EasyUITree> departmentTreeByType(HttpServletRequest request) {
++        String wantType = StringUtils.isNumeric(request.getParameter("wantType")) ? StringUtils.isNotEmpty(request.getParameter("wantType")) ? request.getParameter("wantType") : "1" : "1";
++        String role = StringUtils.isNotEmpty(request.getParameter("role")) ? request.getParameter("role") : "admin";
++        List<EasyUITree> trees = this.getDepartmentComboboxTree(request.getSession());
++        for (EasyUITree tree : trees) {
++            for (EasyUITree tree1 : tree.getChildren()) {
++                if (role.equals("admin")) {
++                    if (Integer.valueOf(wantType) == 1) {
++                        tree1.setChildren(new ArrayList<EasyUITree>());
++                    } else if (Integer.valueOf(wantType) == 2) {
++                        for (EasyUITree tree2 : tree1.getChildren()) {
++                            tree2.setChildren(new ArrayList<EasyUITree>());
++                        }
++                    } else if (Integer.valueOf(wantType) == 3) {
++                        for (EasyUITree tree2 : tree1.getChildren()) {
++                            for (EasyUITree tree3 : tree2.getChildren()) {
++                                tree3.setChildren(new ArrayList<EasyUITree>());
++                            }
++                        }
++                    } else {
++                        return trees;
++                    }
++                } else {
++                    if (Integer.valueOf(wantType) == 2) {
++                        tree1.setChildren(new ArrayList<EasyUITree>());
++                    } else if (Integer.valueOf(wantType) == 3) {
++                        for (EasyUITree tree2 : tree1.getChildren()) {
++                            tree2.setChildren(new ArrayList<EasyUITree>());
++                        }
++                    }
++                }
++            }
++        }
++        return trees;
+-	}
++    }
+ }
+Index: src/main/java/com/creditease/rc/action/SalesController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/action/SalesController.java	(revision 8428)
++++ src/main/java/com/creditease/rc/action/SalesController.java	(revision )
+@@ -1,61 +1,39 @@
+ package com.creditease.rc.action;
+ 
+-import java.math.BigDecimal;
+-import java.text.DateFormat;
+-import java.text.SimpleDateFormat;
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.Calendar;
+-import java.util.Collections;
+-import java.util.Comparator;
+-import java.util.Date;
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Map.Entry;
+-import java.util.Set;
+-
+-import javax.annotation.Resource;
+-import javax.servlet.http.HttpServletRequest;
+-import javax.servlet.http.HttpServletResponse;
+-import javax.servlet.http.HttpSession;
+-
+-import org.springframework.beans.propertyeditors.CustomDateEditor;
+-import org.springframework.stereotype.Controller;
+-import org.springframework.web.bind.WebDataBinder;
+-import org.springframework.web.bind.annotation.InitBinder;
+-import org.springframework.web.bind.annotation.RequestMapping;
+-import org.springframework.web.bind.annotation.ResponseBody;
+-import org.springframework.web.servlet.ModelAndView;
+-
+ import com.creditease.core.security.SpringSecurityUtils;
+ import com.creditease.rc.common.DepartmentEntity;
+ import com.creditease.rc.domain.Message;
+ import com.creditease.rc.domain.RollingForecast;
++import com.creditease.rc.domain.SalesPlanning;
+ import com.creditease.rc.report.excel.ExcelUtils;
+ import com.creditease.rc.report.excel.TableData;
+-import com.creditease.rc.service.IJsGridReportBaseXLSXService;
+-import com.creditease.rc.service.ILaonBalanceDataService;
+-import com.creditease.rc.service.IRollingForecastSerivce;
+-import com.creditease.rc.service.ISalesPlanningService;
+-import com.creditease.rc.service.IStatisticalinfoService;
++import com.creditease.rc.service.*;
+ import com.creditease.rc.util.CommonUtil;
+ import com.creditease.rc.util.DateUtil;
+ import com.creditease.rc.util.DepartmentUtil;
+ import com.creditease.rc.util.SmpWSUtil;
+-import com.creditease.rc.vo.Combobox;
+-import com.creditease.rc.vo.DepartmentEntityVo;
+-import com.creditease.rc.vo.EasyUITree;
+-import com.creditease.rc.vo.LoanRealAndPlanning;
+-import com.creditease.rc.vo.RollingForecastExcel;
+-import com.creditease.rc.vo.RollingForecastHistory;
+-import com.creditease.rc.vo.RollingForecastMessage;
+-import com.creditease.rc.vo.RollingForecastVo;
+-import com.creditease.rc.vo.SalesPlanningTable;
+-import com.creditease.rc.vo.SalesPlanningTableVo;
++import com.creditease.rc.vo.*;
++import org.apache.commons.collections.CollectionUtils;
++import org.apache.commons.lang.StringUtils;
++import org.springframework.beans.propertyeditors.CustomDateEditor;
++import org.springframework.stereotype.Controller;
++import org.springframework.web.bind.WebDataBinder;
++import org.springframework.web.bind.annotation.InitBinder;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.ResponseBody;
++import org.springframework.web.servlet.ModelAndView;
+ 
++import javax.annotation.Resource;
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++import javax.servlet.http.HttpSession;
++import java.io.Serializable;
++import java.math.BigDecimal;
++import java.text.DateFormat;
++import java.text.SimpleDateFormat;
++import java.util.*;
++import java.util.Map.Entry;
++
+ @Controller
+ @RequestMapping("salesController")
+ public class SalesController {
+@@ -73,6 +51,9 @@
+     @Resource
+ 	private ILaonBalanceDataService laonBalanceDataService;
+ 
++	@Resource
++	private IEasyUIService easyUIService;
++
+ 	/**
+ 	 * 
+ 	 * @param binder
+@@ -375,6 +356,13 @@
+ 		modelAndView.addObject("total", total);
+ 		//modelAndView.addObject("salesPlanningTables", salesPlanningTables);
+ 		modelAndView.addObject("selectYear", year + "年");
++
++		/*大区销售计划*/
++		modelAndView.addObject("regions", DepartmentUtil.retMapByCategory.get("region"));
++		modelAndView.addObject("subs", DepartmentUtil.retMapByCategory.get("subs"));
++		modelAndView.addObject("departs", DepartmentUtil.retMapByCategory.get("departs"));
++		modelAndView.setViewName("/jsp/rc/sales/salesPlanningTable_multiple.jsp");
++		modelAndView.addObject("departmentMap", DepartmentUtil.departmentMap);
+ 		return modelAndView;
+ 	}
+ 
+@@ -394,7 +382,7 @@
+ 			combobox.setCode(String.valueOf(i));
+ 			combobox.setValue(i + "年");
+ 			if (i == year1) {
+-				combobox.setSelected(true);
++//				combobox.setSelected(true);
+ 			} else {
+ 				combobox.setSelected(false);
+ 			}
+@@ -512,45 +500,48 @@
+ 		
+ 		for (Entry<String, DepartmentEntityVo> entry : entries) {
+ 			DepartmentEntityVo departmentEntityVo = entry.getValue();
++            /*过滤大区*/
++            if(!departmentEntityVo.getDepartmentName().contains("大区")){
+-			if (CommonUtil.isEmpty(departmentEntityVo.getDepartmentIds())) {
+-				// DepartmentEntity departmentEntity = new DepartmentEntity();
+-				// departmentEntity.setDepartmentId(departmentEntityVo.getDepartmentId());
+-				// departmentEntity.setDepartmentName(departmentEntityVo.getDepartmentName());
+-				// departmentEntities.add(departmentEntity);
+-				
+-				departmentEntities.add(departmentEntityVo);
+-				//添加分中心************
+-				for (Entry<String, DepartmentEntityVo> entry2 : entrySet2) {
+-					String departmentName = entry2.getValue().getDepartmentName();
+-					if (CommonUtil.isNotEmpty(entry2.getValue().getDepartmentIds())){
+-						if(!"0".equals(entry2.getValue().getDepartmentId())){
+-							List<String> departmentIds = entry2.getValue().getDepartmentIds();
+-							Set<String> departmentSet = new HashSet<String>(departmentIds);
+-							if(departmentSet.contains(departmentEntityVo.getDepartmentId())){
+-								DepartmentEntity departmentEntity = new DepartmentEntity();
+-								departmentEntity.setDepartmentId(entry2.getValue().getDepartmentId());
+-								departmentEntity.setDepartmentName(entry2.getValue().getDepartmentName());
+-								Set<String> departmentSet2 = new HashSet<String>(entry2.getValue().getDepartmentIds());
+-								mapTemp.put(departmentEntity, departmentSet2);
+-							}
+-							
+-						}
+-					}
+-				}
+-			}else{//用于判断添加分中心
+-				if(!"0".equals(departmentEntityVo.getDepartmentId())){
+-					String getDepartmentId = departmentEntityVo.getDepartmentId();
+-					String getDepartmentName = departmentEntityVo.getDepartmentName();
+-					DepartmentEntity departmentEntity = new DepartmentEntity();
+-					departmentEntity.setDepartmentId(getDepartmentId);
+-					departmentEntity.setDepartmentName(getDepartmentName);
+-					List<String> departmentIds = departmentEntityVo.getDepartmentIds();
+-					Set<String> setTemp2 = new HashSet<String>(departmentIds);
+-					mapTemp.put(departmentEntity, setTemp2);
+-				}
+-				
+-			}
+-		}
++                if (CommonUtil.isEmpty(departmentEntityVo.getDepartmentIds())) {
++                    // DepartmentEntity departmentEntity = new DepartmentEntity();
++                    // departmentEntity.setDepartmentId(departmentEntityVo.getDepartmentId());
++                    // departmentEntity.setDepartmentName(departmentEntityVo.getDepartmentName());
++                    // departmentEntities.add(departmentEntity);
++
++                    departmentEntities.add(departmentEntityVo);
++                    //添加分中心************
++                    for (Entry<String, DepartmentEntityVo> entry2 : entrySet2) {
++                        String departmentName = entry2.getValue().getDepartmentName();
++                        if (CommonUtil.isNotEmpty(entry2.getValue().getDepartmentIds())){
++                            if(!"0".equals(entry2.getValue().getDepartmentId())){
++                                List<String> departmentIds = entry2.getValue().getDepartmentIds();
++                                Set<String> departmentSet = new HashSet<String>(departmentIds);
++                                if(departmentSet.contains(departmentEntityVo.getDepartmentId())){
++                                    DepartmentEntity departmentEntity = new DepartmentEntity();
++                                    departmentEntity.setDepartmentId(entry2.getValue().getDepartmentId());
++                                    departmentEntity.setDepartmentName(entry2.getValue().getDepartmentName());
++                                    Set<String> departmentSet2 = new HashSet<String>(entry2.getValue().getDepartmentIds());
++                                    mapTemp.put(departmentEntity, departmentSet2);
++                                }
++
++                            }
++                        }
++                    }
++                }else{//用于判断添加分中心
++                    if(!"0".equals(departmentEntityVo.getDepartmentId())){
++                        String getDepartmentId = departmentEntityVo.getDepartmentId();
++                        String getDepartmentName = departmentEntityVo.getDepartmentName();
++                        DepartmentEntity departmentEntity = new DepartmentEntity();
++                        departmentEntity.setDepartmentId(getDepartmentId);
++                        departmentEntity.setDepartmentName(getDepartmentName);
++                        List<String> departmentIds = departmentEntityVo.getDepartmentIds();
++                        Set<String> setTemp2 = new HashSet<String>(departmentIds);
++                        mapTemp.put(departmentEntity, setTemp2);
++                    }
++
++                }
++            }
++		}
+ 
+ 		// 重载sort方法
+ 		Collections.sort(departmentEntities, new Comparator<DepartmentEntity>() {
+@@ -1471,5 +1462,122 @@
+ 		String sellerId = null;
+ 		message = laonBalanceDataService.insertSynchronizationLoan(creditapplicationId, officeId, sellerId);
+ 		return message;
++	}
++
++	@RequestMapping(value = "_salesPlanningTable")
++	public ModelAndView _salesPlanningTable(HttpServletRequest request) {
++		ModelAndView modelAndView = new ModelAndView();
++		modelAndView.setViewName("/jsp/rc/sales/salesPlanning.jsp");
++
++		/*根据当前登录人获取不同的菜单数据*/
++		Set<String> userAuthoritiesSet = smpWSUtil.getUserAuthorities();
++		String me = null;
++		List<DepartmentEntityVo> seeByMeEntity = new ArrayList<DepartmentEntityVo>((List<DepartmentEntityVo>)DepartmentUtil.retMapByCategory.get("subs"));
++		List<DepartmentEntityVo> seeByMeEntity_depart = new ArrayList<DepartmentEntityVo>((List<DepartmentEntityVo>)DepartmentUtil.retMapByCategory.get("departs"));
++		List<DepartmentEntityVo> seeByMeEntity_region = new ArrayList<DepartmentEntityVo>((List<DepartmentEntityVo>)DepartmentUtil.retMapByCategory.get("region"));
++		if (userAuthoritiesSet.contains("ROLE_SALES_ADMIN")) {
++			me = "admin";
++		} else {
++			Map<String, DepartmentEntityVo> seeByMeMap = easyUIService.getDepartmentMapByAuthority();
++			List<String> regionIds = (List<String>) DepartmentUtil.retMapByCategory.get("regionIds");
++			seeByMeEntity.clear();
++			seeByMeEntity_depart.clear();
++            DepartmentEntityVo entity;
++			for (DepartmentEntityVo vo : seeByMeMap.values()) {
++				if (!regionIds.contains(vo.getDepartmentId())) {
++					entity = new DepartmentEntityVo();
++					entity.setDepartmentId(vo.getDepartmentId());
++					entity.setDepartmentName(vo.getDepartmentName());
++					if (null != vo.getDepartmentIds()) {
++						seeByMeEntity.add(entity);
++					} else {
++						seeByMeEntity_depart.add(entity);
++					}
++				}
++			}
++			if (userAuthoritiesSet.contains("ROLE_REGION")) {
++				me = "regionMgr";
++			} else if (userAuthoritiesSet.contains("ROLE_QVYUJINGLI")) {
++				me = "cityMgr";
++			}
++		}
++        int s_year = StringUtils.isNotEmpty(request.getParameter("year")) ? Integer.valueOf(request.getParameter("year")) : Calendar.getInstance().get(Calendar.YEAR);
++        String s_departmentIds = StringUtils.isNotEmpty(request.getParameter("departmentIds")) ? request.getParameter("departmentIds") : "";
++
++        if (StringUtils.isNotEmpty(s_departmentIds)) {
++            String[] arr = s_departmentIds.split(",");
++
++            List<String> a2l = Arrays.asList(arr);
++            List<String> regionIds = (List<String>)DepartmentUtil.retMapByCategory.get("regionIds");
++            List<String> intersection = (List<String>)CollectionUtils.intersection(a2l, regionIds);
++            if(!intersection.isEmpty()){
++                for(String id : intersection){
++                    for(String id1 : DepartmentUtil.departmentMap.get(id).getDepartmentIds()){
++                        s_departmentIds += "," + id1;
++                        for(String id2 : DepartmentUtil.departmentMap.get(id1).getDepartmentIds()){
++                            s_departmentIds += "," + id2;
++                        }
++                    }
++                }
++            }
++
++            List<DepartmentEntityVo> entities = new ArrayList<DepartmentEntityVo>();
++            for (DepartmentEntityVo entity : seeByMeEntity) {
++                for (String s : arr) {
++                    if (entity.getDepartmentId().equals(s)) {
++                        entities.add(entity);
++                    }
++                }
++            }
++            if(!entities.isEmpty()){
++                seeByMeEntity.clear();
++                seeByMeEntity.addAll(entities);
++            }
++            entities.clear();
++            for (DepartmentEntityVo entity : seeByMeEntity_depart) {
++                for (String s : arr) {
++                    if (entity.getDepartmentId().equals(s)) {
++                        entities.add(entity);
++                    }
++                }
++            }
++            if(!entities.isEmpty()){
++                seeByMeEntity_depart.clear();
++                seeByMeEntity_depart.addAll(entities);
++            }
++            entities.clear();
++            for (DepartmentEntityVo entity : seeByMeEntity_region) {
++                for (String s : arr) {
++                    if (entity.getDepartmentId().equals(s)) {
++                        entities.add(entity);
++                    }
++                }
++            }
++            if(!entities.isEmpty()){
++                seeByMeEntity_region.clear();
++                seeByMeEntity_region.addAll(entities);
++            }
++        }
++
++        modelAndView.addObject("map_loan", salesPlanningService.searchSalesPlanningByCase(new SalesPlanning(s_year, "0", s_departmentIds)));
++        modelAndView.addObject("map_contract", salesPlanningService.searchSalesPlanningByCase(new SalesPlanning(s_year, "1", s_departmentIds)));
++
++        modelAndView.addObject("departmentMap", DepartmentUtil.departmentMap);
++
++        modelAndView.addObject("subs", seeByMeEntity);
++		modelAndView.addObject("departs", seeByMeEntity_depart);
++        modelAndView.addObject("regions", seeByMeEntity_region);
++
++		modelAndView.addObject("me", me);
++        modelAndView.addObject("from", !s_departmentIds.equals("") ? s_departmentIds : "");
++
++		return modelAndView;
++	}
++
++    @RequestMapping(value = "saveSalesPlanning")
++    public
++    @ResponseBody
++    Message saveSalesPlanning() {
++        return salesPlanningService.saveSalesPlanning();
+-	}
++    }
+ }
+Index: WebContent/scripts/sales/salesPlanning.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/scripts/sales/salesPlanning.js	(revision 8428)
++++ WebContent/scripts/sales/salesPlanning.js	(revision )
+@@ -1,222 +1,314 @@
+-$(function() {
++$(function () {
+-	$("#year").combobox({
++    $("#year").combobox({
+-		valueField : "code",
++        valueField: "code",
+-		textField : "value",
++        textField: "value",
+-		url : serverName + "/salesController/getComboYear.do"
++        url: serverName + "/salesController/getComboYear.do"
+-	});
++    });
+-// $("#areaDepartmentIds").combobox({
+-// valueField : "code",
+-// textField : "value",
+-// width : 400,
+-// multiple : true,
+-// editable : false,
+-// url : serverName + "/salesController/getComboAreaDepartments.do",
+-// onSelect : function(record) {
+-// var getValuesArray = $("#areaDepartmentIds").combobox("getValues");
+-// if (getValuesArray.length >= 2 && getValuesArray[0] == "") {
+-// getValuesArray.shift();
+-// $("#areaDepartmentIds").combobox("setValues", getValuesArray);
+-// }
+-// if (record.code == "") {
+-// $("#areaDepartmentIds").combobox("setValue", "");
+-// }
+-// },
+-// onUnselect : function(record) {
+-// var getValuesArray = $("#areaDepartmentIds").combobox("getValues");
+-// if (getValuesArray == null || getValuesArray == "") {
+-// $("#areaDepartmentIds").combobox("setValue", "");
+-// }
+-//
+-// }
+-// });
+-	departmentComboboxTree("areaDepartmentIds", true);
+-	constructSalesPlanningTable("initialization");
++
++    if (!from) {
++        localStorage.removeItem('department');
++        localStorage.removeItem('index_when_box');
++    }
++
++    if (sessionStorage.getItem('edit')) {
++        sessionStorage.removeItem('edit');
++    }
++    if (localStorage.getItem('year')) {
++        $('#year').combobox('setValue', localStorage.getItem('year'));
++        localStorage.removeItem('year');
++    } else {
++        $('#year').combobox('setValue', new Date().getFullYear());
++    }
++
++    /*确保当前已编辑标签页数据已保存*/
++    $.fn.window.defaults.closable = false;
++    $.messager.defaults = {ok: '是', cancel: '否'};
++    $('#sales_tab').tabs({
++        'onSelect': function (title) {
++            var index = $('#sales_tab').tabs('getTabIndex', $('#sales_tab').tabs('getTab', title));
++
++            var box_name = role_to_search[me_js + index][0];
++            if (box_name) {
++                $('#box_name').html(box_name);
++            }
++            departmentTreeByType("areaDepartmentIds", role_to_search[me_js + index][1], role_to_search[me_js + index][2], localStorage.getItem('department'));
++
++            var arr_index = getIndexsofSelections();
++            if (arr_index[0] == index) {
++                $('#' + role_to_tab[me_js + index]).tabs({
++                    'onSelect': function (title) {
++                        var _index = $('#' + role_to_tab[me_js + index]).tabs('getTab', title);
++                        if (arr_index[1] != _index && sessionStorage.getItem('edit')) {
++                            $.messager.confirm('提示', '<p style="width: 85%" align="center">是否保存当前修改？</p>', function (ret) {
++                                if (ret) {
++                                    //save
++                                    sessionStorage.removeItem('edit');
++                                    saveAll();
++                                } else {
++                                    //cancel save
++                                    cancelEdit();
++                                }
+-});
++                            });
++                        }
++                    }
++                });
++            } else {
++                if (sessionStorage.getItem('edit')) {
++                    saveAll();
++                }
++            }
++        }
++    });
+ 
++    /*取消后重新显示当前标签页*/
++    var pIndex = sessionStorage.getItem('pIndex');
++    var cIndex = sessionStorage.getItem('cIndex');
++    if (pIndex && cIndex) {
++        actions['select']([pIndex, cIndex]);
++    }
++    sessionStorage.removeItem('pIndex');
++    sessionStorage.removeItem('cIndex');
++});
++
++
++/*
++ *   操作：保存 编辑 取消 重填 选中
++ */
++var actions = {
++    '00reset': resetFunc(['sales_tab_region_loan', 'sales_tab_subs_loan_counterparts', 'sales_tab_depart_loan_counterparts']),
++    '01reset': resetFunc(['sales_tab_region_contract', 'sales_tab_subs_contract_counterparts', 'sales_tab_depart_contract_counterparts']),
++    '10reset': resetFunc(['sales_tab_subs_loan']),
++    '11reset': resetFunc(['sales_tab_subs_contract']),
++    '20reset': resetFunc(['sales_tab_depart_loan']),
++    '21reset': resetFunc(['sales_tab_depart_contract']),
++    'select': selectFunc(),
++    'edit': editFunc()
++};
++
++/*
++ *   角色对应子标签页ID
++ */
++var role_to_tab = {
++    'admin': 'sales_tab_region',
++    'regionMgr': 'sales_tab_subs',
++    'cityMgr': 'sales_tab_depart',
++    'admin0': 'sales_tab_region',
++    'admin00': 'sales_tab_region_loan',
++    'admin01': 'sales_tab_region_contract',
++    'regionMgr0': 'sales_tab_subs',
++    'regionMgr00': 'sales_tab_subs_loan_counterparts',
++    'regionMgr01': 'sales_tab_subs_contract_counterparts',
++    'cityMgr0': 'sales_tab_depart',
++    'cityMgr00': 'sales_tab_depart_loan_counterparts',
++    'cityMgr01': 'sales_tab_depart_contract_counterparts',
++    'admin1': 'sales_tab_subs',
++    'admin10': 'sales_tab_subs_loan',
++    'admin11': 'sales_tab_subs_contract',
++    'admin2': 'sales_tab_depart',
++    'admin20': 'sales_tab_depart_loan',
++    'admin21': 'sales_tab_depart_contract'
++};
++
++/*
++ *   角色对应标识，用于保存
++ */
++var role_to_saving = {
++    'admin00': 'region_loan',
++    'admin01': 'region_contract',
++    'admin10': 'subs_loan',
++    'admin11': 'subs_contract',
++    'admin20': 'depart_loan',
++    'admin21': 'depart_contract',
++    'regionMgr00': 'subs_loan',
++    'regionMgr01': 'subs_contract',
++    'cityMgr00': 'depart_loan',
++    'cityMgr01': 'depart_contract'
++};
++
++/*
++ *   角色对应搜索框
++ */
++var role_to_search = {
++    'admin0': ['请选择大区', 1, 'admin'],
++    'admin1': ['请选择大区', 1, 'admin'],
++    'admin2': ['请选择大区', 1, 'admin'],
++    'regionMgr0': ['请选择分中心', 2, 'regionMgr'],
++    'cityMgr0': ['请选择营业部', 3, 'cityMgr']
++};
++
++/*
++ *   保存
++ */
+ function saveAll() {
++    $.messager.confirm('提示', '<p style="width: 85%" align="center">确定保存吗？</p>', function (ret) {
++        if (ret) {
++            //save
+-	$("#save").linkbutton("disable");
+-	$("#redo").linkbutton("disable");
+-	$("#reload").linkbutton("disable");
++            $("#save").linkbutton("disable");
++            $("#redo").linkbutton("disable");
++            $("#reload").linkbutton("disable");
+-	$(".easyui-numberbox").addClass("myInputBoder");
++            $(".easyui-numberbox").addClass("myInputBorder");
+-	$(".easyui-numberbox").attr("readonly", "readonly");
++            $(".easyui-numberbox").attr("readonly", "readonly");
+-	ajaxSubmit(serverName + "/salesController/saveAll.do", $("#form1").serialize() + "&" + $("#form2").serialize(), function(r) {
++            var arr_index = getIndexsofSelections();
++            var form_parent = role_to_tab[me_js + arr_index[0] + arr_index[1]];
++            var types = role_to_saving[me_js + arr_index[0] + arr_index[1]];
++            ajaxSubmit(serverName + "/salesController/saveSalesPlanning.do", {
++                'd': JSON.stringify($('#' + form_parent + ' form').serialize()),
++                'types': types
++            }, function (r) {
++                memMe();
++                $("#edit").linkbutton("enable");
+-		if (r.success) {
+-			$.messager.show({
++                if (r.success) {
++                    $.messager.show({
+-				showType : "show",
++                        showType: "show",
+-				timeout : 5000,
++                        timeout: 5000,
+-				title : "消息",
++                        title: "消息",
+-				msg : r.msg
++                        msg: r.msg
+-			});
++                    });
+-			$("#save").linkbutton("disable");
+-			$("#redo").linkbutton("disable");
+-			$("#reload").linkbutton("disable");
+-			$("#edit").linkbutton("enable");
+-			constructSalesPlanningTable(null);
+-		} else {
+-			$.messager.show({
+-				showType : "show",
+-				timeout : 5000,
+-				title : "消息",
+-				msg : r.msg
++
++                }
+-			});
+-		}
+-	});
++            });
++        }
++    });
+ }
++
++/*
++ *   编辑
++ */
+ function edit() {
++    var arr_index = getIndexsofSelections();
++    actions['edit']([arr_index[0], arr_index[1]]);
++    sessionStorage.setItem('edit', 'any');
++}
++
++/*
++ *   取消
++ */
++function cancelEdit(type) {
++    var cancelAction = function () {
++        memMe();
++        searchSalesPlan('', '', '');
++    }
++    if (type == 'cancelEdit') {
++        $.messager.confirm('提示', '<p style="width: 85%" align="center">确定取消吗？</p>', function (ret) {
++            if (ret) {
++                cancelAction();
++            }
++        });
++    } else {
++        cancelAction();
++    }
++
++}
++
++/*
++ *   重填
++ */
++function clearSelected() {
++    $.messager.confirm('提示', '您确定重填当前所有销售计划数据吗？', function (ret) {
++        if (ret) {
++            var arr_index = getIndexsofSelections();
++            actions['' + arr_index[0] + arr_index[1] + 'reset']();
++        }
++    });
++}
++function resetFunc(tabArr) {
++    function nest() {
++        for (var i = 0; i < tabArr.length; i++) {
++            if (tabArr[i]) {
++                $('#' + tabArr[i] + ' form').trigger('reset');
++            }
++        }
++    }
++
++    return nest;
++}
++function selectFunc() {
++    function nest(tabIndexArr) {
++        $('#sales_tab').tabs('select', Number.parseInt(tabIndexArr[0]));
++        $('#' + role_to_tab[[me_js] + tabIndexArr[0]]).tabs('select', Number.parseInt(tabIndexArr[1]));
++    }
++
++    return nest;
++}
++function editFunc() {
++    function nest(tabIndexArr) {
+-	$("#save").linkbutton("enable");
+-	$("#redo").linkbutton("enable");
+-	$("#reload").linkbutton("enable");
+-	$("#edit").linkbutton("disable");
++        $("#save").linkbutton("enable");
++        $("#redo").linkbutton("enable");
++        $("#reload").linkbutton("enable");
++        $("#edit").linkbutton("disable");
+-	$(".easyui-numberbox").removeClass("myInputBoder");
+-	$(".easyui-numberbox").removeAttr("readonly");
++        $('#' + role_to_tab[[me_js] + tabIndexArr[0] + tabIndexArr[1]] + ' .myInputBorder').removeClass("myInputBorder").removeAttr("readonly");
+-}
++    }
+-function cancelEdit() {
+-	$("#save").linkbutton("disable");
+-	$("#redo").linkbutton("disable");
+-	$("#reload").linkbutton("disable");
+-	$("#edit").linkbutton("enable");
+-	constructSalesPlanningTable(null);
++
++    return nest;
+ }
+-function clearSelected() {
+-	var id = $("#repaymentSearchTab").tabs("getSelected")[0].children[0].id;
+-	if (id == "form1") {
+-		var jan = $("#form1 input[name$='].jan']");
+-		var feb = $("#form1 input[name$='].feb']");
+-		var mar = $("#form1 input[name$='].mar']");
+-		var apr = $("#form1 input[name$='].apr']");
+-		var may = $("#form1 input[name$='].may']");
+-		var jun = $("#form1 input[name$='].jun']");
+-		var jul = $("#form1 input[name$='].jul']");
+-		var aug = $("#form1 input[name$='].aug']");
+-		var sep = $("#form1 input[name$='].sep']");
+-		var oct = $("#form1 input[name$='].oct']");
+-		var nov = $("#form1 input[name$='].nov']");
+-		var dec = $("#form1 input[name$='].dec']");
+-		$.each(jan, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(feb, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(mar, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(apr, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(may, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(jun, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(jul, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(aug, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(sep, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(oct, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(nov, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(dec, function(i, val) {
+-			$("#form1 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-	} else if (id == "form2") {
+-		var jan = $("#form2 input[name$='].jan']");
+-		var feb = $("#form2 input[name$='].feb']");
+-		var mar = $("#form2 input[name$='].mar']");
+-		var apr = $("#form2 input[name$='].apr']");
+-		var may = $("#form2 input[name$='].may']");
+-		var jun = $("#form2 input[name$='].jun']");
+-		var jul = $("#form2 input[name$='].jul']");
+-		var aug = $("#form2 input[name$='].aug']");
+-		var sep = $("#form2 input[name$='].sep']");
+-		var oct = $("#form2 input[name$='].oct']");
+-		var nov = $("#form2 input[name$='].nov']");
+-		var dec = $("#form2 input[name$='].dec']");
+-		$.each(jan, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(feb, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(mar, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(apr, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(may, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(jun, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(jul, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(aug, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(sep, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(oct, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(nov, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-		$.each(dec, function(i, val) {
+-			$("#form2 input[numberboxname='" + val.name + "']").numberbox("setValue", "");
+-		});
+-	} else {
+-		alert("clearSelected js方法出错！");
++
++/*
++ *   获取已选中父子标签ID
++ */
++function getIndexsofSelections() {
++    //parent
++    var tab = $('#sales_tab').tabs('getSelected');
++    var index = $('#sales_tab').tabs('getTabIndex', tab);
++    //child
++    var _tab, _index;
++    if (index == 0) {
++        _tab = $('#' + role_to_tab[me_js]).tabs('getSelected');
++        _index = $('#' + role_to_tab[me_js]).tabs('getTabIndex', _tab);
++    } else if (index == 1) {
++        _tab = $('#sales_tab_subs').tabs('getSelected');
++        _index = $('#sales_tab_subs').tabs('getTabIndex', _tab);
++    } else if (index == 2) {
++        _tab = $('#sales_tab_depart').tabs('getSelected');
++        _index = $('#sales_tab_depart').tabs('getTabIndex', _tab);
+-	}
++    }
++    return [index, _index]
+ }
+-function constructSalesPlanningTable(type) {
+-	// 初始化时为了避免渲染时差问题
+-	if (type == "initialization") {
+-		var areaDepartmentIds = null;
+-		var year = null;
+-		if ($("#salesPlanningTabs").tabs("exists", "销售计划")) {
+-			$("#salesPlanningTabs").tabs("close", "销售计划");
++function memMe() {
++    sessionStorage.clear();
++    var arr_index = getIndexsofSelections();
++    sessionStorage.setItem('pIndex', arr_index[0]);
++    sessionStorage.setItem('cIndex', arr_index[1]);
+-		}
++}
+-		$("#salesPlanningTabs").tabs("add", {
+-			title : "销售计划",
+-			href : serverName + "/salesController/salesPlanningTable.do?areaDepartmentIds=" + areaDepartmentIds + "&year=" + year,
+-			onLoad : function(r) {
++function memYearAndDepartment() {
++    localStorage.setItem('year', $('#year').combobox('getValue'));
++    localStorage.setItem('department', $('#areaDepartmentIds').combobox('getValues'));
+-			}
++}
+-		});
+-	} else {// 搜索按钮执行重新组建table
+-		if ($("#searchForm").form("validate")) {
+-			$("#save").linkbutton("disable");
+-			$("#redo").linkbutton("disable");
+-			$("#reload").linkbutton("disable");
+-			$("#edit").linkbutton("enable");
+-			var departmentNameValues = $("#areaDepartmentIds").combotree("getValues");
+-			var departmentNamestr = departmentNameValues.join(",");
+-			var areaDepartmentIds = departmentNamestr;
+-			var year = $("#year").combobox("getValue");
+-			if ($("#salesPlanningTabs").tabs("exists", "销售计划")) {
+-				$("#salesPlanningTabs").tabs("close", "销售计划");
++
++function searchSalesPlan(year, departmentIds, from) {
++    var alreadyYear = $('#year').combobox('getValue');
++    if (!year) {
++        year = alreadyYear;
+-			}
++    }
+-			$("#salesPlanningTabs").tabs("add", {
+-				title : "销售计划",
+-				href : serverName + "/salesController/salesPlanningTable.do?areaDepartmentIds=" + areaDepartmentIds + "&year=" + year,
+-				onLoad : function(r) {
++    var alreadyIds = $('#areaDepartmentIds').combotree('getValues').join(',');
++    if (!departmentIds) {
++        if (alreadyIds) {
++            departmentIds = alreadyIds;
++        } else if (from) {
++            $.messager.alert("提示", '<p style="width: 85%;" align="center">请选择营业部</p>', "info");
++            return;
+-				}
++        }
+-			});
+-		} else {
+-			$.messager.alert("提示", '请选择营业部', "warning");
+-		}
++    }
++    memMe();
++    memYearAndDepartment();
++    window.location.href = serverName + '/salesController/_salesPlanningTable.do?year=' + year + '&departmentIds=' + departmentIds;
+-	}
++}
+ 
++/*
++ *   分别获取（操作人-对应）大区、分中心、营业部
++ */
++function departmentTreeByType(id, type, role, selected) {
++    ajaxSubmit(serverName + "/easyUIController/departmentTreeByType.do", {wantType: type, role: role}, function (r) {
++        $("#" + id + "").combotree({
++            data: r,
++            multiple: true,
++            editable: false,
++            onlyLeafCheck: true,
++            required: true,
++            onLoadSuccess: function () {
++                if (selected) {
++                    $('#' + id).combotree('setValues', selected.split(','));
++                }
++            }
++        });
++    });
+ }
+Index: WebContent/jsp/rc/sales/salesPlanningTable_common.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanningTable_common.jsp	(revision )
++++ WebContent/jsp/rc/sales/salesPlanningTable_common.jsp	(revision )
+@@ -0,0 +1,122 @@
++<%--
++  Created by IntelliJ IDEA.
++  User: v-weizhang
++  Date: 2015-1-27
++  Time: 16:20
++  To change this template use File | Settings | File Templates.
++--%>
++<%@ page contentType="text/html;charset=UTF-8" language="java" %>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
++
++<td class="myTD">
++    <input type="text" name="jan" value="${map_contract[departmentId].jan}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].jan}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++    <input type="hidden" name="departmentId" value="${departmentId}"/>
++    <input type="hidden" name="departmentName" value="${departmentName}"/>
++</td>
++<td class="myTD">
++    <input type="text" name="feb" value="${map_contract[departmentId].feb}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].feb}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="mar" value="${map_contract[departmentId].mar}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].mar}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="apr" value="${map_contract[departmentId].apr}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].apr}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/></td>
++<td class="myTD">
++    <input type="text" name="may" value="${map_contract[departmentId].may}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].may}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="jun" value="${map_contract[departmentId].jun}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].jun}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="jul" value="${map_contract[departmentId].jul}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].jul}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="aug" value="${map_contract[departmentId].aug}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].aug}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="sep" value="${map_contract[departmentId].sep}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].sep}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="oct" value="${map_contract[departmentId].oct}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].oct}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="nov" value="${map_contract[departmentId].nov}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].nov}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="dec" value="${map_contract[departmentId].dec}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly" precision="2"
++            <c:if test="${not empty map_contract[departmentId].dec}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++
++
++
+Index: src/main/java/com/creditease/rc/dao/impl/SalesPlanningDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/dao/impl/SalesPlanningDao.java	(revision 8428)
++++ src/main/java/com/creditease/rc/dao/impl/SalesPlanningDao.java	(revision )
+@@ -58,4 +58,25 @@
+ 		baseDao.batchUpdate("SALESPLANNING.dynamicUpdate", updateList);
+ 		return true;
+ 	}
++
++    @Override
++    public List<Integer> searchSalesPlanningDel(Map m) {
++        return (List<Integer>)baseDao.queryList("SALESPLANNING.searchSalesPlanningDel", m);
++    }
++
++    @Override
++    public boolean saveSalesPlannings(List<SalesPlanning> list) {
++        baseDao.batchInsert("SALESPLANNING.saveSalesPlanning", list);
++        return true;
++    }
++
++    @Override
++    public void deleteSalesPlannings(List<Integer> ids) {
++        baseDao.batchDelete("SALESPLANNING.deleteSalesPlanning", ids);
++    }
++
++    @Override
++    public List<SalesPlanning> searchSalesPlanningByCase(Map<String, Object> map) {
++        return (List<SalesPlanning>) baseDao.queryList("SALESPLANNING.searchSalesPlanningByCase", map);
++    }
+ }
+Index: WebContent/jsp/rc/sales/salesPlanningTable_common_loan.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanningTable_common_loan.jsp	(revision )
++++ WebContent/jsp/rc/sales/salesPlanningTable_common_loan.jsp	(revision )
+@@ -0,0 +1,122 @@
++<%--
++  Created by IntelliJ IDEA.
++  User: v-weizhang
++  Date: 2015-1-27
++  Time: 16:20
++  To change this template use File | Settings | File Templates.
++--%>
++<%@ page contentType="text/html;charset=UTF-8" language="java" %>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
++
++<td class="myTD">
++    <input type="text" name="jan" value="${map_loan[departmentId].jan}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].jan}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++    <input type="hidden" name="departmentId" value="${departmentId}"/>
++    <input type="hidden" name="departmentName" value="${departmentName}"/>
++</td>
++<td class="myTD">
++    <input type="text" name="feb" value="${map_loan[departmentId].feb}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].feb}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="mar" value="${map_loan[departmentId].mar}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].mar}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="apr" value="${map_loan[departmentId].apr}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].apr}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/></td>
++<td class="myTD">
++    <input type="text" name="may" value="${map_loan[departmentId].may}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].may}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="jun" value="${map_loan[departmentId].jun}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].jun}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="jul" value="${map_loan[departmentId].jul}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].jul}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="aug" value="${map_loan[departmentId].aug}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].aug}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="sep" value="${map_loan[departmentId].sep}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].sep}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="oct" value="${map_loan[departmentId].oct}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].oct}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="nov" value="${map_loan[departmentId].nov}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].nov}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++<td class="myTD">
++    <input type="text" name="dec" value="${map_loan[departmentId].dec}" style="width: 100%;"
++           class="easyui-numberbox myInputBorder" readonly="readonly"
++            <c:if test="${not empty map_loan[departmentId].dec}">
++                <c:if test="${! (me eq 'admin')}">
++                    disabled
++                </c:if>
++            </c:if>/>
++</td>
++
++
++
+Index: src/main/java/com/creditease/rc/domain/SalesPlanning.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/domain/SalesPlanning.java	(revision 8428)
++++ src/main/java/com/creditease/rc/domain/SalesPlanning.java	(revision )
+@@ -4,13 +4,29 @@
+ 
+ public class SalesPlanning {
+ 
++    public SalesPlanning() {
++    }
++
++    public SalesPlanning(Integer year, String type) {
++        this.year = year;
++        this.type = type;
++    }
++
++    public SalesPlanning(Integer year, String type, String areaDepartmentIds) {
++        this.year = year;
++        this.type = type;
++        this.areaDepartmentIds = areaDepartmentIds;
++    }
++
+-	private Long salesPlanningId; // 销售计划主键
++    private Long salesPlanningId; // 销售计划主键
+ 	private Integer year; // 年份
+ 	private Integer month; // 月份
+ 	private String type; // 数据类型：0、放款量，1、合同金额
+-	private Long areaDepartmentId; // 营业部ID
+-	private String areaDepartmentName; // 营业部名称
++	private Long areaDepartmentId; // 营业部ID （2015-02-03 需求变更：也值大区ID、分中心ID）
++	private String areaDepartmentIds; // 营业部IDs ..s
++	private String areaDepartmentName; // 营业部名称 （2015-02-03 需求变更：也值大区名称、分中心名称）
+ 	private BigDecimal value; // 数值
++	private String planType; // 大区销售计划、分中心..、营业部..
+ 
+ 	public Long getSalesPlanningId() {
+ 		return salesPlanningId;
+@@ -68,4 +84,19 @@
+ 		this.value = value;
+ 	}
+ 
++	public String getPlanType() {
++		return planType;
++	}
++
++	public void setPlanType(String planType) {
++		this.planType = planType;
++	}
++
++    public String getAreaDepartmentIds() {
++        return areaDepartmentIds;
++    }
++
++    public void setAreaDepartmentIds(String areaDepartmentIds) {
++        this.areaDepartmentIds = areaDepartmentIds;
++    }
+ }
+\ No newline at end of file
+Index: WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp	(revision )
++++ WebContent/jsp/rc/sales/salesPlanningTable_multiple.jsp	(revision )
+@@ -0,0 +1,389 @@
++<%@ page language="java" import="java.util.*" pageEncoding="utf-8" %>
++<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
++<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
++<html>
++<script>
++    function configWidthAndColspan(tabId, width, colspan) {
++        $('#' + tabId + ' th').first().attr('width', width).attr('colspan', colspan);
++    }
++</script>
++<body>
++<div id="tol">
++    <a id="edit" class="easyui-linkbutton" plain="true" iconCls="icon-edit" onclick="edit()">编辑</a>
++    <a id="save" class="easyui-linkbutton" plain="true" iconCls="icon-save" disabled="true"
++       onclick="saveAll()">保存</a>
++    <a id="redo" class="easyui-linkbutton" plain="true" iconCls="icon-redo" disabled="true"
++       onclick="cancelEdit('cancelEdit')">取消</a>
++</div>
++<div id="sales_tab" class="easyui-tabs" style="padding: 10px;" fit="true" tools="#tol">
++
++    <c:set var="map_loan" value="${map_loan}" scope="request"/>
++    <c:set var="map_contract" value="${map_contract}" scope="request"/>
++
++    <script>
++        var me_js = '${me}';
++        var from = '${from}';
++    </script>
++    <c:if test="${me eq 'admin'}">
++        <div id="tab1" title="大区销售计划">
++            <div id="sales_tab_region" class="easyui-tabs" style="padding: 10px;" fit="true">
++                    <%--大区销售计划 apply for admin--%>
++                <div id="sales_tab_region_loan" title="放款量（单位/笔）">
++                    <form>
++                        <table style="width: 100%; height: 100%;" cellspacing="0px">
++                            <tr style="width: 100%">
++                                <th class="myTH">
++                                    <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                </th>
++                                <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                            </tr>
++                            <c:forEach items="${regions}" var="region">
++                                <tr>
++                                    <td class="myTH">
++                                            ${region.departmentName}
++                                    </td>
++                                    <c:set var="departmentName" value="${region.departmentName}" scope="request"/>
++                                    <c:set var="departmentId" value="${region.departmentId}" scope="request"/>
++                                    <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                </tr>
++                            </c:forEach>
++                        </table>
++                    </form>
++                </div>
++                <div id="sales_tab_region_contract" title="合同金额（单位/万元）">
++                    <form>
++                        <table style="width: 100%; height: 100%;" cellspacing="0px">
++                            <tr style="width: 100%">
++                                <th class="myTH">
++                                    <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                </th>
++                                <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                            </tr>
++                            <c:forEach items="${regions}" var="region">
++                                <tr>
++                                    <td class="myTH">
++                                            ${region.departmentName}
++                                    </td>
++                                    <c:set var="departmentName" value="${region.departmentName}" scope="request"/>
++                                    <c:set var="departmentId" value="${region.departmentId}" scope="request"/>
++                                    <jsp:include page="salesPlanningTable_common.jsp" flush="true"/>
++                                </tr>
++                            </c:forEach>
++                        </table>
++                    </form>
++                </div>
++            </div>
++        </div>
++        <script>
++            configWidthAndColspan('sales_tab_region_loan', '10%', 0);
++            configWidthAndColspan('sales_tab_region_contract', '10%', 0);
++        </script>
++    </c:if>
++    <c:if test="${me eq 'admin' or me eq 'regionMgr'}">
++        <div id="tab2" title="分中心销售计划">
++            <div id="sales_tab_subs" class="easyui-tabs" style="padding: 10px;" fit="true">
++                <c:choose>
++                    <c:when test="${me eq 'admin'}">
++                        <div id="sales_tab_subs_loan" title="放款量（单位/笔）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--分中心销售计划 apply for admin--%>
++                                    <c:forEach items="${regions}" var="region">
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <tr>
++                                                <c:if test="${status.count == 1}">
++                                                    <td class="myTH"
++                                                        rowspan="${fn:length(departmentMap[region.departmentId].departmentIds)}"
++                                                        width="7%">
++                                                            ${region.departmentName}
++                                                    </td>
++                                                </c:if>
++                                                <td class="myTH" width="10%">
++                                                        ${departmentMap[entity].departmentName}
++                                                </td>
++                                                <c:set var="departmentName" value="${departmentMap[entity].departmentName}" scope="request"/>
++                                                <c:set var="departmentId" value="${departmentMap[entity].departmentId}" scope="request"/>
++                                                <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                            </tr>
++                                        </c:forEach>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                        <div id="sales_tab_subs_contract" title="合同金额（单位/万元）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--分中心销售计划 apply for admin--%>
++                                    <c:forEach items="${regions}" var="region">
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <tr>
++                                                <c:if test="${status.count == 1}">
++                                                    <td class="myTH"
++                                                        rowspan="${fn:length(departmentMap[region.departmentId].departmentIds)}"
++                                                        width="7%">
++                                                            ${region.departmentName}
++                                                    </td>
++                                                </c:if>
++                                                <td class="myTH" width="10%">
++                                                        ${departmentMap[entity].departmentName}
++                                                </td>
++                                                <c:set var="departmentName" value="${departmentMap[entity].departmentName}" scope="request"/>
++                                                <c:set var="departmentId" value="${departmentMap[entity].departmentId}" scope="request"/>
++                                                <jsp:include page="salesPlanningTable_common.jsp" flush="true"/>
++                                            </tr>
++                                        </c:forEach>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                    </c:when>
++                    <%--分中心销售计划 apply for counterparts--%>
++                    <c:when test="${me eq 'regionMgr'}">
++                        <div id="sales_tab_subs_loan_counterparts" title="放款量（单位/笔）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                    <c:forEach items="${subs}" var="sub">
++                                        <tr>
++                                            <td class="myTH" width="7%">
++                                                    ${sub.departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${sub.departmentName}" scope="request"/>
++                                            <c:set var="departmentId" value="${sub.departmentId}" scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                        <div id="sales_tab_subs_contract_counterparts" title="合同金额（单位/万元）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                    <c:forEach items="${subs}" var="sub">
++                                        <tr>
++                                            <td class="myTH" width="7%">
++                                                    ${sub.departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${sub.departmentName}" scope="request"/>
++                                            <c:set var="departmentId" value="${sub.departmentId}" scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                    </c:when>
++                </c:choose>
++                </table>
++                </form>
++            </div>
++        </div>
++        <script>
++            configWidthAndColspan('sales_tab_subs_loan', '15%', 2);
++            configWidthAndColspan('sales_tab_subs_contract', '15%', 2);
++            configWidthAndColspan('sales_tab_subs_loan_counterparts', '10%', 1);
++            configWidthAndColspan('sales_tab_subs_contract_counterparts', '10%', 1);
++        </script>
++    </c:if>
++    <c:if test="${me eq 'admin' or me eq 'cityMgr'}">
++        <div id="tab3" title="营业部销售计划">
++            <div id="sales_tab_depart" class="easyui-tabs" style="padding: 10px;" fit="true">
++                <c:choose>
++                    <c:when test="${me eq 'admin'}">
++                        <div id="sales_tab_depart_loan" title="放款量（单位/笔）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--营业部销售计划 apply for admin--%>
++                                    <c:forEach items="${regions}" var="region">
++                                        <c:set var="regionMerge" value="0"></c:set>
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <c:forEach items="${departmentMap[entity].departmentIds}" var="_entity"
++                                                       varStatus="_status">
++                                                <c:if test="${_status.last}">
++                                                    <c:set var="regionMerge"
++                                                           value="${regionMerge + _status.count}"></c:set>
++                                                </c:if>
++                                            </c:forEach>
++                                        </c:forEach>
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <c:forEach items="${departmentMap[entity].departmentIds}" var="_entity"
++                                                       varStatus="_status">
++                                                <tr>
++                                                    <c:if test="${status.count == 1 && _status.count == 1}">
++                                                        <td class="myTH" width="10%" rowspan="${regionMerge}">
++                                                                ${region.departmentName}
++                                                        </td>
++                                                    </c:if>
++                                                    <c:if test="${_status.count == 1}">
++                                                        <td class="myTH" width="10%"
++                                                            rowspan="${fn:length(departmentMap[entity].departmentIds)}">
++                                                                ${departmentMap[entity].departmentName}
++                                                        </td>
++                                                    </c:if>
++                                                    <td class="myTH" width="13%">
++                                                            ${departmentMap[_entity].departmentName}
++                                                    </td>
++                                                    <c:set var="departmentName" value="${departmentMap[_entity].departmentName}" scope="request"/>
++                                                    <c:set var="departmentId" value="${departmentMap[_entity].departmentId}" scope="request"/>
++                                                    <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                                </tr>
++                                            </c:forEach>
++                                        </c:forEach>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                        <div id="sales_tab_depart_contract" title="合同金额（单位/万元）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--营业部销售计划 apply for admin--%>
++                                    <c:forEach items="${regions}" var="region">
++                                        <c:set var="regionMerge" value="0"></c:set>
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <c:forEach items="${departmentMap[entity].departmentIds}" var="_entity"
++                                                       varStatus="_status">
++                                                <c:if test="${_status.last}">
++                                                    <c:set var="regionMerge"
++                                                           value="${regionMerge + _status.count}"></c:set>
++                                                </c:if>
++                                            </c:forEach>
++                                        </c:forEach>
++                                        <c:forEach items="${departmentMap[region.departmentId].departmentIds}"
++                                                   var="entity"
++                                                   varStatus="status">
++                                            <c:forEach items="${departmentMap[entity].departmentIds}" var="_entity"
++                                                       varStatus="_status">
++                                                <tr>
++                                                    <c:if test="${status.count == 1 && _status.count == 1}">
++                                                        <td class="myTH" width="10%" rowspan="${regionMerge}">
++                                                                ${region.departmentName}
++                                                        </td>
++                                                    </c:if>
++                                                    <c:if test="${_status.count == 1}">
++                                                        <td class="myTH" width="10%"
++                                                            rowspan="${fn:length(departmentMap[entity].departmentIds)}">
++                                                                ${departmentMap[entity].departmentName}
++                                                        </td>
++                                                    </c:if>
++                                                    <td class="myTH" width="13%">
++                                                            ${departmentMap[_entity].departmentName}
++                                                    </td>
++                                                    <c:set var="departmentName" value="${departmentMap[_entity].departmentName}" scope="request"/>
++                                                    <c:set var="departmentId" value="${departmentMap[_entity].departmentId}" scope="request"/>
++                                                    <jsp:include page="salesPlanningTable_common.jsp" flush="true"/>
++                                                </tr>
++                                            </c:forEach>
++                                        </c:forEach>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                    </c:when>
++                    <c:when test="${me eq 'cityMgr'}">
++                        <div id="sales_tab_depart_loan_counterparts" title="放款量（单位/笔）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年放款量</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--营业部销售计划 apply for counterparts--%>
++                                    <c:forEach items="${departs}" var="depart">
++                                        <tr>
++                                            <td class="myTH" width="10%">
++                                                    ${depart.departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${depart.departmentName}" scope="request"/>
++                                            <c:set var="departmentId" value="${depart.departmentId}" scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common_loan.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                        <div id="sales_tab_depart_contract_counterparts" title="合同金额（单位/万元）">
++                            <form>
++                                <table style="width: 100%; height: 100%;" cellspacing="0px">
++                                    <tr style="width: 100%">
++                                        <th class="myTH">
++                                            <font style="font-weight: bold; color: red;">${year}年合同金额</font>
++                                        </th>
++                                        <jsp:include page="salesPlanningTable_common_month.jsp" flush="true"/>
++                                    </tr>
++                                        <%--营业部销售计划 apply for counterparts--%>
++                                    <c:forEach items="${departs}" var="depart">
++                                        <tr>
++                                            <td class="myTH" width="10%">
++                                                    ${depart.departmentName}
++                                            </td>
++                                            <c:set var="departmentName" value="${depart.departmentName}" scope="request"/>
++                                            <c:set var="departmentId" value="${depart.departmentId}" scope="request"/>
++                                            <jsp:include page="salesPlanningTable_common.jsp" flush="true"/>
++                                        </tr>
++                                    </c:forEach>
++                                </table>
++                            </form>
++                        </div>
++                    </c:when>
++                </c:choose>
++            </div>
++        </div>
++        <script>
++            configWidthAndColspan('sales_tab_depart_loan', '15%', 3);
++            configWidthAndColspan('sales_tab_depart_contract', '15%', 3);
++            configWidthAndColspan('sales_tab_depart_loan_counterparts', '15%', 0);
++            configWidthAndColspan('sales_tab_depart_contract_counterparts', '15%', 0);
++        </script>
++    </c:if>
++</div>
++</body>
++</html>
+\ No newline at end of file
+Index: src/main/java/com/creditease/rc/service/impl/EasyUIService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/impl/EasyUIService.java	(revision 8428)
++++ src/main/java/com/creditease/rc/service/impl/EasyUIService.java	(revision )
+@@ -10,9 +10,6 @@
+ import javax.annotation.PostConstruct;
+ import javax.annotation.Resource;
+ 
+-import com.creditease.core.security.User;
+-import com.creditease.rc.domain.Employee;
+-import com.creditease.rc.service.ICustomerBasicInfoService;
+ import org.springframework.stereotype.Service;
+ 
+ import com.creditease.core.security.SpringSecurityUtils;
+@@ -22,73 +19,36 @@
+ import com.creditease.rc.util.DepartmentUtil;
+ import com.creditease.rc.util.SmpWSUtil;
+ import com.creditease.rc.vo.DepartmentEntityVo;
+-import com.creditease.rc.vo.EasyUITree;
+ 
+ @Service
+ public class EasyUIService implements IEasyUIService {
+ 	@Resource
+ 	private SmpWSUtil smpWSUtil;
+-	@Resource
+-	private ICustomerBasicInfoService customerBasicInfoService;
++
+-	@PostConstruct
+-	public void constructDepartmentMap() {
++    @PostConstruct
++    public void constructDepartmentMap() {
+-		// TODO Auto-generated method stub
+-		System.out.println("启动时调用smp构建营业部MAP");
++        System.out.println("启动时调用smp构建营业部MAP");
+-		DepartmentEntityVo departmentEntityVoAll = new DepartmentEntityVo();
+-		List<String> cityDepartmentIdList = new ArrayList<String>();
+-		departmentEntityVoAll.setDepartmentId("0");
+-		departmentEntityVoAll.setDepartmentName("全部");
+-		departmentEntityVoAll.setDepartmentIds(cityDepartmentIdList);
+-		DepartmentUtil.departmentMap.put("0", departmentEntityVoAll);
+-		Map<String, String> allCityDepartMap = smpWSUtil.getAllCityDepart();
+-		Set<Entry<String, String>> allCityDepartmentSet = allCityDepartMap.entrySet();
+-		for (Entry<String, String> cityDepartment : allCityDepartmentSet) {
+-			String cityDepartmentId = cityDepartment.getKey();
+-			String cityDepartmentName = cityDepartment.getValue();
+-			cityDepartmentIdList.add(cityDepartmentId);
+-			DepartmentEntityVo departmentEntityVoCity = new DepartmentEntityVo();
+-			departmentEntityVoCity.setDepartmentId(cityDepartmentId);
+-			departmentEntityVoCity.setDepartmentName(cityDepartmentName);
+-			List<String> areaDepartmentIdList = new ArrayList<String>();
+-			departmentEntityVoCity.setDepartmentIds(areaDepartmentIdList);
+-
+-			DepartmentUtil.departmentMap.put(cityDepartmentId, departmentEntityVoCity);
+-
+-			List<DepartmentEntity> areaDepartmentEntities = smpWSUtil
+-					.getSubordinateDepartListByDepartId(cityDepartmentId);
+-
+-			for (DepartmentEntity areaDepartmentEntity : areaDepartmentEntities) {
+-				String areaDepartmentId = areaDepartmentEntity.getDepartmentId();
+-				String areaDepartmentName = areaDepartmentEntity.getDepartmentName();
+-				areaDepartmentIdList.add(areaDepartmentId);
+-				DepartmentEntityVo departmentEntityVoArea = new DepartmentEntityVo();
+-				departmentEntityVoArea.setDepartmentId(areaDepartmentId);
+-				departmentEntityVoArea.setDepartmentName(areaDepartmentName);
+-				DepartmentUtil.departmentMap.put(areaDepartmentId, departmentEntityVoArea);
+-			}
+-		}
+-
++        /*定制树形菜单*/
++        customizeTree();
++        /*输出到控制台*/
+-		System.out.println("==============================================================================");
++        System.out.println("==============================================================================");
+-
+-		Set<Entry<String, DepartmentEntityVo>> entries = DepartmentUtil.departmentMap.entrySet();
++        Set<Entry<String, DepartmentEntityVo>> entries = DepartmentUtil.departmentMap.entrySet();
+-
+-		for (Entry<String, DepartmentEntityVo> entry : entries) {
+-			String key = entry.getKey();
+-			DepartmentEntityVo departmentEntityVo = entry.getValue();
+-			String getDepartmentId = departmentEntityVo.getDepartmentId();
+-			String getDepartmentName = departmentEntityVo.getDepartmentName();
+-			List<String> getDepartmentIds = departmentEntityVo.getDepartmentIds();
+-			String a = "";
+-			if (CommonUtil.isNotEmpty(getDepartmentIds)) {
+-				a = getDepartmentIds.toString();
+-			}
++        for (Entry<String, DepartmentEntityVo> entry : entries) {
++            String key = entry.getKey();
++            DepartmentEntityVo departmentEntityVo = entry.getValue();
++            String getDepartmentId = departmentEntityVo.getDepartmentId();
++            String getDepartmentName = departmentEntityVo.getDepartmentName();
++            List<String> getDepartmentIds = departmentEntityVo.getDepartmentIds();
++            String a = "";
++            if (CommonUtil.isNotEmpty(getDepartmentIds)) {
++                a = getDepartmentIds.toString();
++            }
+-			System.out.println("key=" + key + "  DepartmentId=" + getDepartmentId + "  DepartmentName"
+-					+ getDepartmentName + "  children=" + a);
++            System.out.println("key=" + key + "  DepartmentId=" + getDepartmentId + "  DepartmentName" + getDepartmentName + "  children=" + a);
+ 
+-		}
+-		System.out.println("==============================================================================");
+-		System.out.println("营业部MAP构建完毕");
+-	}
++        }
++        System.out.println("==============================================================================");
++        System.out.println("营业部MAP构建完毕");
++    }
+ 
+ 	@Override
+ 	public Map<String, DepartmentEntityVo> getDepartmentMapByAuthority() {
+@@ -126,76 +86,103 @@
+ 		}
+ 		return map;
+ 	}
+-	@Override
+-	public List<EasyUITree> constructUsersForDeparmentTree(List<EasyUITree> easyUITrees) {
+-		int size = easyUITrees.get(0).getChildren().size();
+-		if (size == 0) {
+-			//只有营业部 区分是信贷员还是营业部登陆
+-			Set<String> authorities = smpWSUtil.getUserAuthorities();
+-			//是营业部经理 或者区域经理登陆
+-			if (authorities.contains("ROLE_LOAN_MGR") || authorities.contains("ROLE_RISK_MGR")) {
+-				List<Employee> employees = customerBasicInfoService.getEmployeeListByDeparmentId(easyUITrees.get(0).getId());
+-				//循环营业部下的雇员 添加到营业部里面
+-				addUsers(employees, easyUITrees.get(0).getChildren());
+-			} else {
+-				//营业员登陆
+-				EasyUITree easyUITree = new EasyUITree();
+-				//把自己添加到营业部
+-				User user = SpringSecurityUtils.getCurrentUser();
+-				easyUITree.setId(user.getUserId());
+-				easyUITree.setText(user.getName_zh());
+-				easyUITrees.get(0).getChildren().add(easyUITree);
+-			}
+-		} else {
+-			//总部人员 或者 大区 区域经理
+-			for (EasyUITree easyUITree : easyUITrees.get(0).getChildren()) {
+-				if (easyUITree.getText().contains("大区")) {
+-					//构建大区下的分中心
+-					constructUsersForTree(easyUITree.getChildren());
+-				} else {
+-					//构建分中心
+-					constructUsersForTree(easyUITrees.get(0).getChildren());
+-				}
+ 
++    /*定制树形菜单
++    * 1 新增大区 （注：在 smp 配置此部门时，需配置为城市一级部门）
++    * 2 涉及到办公室部门的合并
++    * 3 返回 所有大区 所有办公室 所有分中心 所有营业部
++    */
++    private void customizeTree() {
++        String departmentId;
++        String departmentName;
++        DepartmentEntityVo entityVo;
++        List<DepartmentEntity> departments;
++
++        List<DepartmentEntity> regions = new ArrayList<DepartmentEntity>();
++        List<String> regionIds = new ArrayList<String>();
++        List<DepartmentEntity> offices = new ArrayList<DepartmentEntity>();
++        List<String> officeIds = new ArrayList<String>();
++        List<DepartmentEntity> subs = new ArrayList<DepartmentEntity>();
++        List<String> subIds = new ArrayList<String>();
++        List<DepartmentEntity> departs = new ArrayList<DepartmentEntity>();
++        List<String> departIds = new ArrayList<String>();
++
++        /*全部*/
++        entityVo = new DepartmentEntityVo();
++        entityVo.setDepartmentId("0");
++        entityVo.setDepartmentName("全部");
++        List<String> rootList = new ArrayList<String>();
++        entityVo.setDepartmentIds(rootList);
++        DepartmentUtil.departmentMap.put("0", entityVo);
++
++        /*获取所有城市一级部门*/
++        Map<String, String> allCityDepartMap = smpWSUtil.getAllCityDepart();
++        Set<Entry<String, String>> allCityDepartmentSet = allCityDepartMap.entrySet();
++        for (Entry<String, String> cityDepartment : allCityDepartmentSet) {
++            departmentId = cityDepartment.getKey();
++            departmentName = cityDepartment.getValue();
++
++            /*大区*/
++            if (departmentName.contains("大区")) {
++                rootList.add(departmentId);
++                entityVo = new DepartmentEntityVo();
++                entityVo.setDepartmentId(departmentId);
++                entityVo.setDepartmentName(departmentName);
++                List<String> subCenterDepartmentIdList = new ArrayList<String>();
++                entityVo.setDepartmentIds(subCenterDepartmentIdList);
++                DepartmentUtil.departmentMap.put(departmentId, entityVo);
++                regions.add(entityVo);
++                regionIds.add(departmentId);
++
++                /*办公室（需求规则：此菜单不显示）*/
++                departments = smpWSUtil.getSubordinateDepartListByDepartId(departmentId);
++                for (DepartmentEntity entity : departments) {
++                    departmentId = entity.getDepartmentId();
++                    departmentName = entity.getDepartmentName();
++                    entityVo = new DepartmentEntityVo();
++                    entityVo.setDepartmentId(departmentId);
++                    entityVo.setDepartmentName(departmentName);
++                    offices.add(entityVo);
++                    officeIds.add(departmentId);
++
++                    /*分中心*/
++                    departments = smpWSUtil.getSubordinateDepartListByDepartId(departmentId);
++                    for (DepartmentEntity _entity : departments) {
++                        departmentId = _entity.getDepartmentId();
++                        departmentName = _entity.getDepartmentName();
++                        subCenterDepartmentIdList.add(departmentId);
++                        entityVo = new DepartmentEntityVo();
++                        entityVo.setDepartmentId(departmentId);
++                        entityVo.setDepartmentName(departmentName);
++                        List<String> salesDepartmentIdList = new ArrayList<String>();
++                        entityVo.setDepartmentIds(salesDepartmentIdList);
++                        DepartmentUtil.departmentMap.put(departmentId, entityVo);
++                        subs.add(entityVo);
++                        subIds.add(departmentId);
++
++                        /*营业部*/
++                        departments = smpWSUtil.getSubordinateDepartListByDepartId(departmentId);
++                        for (DepartmentEntity __entity : departments) {
++                            departmentId = __entity.getDepartmentId();
++                            departmentName = __entity.getDepartmentName();
++                            salesDepartmentIdList.add(departmentId);
++                            entityVo = new DepartmentEntityVo();
++                            entityVo.setDepartmentId(departmentId);
++                            entityVo.setDepartmentName(departmentName);
++                            DepartmentUtil.departmentMap.put(departmentId, entityVo);
++                            departs.add(entityVo);
++                            departIds.add(departmentId);
+-			}
+-		}
++                        }
++                    }
+-		return easyUITrees;
+-	}
+-	//构建分中心 营业部 客户经理
+-	public void constructUsersForTree(List<EasyUITree> easyUITrees){
+-		//循环分中心
+-		for(EasyUITree easyUITree:easyUITrees){
+-			//循环营业部
+-			for(EasyUITree easyUITreePart:easyUITree.getChildren()){
+-				//获取营业部下的用户
+-				List<Employee> employees = new ArrayList<Employee>();
+-				List<EasyUITree> easyUITreess = new ArrayList<EasyUITree>();
+-				employees = customerBasicInfoService.getEmployeeListByDeparmentId(easyUITreePart.getId());
+-				//添加雇员到营业部下
+-				easyUITreess = convertEmployeeToTree(employees);
+-				easyUITreePart.getChildren().clear();
+-				easyUITreePart.setChildren(easyUITreess);
+-			}
+-		}
+ 
+-	}
++                }
+-	private List<EasyUITree>  convertEmployeeToTree(List<Employee> employees){
+-		List<EasyUITree> easyUITrees = new ArrayList<EasyUITree>();
+-		for(Employee employee:employees){
+-			EasyUITree easyUITree = new EasyUITree();
+-			easyUITree.setId(employee.getComEmpId().toString());
+-			easyUITree.setText(employee.getName());
+-			easyUITrees.add(easyUITree);
+-		}
++            }
+-		return easyUITrees;
+-	}
++        }
+-	//添加雇员到营业部
+-	public void addUsers(List<Employee> employees,List<EasyUITree> children){
+-		for(Employee employee:employees){
+-			EasyUITree easyUITree = new EasyUITree();
+-			easyUITree.setId(employee.getComEmpId().toString());
+-			easyUITree.setText(employee.getName());
+-			children.add(easyUITree);
++        Object[][] ret = {{"region", regions, regionIds}, {"offices", offices, officeIds}, {"subs", subs, subIds}, {"departs", departs, departIds}};
++        for (Object[] item : ret) {
++            DepartmentUtil.retMapByCategory.put((String) item[0], item[1]);
++            DepartmentUtil.retMapByCategory.put(item[0] + "Ids", item[2]);
+-		}
+-	}
++        }
++    }
++
+ }
+Index: src/main/resources/config/ibatis/rc/SalesPlanning.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/ibatis/rc/SalesPlanning.xml	(revision 8428)
++++ src/main/resources/config/ibatis/rc/SalesPlanning.xml	(revision )
+@@ -11,6 +11,7 @@
+ 		<result property="areaDepartmentId" column="AREA_DEPARTMENT_ID" />
+ 		<result property="areaDepartmentName" column="AREA_DEPARTMENT_NAME" />
+ 		<result property="value" column="VALUE" />
++		<result property="planType" column="PLAN_TYPE" />
+ 	</resultMap>
+ 
+ 	<insert id="dynamicInsert" parameterClass="salesPlanning">
+@@ -425,5 +426,80 @@
+ 	</sql>
+ 	<select id="querySalesPlanningTable" parameterClass="java.util.HashMap" resultClass="salesPlanningTable">
+ 		<include refid="querySalesPlanningTableSQL" />
++	</select>
++
++    <!--获取被更新数据-->
++    <select id="searchSalesPlanningDel" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
++        SELECT t.sales_planning_id FROM rl_sales_planning t WHERE t.plan_type = #plan_type# AND t.type = #type# AND t.area_department_id
++        IN
++        <iterate property="del" open="(" close=")" conjunction=",">
++            #del[]#
++        </iterate>
++        AND year = #year#
++    </select>
++
++    <insert id="saveSalesPlanning" parameterClass="salesPlanning">
++        <selectKey keyProperty="salesPlanningId" resultClass="java.lang.Long" type="pre">
++            select SEQ_BASIC_INFO.NEXTVAL as value from dual
++        </selectKey>
++        insert into rl_sales_planning(
++            sales_planning_id
++            ,year
++            ,month
++            ,type
++            ,area_department_id
++            ,area_department_name
++            ,value
++            ,plan_type
++        )values(
++            #salesPlanningId#
++            ,#year#
++            ,#month#
++            ,#type#
++            ,#areaDepartmentId#
++            ,#areaDepartmentName#
++            ,#value#
++            ,#planType#
++        )
++    </insert>
++
++    <statement id="deleteSalesPlanning" parameterClass="java.util.List">
++        DELETE FROM rl_sales_planning WHERE sales_planning_id IN
++        <iterate open="(" close=")" conjunction=",">
++            #list[]#
++        </iterate>
++    </statement>
++
++    <!--按照条件查询数据-->
++    <sql id="sql_searchSalesPlanningByCase">
++        SELECT
++              t2.SALES_PLANNING_ID AS salesPlanningId,
++              t2.YEAR AS year,
++              t2.TYPE AS type,
++              t2.AREA_DEPARTMENT_ID AS areaDepartmentId,
++              t2.AREA_DEPARTMENT_NAME AS areaDepartmentName,
++              t2.VALUE AS value,
++              t2.MONTH AS month,
++              t2.PLAN_TYPE AS planType
++        FROM (SELECT
++                    t1.SALES_PLANNING_ID,
++                    t1.YEAR,
++                    t1.TYPE,
++                    t1.AREA_DEPARTMENT_ID,
++                    t1.AREA_DEPARTMENT_NAME,
++                    t1.VALUE,
++                    t1.MONTH,
++                    t1.PLAN_TYPE,
++                    row_number() OVER (PARTITION BY t1.AREA_DEPARTMENT_ID ORDER BY t1.SALES_PLANNING_ID DESC) rn
++              FROM RL_SALES_PLANNING t1
++              WHERE t1.YEAR = #year#
++              AND t1.TYPE = #type#
++                <isNotEmpty property="departmentIds">
++                    AND t1.AREA_DEPARTMENT_ID IN ($departmentIds$)
++                </isNotEmpty> ) t2
++        WHERE t2.rn BETWEEN 1 AND 12
++    </sql>
++    <select id="searchSalesPlanningByCase" parameterClass="java.util.HashMap" resultClass="salesPlanning">
++        <include refid="sql_searchSalesPlanningByCase"/>
+-	</select>
++    </select>
+ </sqlMap>
+\ No newline at end of file
+Index: WebContent/jsp/rc/sales/salesPlanning.jsp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- WebContent/jsp/rc/sales/salesPlanning.jsp	(revision 8428)
++++ WebContent/jsp/rc/sales/salesPlanning.jsp	(revision )
+@@ -1,95 +1,85 @@
+-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
++<%@ page language="java" import="java.util.*" pageEncoding="utf-8" %>
+-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
++<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
++<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
++<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+ <%
+-	String path = request.getContextPath();
++    String path = request.getContextPath();
+-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+-			+ path + "/";
++    String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
+ %>
+ 
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html>
+-	<head>
++<head>
+-		<base href="<%=basePath%>" />
++    <base href="<%=basePath%>"/>
+ 
+-		<title>My JSP 'salesPlanning.jsp' starting page</title>
++    <title>My JSP 'salesPlanning.jsp' starting page</title>
+ 
+-		<meta http-equiv="pragma" content="no-cache" />
++    <meta http-equiv="pragma" content="no-cache"/>
+-		<meta http-equiv="cache-control" content="no-cache" />
++    <meta http-equiv="cache-control" content="no-cache"/>
+-		<meta http-equiv="expires" content="0" />
++    <meta http-equiv="expires" content="0"/>
+-		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3" />
++    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3"/>
+-		<meta http-equiv="description" content="This is my page" />
++    <meta http-equiv="description" content="This is my page"/>
+-		<!--
++    <!--
+ 	<link rel="stylesheet" type="text/css" href="styles.css">
+ 	<script type="text/javascript">var serverName = "<%=path%>";</script>
+ 	-->
+-		<jsp:include page="../include/easyui.jsp"></jsp:include>
++    <jsp:include page="../include/easyui.jsp"></jsp:include>
+-		<script type="text/javascript">var serverName = "<%=path%>";</script>
++    <script type="text/javascript">
++        var serverName = "<%=path%>";
++    </script>
+-		<script type="text/javascript" src="<%=basePath%>/scripts/sales/salesPlanning.js"></script>
+-		<style type="text/css">
+-.myTH {
+-	border-right: 1px solid #ccc;
+-	font-size: 12px;
+-	font-weight: normal;
++    <script type="text/javascript" src="<%=basePath%>/scripts/sales/salesPlanning.js"></script>
++    <style type="text/css">
++        .myTH {
++            border-right: 1px solid #ccc;
++            font-size: 12px;
++            font-weight: normal;
+-	background: #fafafa
+-		url('scripts/uilib/themes/default/images/datagrid_header_bg.gif')
+-		repeat-x left bottom;
++            background: #fafafa url('/scripts/uilib/themes/default/images/datagrid_header_bg.gif') repeat-x left bottom;
+-	border-bottom: 1px dotted #ccc;
+-	border-top: 1px dotted #ccc;
+-	overflow: hidden;
++            border-bottom: 1px dotted #ccc;
++            border-top: 1px dotted #ccc;
++            overflow: hidden;
+-	background: #fafafa
+-		url('scripts/uilib/themes/default/images/datagrid_header_bg.gif')
+-		repeat-x left bottom;
++            background: #fafafa url('/scripts/uilib/themes/default/images/datagrid_header_bg.gif') repeat-x left bottom;
+-	border-bottom: 1px dotted #ccc;
+-	cursor: default;
+-	border-top: 1px dotted #ccc;
+-}
++            border-bottom: 1px dotted #ccc;
++            cursor: default;
++            border-top: 1px dotted #ccc;
++        }
+ 
+-.myTD {
+-	font-size: 12px;
+-	border-right: 1px dotted #ccc;
+-	border-bottom: 1px dotted #ccc;
+-	overflow: hidden;
+-	padding: 0;
+-	margin: 0;
+-}
++        .myTD {
++            font-size: 12px;
++            border-right: 1px dotted #ccc;
++            border-bottom: 1px dotted #ccc;
++            overflow: hidden;
++            padding: 0;
++            margin: 0;
++        }
+ 
+-.myInputBoder {
++        .myInputBorder {
+-	border: 1px;
+-}
+-</style>
+-	</head>
++            border: 1px;
++        }
++    </style>
++</head>
+ 
+-	<body class="easyui-layout">
+-		<div region="center">
+-			<div id="salesSearchTab" class="easyui-tabs" style="padding: 10px;">
++<body class="easyui-layout">
++<div region="center">
++    <div id="salesSearchTab" class="easyui-tabs" style="padding: 10px;">
+-				<div title="年份选择">
++        <div title="搜索" style="height: auto; width: auto">
+-				<form id="searchForm">
++            <form id="searchForm">
+-					<br />
+-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请选择年份：&nbsp;&nbsp;
+-					<input id="year" class="easyui-combobox" />
+-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 请选择营业部：&nbsp;&nbsp;
+-					<input id=areaDepartmentIds class="easyui-combobox" style="width: 400px;"/>
+-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-					<a class="easyui-linkbutton" plain="false" iconCls="icon-search" onclick="constructSalesPlanningTable(0)">搜索</a>
+-					<br />
+-					<br />
++                <table style="height: 50px;padding-left: 50px;" cellspacing="20px">
++                    <tr>
++                        <td>
++                            请选择年份：<input id="year" class="easyui-combobox"/>
++                        </td>
++                        <td>
++                            <span id="box_name">请选择营业部</span>：<input id=areaDepartmentIds style="width: 400px;"/>
++                            <a class="easyui-linkbutton" plain="false" iconCls="icon-search"
++                               onclick="searchSalesPlan('', '', 'box')">搜索</a>
++                        </td>
++                    </tr>
++                </table>
+-					</form>
+-				</div>
+-			</div>
++            </form>
++        </div>
++    </div>
+-			<div id="salesPlanningTabs" class="easyui-tabs" style="padding: 10px;" tools="#tol">
+-
+-			</div>
+-			<div id="tol">
+-				<sec:authorize ifAnyGranted="${control.salesPlanning_save}">
+-					<a id="save" class="easyui-linkbutton" plain="true" iconCls="icon-save" disabled="true" onclick="saveAll()">保存全部</a>
+-					<a id="edit" class="easyui-linkbutton" plain="true" iconCls="icon-edit" onclick="edit()">编辑</a>
+-					<a id="redo" class="easyui-linkbutton" plain="true" iconCls="icon-redo" disabled="true" onclick="cancelEdit()">取消编辑</a>
+-					<a id="reload" class="easyui-linkbutton" plain="true" iconCls="icon-reload" disabled="true" onclick="clearSelected()">清空当前</a>
+-				</sec:authorize>
+-			</div>
++    <jsp:include page="salesPlanningTable_multiple.jsp" flush="true"/>
+-		</div>
+-	</body>
++</div>
++</body>
+ </html>
+Index: src/main/java/com/creditease/rc/util/DepartmentUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/util/DepartmentUtil.java	(revision 8428)
++++ src/main/java/com/creditease/rc/util/DepartmentUtil.java	(revision )
+@@ -15,6 +15,8 @@
+ 
+ 	public static Map<String, DepartmentEntityVo> departmentMap = new HashMap<String, DepartmentEntityVo>();
+ 
++	public static Map<String, Object> retMapByCategory = new HashMap<String, Object>();
++
+ 	private static DepartmentUtil instance = null;
+ 
+ 	public static DepartmentUtil getInstance() {
+Index: src/main/java/com/creditease/rc/service/ISalesPlanningService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/ISalesPlanningService.java	(revision 8428)
++++ src/main/java/com/creditease/rc/service/ISalesPlanningService.java	(revision )
+@@ -24,4 +24,8 @@
+ 
+ 	boolean updateSalesPlanningList(List<SalesPlanning> updateList);
+ 
++    public Message saveSalesPlanning();
++
++    public Map<String, SalesPlanningTable> searchSalesPlanningByCase(SalesPlanning salesPlanning);
++
+ }
+Index: src/main/java/com/creditease/rc/service/impl/SalesPlanningService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/impl/SalesPlanningService.java	(revision 8428)
++++ src/main/java/com/creditease/rc/service/impl/SalesPlanningService.java	(revision )
+@@ -1,15 +1,5 @@
+ package com.creditease.rc.service.impl;
+ 
+-import java.math.BigDecimal;
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-import java.util.List;
+-import java.util.Map;
+-
+-import javax.annotation.Resource;
+-
+-import org.springframework.stereotype.Service;
+-
+ import com.creditease.rc.dao.ISalesPlanningDao;
+ import com.creditease.rc.domain.Message;
+ import com.creditease.rc.domain.SalesPlanning;
+@@ -17,7 +7,20 @@
+ import com.creditease.rc.util.CommonUtil;
+ import com.creditease.rc.vo.SalesPlanningTable;
+ import com.creditease.rc.vo.SalesPlanningTableVo;
++import org.springframework.beans.BeanUtils;
++import org.springframework.stereotype.Service;
++import org.springframework.web.context.request.RequestContextHolder;
++import org.springframework.web.context.request.ServletRequestAttributes;
+ 
++import javax.annotation.Resource;
++import javax.servlet.http.HttpServletRequest;
++import java.io.UnsupportedEncodingException;
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.math.BigDecimal;
++import java.net.URLDecoder;
++import java.util.*;
++
+ @Service
+ public class SalesPlanningService implements ISalesPlanningService {
+ 
+@@ -286,4 +289,171 @@
+ 
+ 		return salesPlannings;
+ 	}
++
++    @Override
++    public Message saveSalesPlanning() {
++        Message m = new Message(false, "保存失败");
++        HttpServletRequest r = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
++
++        String[] str_arr = r.getParameter("d").substring(1, r.getParameter("d").length() - 1).split("&");
++        List<String> l = Arrays.asList(str_arr);
++
++        String[] entry;
++        SalesPlanningTable s = null;
++        List<SalesPlanningTable> ls = new ArrayList<SalesPlanningTable>();
++        String[] types;
++        /*
++        pType: 大区 ==> "0"、分中心 ==> "1"、营业部==>"2"
++		cType: 放款量 ==> "0"、合同金额  ==> "1"
++		 */
++        String pType, cType;
++
++        List<String> del_department_ids = new ArrayList<String>();
++
++        for (String aL : l) {
++            entry = aL.split("=");
++            if (entry[0].equals("jan")) {
++                s = new SalesPlanningTable();
++                s.setJan(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("dec")) {
++                s.setDec(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++                types = r.getParameter("types").split("_");
++                pType = types[0].equals("region") ? "0" : types[0].equals("subs") ? "1" : "2";
++                cType = types[1].equals("loan") ? "0" : "1";
++                s.setPlanType(pType);
++                s.setType(cType);
++                s.setYear(Calendar.getInstance().get(Calendar.YEAR));
++                ls.add(s);
++                del_department_ids.add(s.getAreaDepartmentId().toString());
++            } else if (entry[0].equals("feb")) {
++                s.setFeb(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("mar")) {
++                s.setMar(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("apr")) {
++                s.setApr(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("may")) {
++                s.setMay(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("jun")) {
++                s.setJun(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("jul")) {
++                s.setJul(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("aug")) {
++                s.setAug(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("sep")) {
++                s.setSep(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("oct")) {
++                s.setOct(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("nov")) {
++                s.setNov(entry.length > 1 ? new BigDecimal(entry[1]) : null);
++            } else if (entry[0].equals("departmentId")) {
++                s.setAreaDepartmentId(Long.valueOf(entry[1]));
++            } else if (entry[0].equals("departmentName")) {
++                try {
++                    s.setAreaDepartmentName(URLDecoder.decode(entry[1], "utf-8"));
++                } catch (UnsupportedEncodingException e) {
++                    e.printStackTrace();
+-}
++                }
++            }
++        }
++
++        Map<String, Object> map = new HashMap<String, Object>();
++        map.put("plan_type", ls.get(0).getPlanType());
++        map.put("type", ls.get(0).getType());
++        map.put("del", del_department_ids);
++        map.put("year", ls.get(0).getYear());
++        List<Integer> del_ids = salesPlanningDao.searchSalesPlanningDel(map);
++
++        try {
++            boolean ret = this._saveSalesPlanning(ls);
++            if (ret) {
++                if (!del_ids.isEmpty()) {
++                    salesPlanningDao.deleteSalesPlannings(del_ids);
++                }
++                m = new Message(true, "保存成功");
++            }
++        } catch (NoSuchMethodException e) {
++            e.printStackTrace();
++        } catch (InvocationTargetException e) {
++            e.printStackTrace();
++        } catch (IllegalAccessException e) {
++            e.printStackTrace();
++        }
++        return m;
++    }
++
++    @Override
++    public Map<String, SalesPlanningTable> searchSalesPlanningByCase(SalesPlanning salesPlanning) {
++        Map<String, Object> map = new HashMap<String, Object>();
++        map.put("year", salesPlanning.getYear());
++        map.put("type", salesPlanning.getType());
++        map.put("departmentIds", salesPlanning.getAreaDepartmentIds());
++        List<SalesPlanning> plannings = salesPlanningDao.searchSalesPlanningByCase(map);
++
++        Map<String, SalesPlanningTable> _map = new HashMap<String, SalesPlanningTable>();
++
++        Object[][] n2e = {
++                {1, "setJan"}, {2, "setFeb"}, {3, "setMar"}, {4, "setApr"}, {5, "setMay"}, {6, "setJun"},
++                {7, "setJul"}, {8, "setAug"}, {9, "setSep"}, {10, "setOct"}, {11, "setNov"}, {12, "setDec"}
++        };
++        SalesPlanningTable table = new SalesPlanningTable();
++        Method method = null;
++        for (SalesPlanning planning : plannings) {
++
++            if (!_map.containsKey(planning.getAreaDepartmentId().toString())) {
++                table = new SalesPlanningTable();
++                _map.put(planning.getAreaDepartmentId().toString(), table);
++            }
++
++            try {
++                method = SalesPlanningTable.class.getDeclaredMethod(String.valueOf(n2e[planning.getMonth() - 1][1]), BigDecimal.class);
++            } catch (NoSuchMethodException e) {
++                e.printStackTrace();
++            }
++
++            try {
++                assert method != null;
++                method.invoke(table, planning.getValue());
++            } catch (IllegalAccessException e) {
++                e.printStackTrace();
++            } catch (InvocationTargetException e) {
++                e.printStackTrace();
++            }
++        }
++
++        return _map;
++    }
++
++    private boolean _saveSalesPlanning(List<SalesPlanningTable> list) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
++
++        String[][] n2e = {
++                {"1", "getJan"}, {"2", "getFeb"}, {"3", "getMar"}, {"4", "getApr"}, {"5", "getMay"}, {"6", "getJun"},
++                {"7", "getJul"}, {"8", "getAug"}, {"9", "getSep"}, {"10", "getOct"}, {"11", "getNov"}, {"12", "getDec"}
++        };
++
++        List<SalesPlanning> plannings = new ArrayList<SalesPlanning>();
++        SalesPlanning planning;
++        SalesPlanning _planning;
++
++        for (SalesPlanningTable table : list) {
++            planning = new SalesPlanning();
++            planning.setYear(table.getYear());
++            planning.setType(table.getType());
++            planning.setAreaDepartmentId(table.getAreaDepartmentId());
++            planning.setAreaDepartmentName(table.getAreaDepartmentName());
++            planning.setPlanType(table.getPlanType());
++
++            for (int i = 0; i < 12; i++) {
++                _planning = new SalesPlanning();
++                BeanUtils.copyProperties(planning, _planning);
++                _planning.setMonth(i + 1);
++                Method method = SalesPlanningTable.class.getDeclaredMethod(n2e[i][1]);
++                _planning.setValue((BigDecimal) method.invoke(table));
++                plannings.add(_planning);
++            }
++        }
++
++        return salesPlanningDao.saveSalesPlannings(plannings);
++    }
++}
++
++

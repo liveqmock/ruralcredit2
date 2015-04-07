@@ -1,0 +1,57 @@
+[{
+	"name":"赵",
+	"manager":"赵",
+	"accepter":"赵",
+	"opttime":"2012-10-31",
+	"status":"未通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"
+	
+},{
+	"name":"钱",
+	"manager":"钱某",
+	"accepter":"钱",
+	"opttime":"2012-01-02",
+	"status":"已通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"
+	
+},{
+	"name":"孙",
+	"manager":"孙",
+	"accepter":"孙",
+	"opttime":"2012-03-08",
+	"status":"未通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"	
+	
+},{
+	"name":"李",
+	"manager":"李",
+	"accepter":"李",
+	"opttime":"2012-02-14",
+	"status":"已通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"
+	
+},{
+	"name":"周",
+	"manager":"周",
+	"accepter":"周",
+	"opttime":"2012-09-23",
+	"status":"未通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"	
+	
+},{
+	"name":"吴",
+	"manager":"吴",
+	"accepter":"吴",
+	"opttime":"2012-11-01",
+	"status":"已通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"
+	
+},{
+	"name":"郑",
+	"manager":"郑",
+	"accepter":"郑",
+	"opttime":"2012-11-02",
+	"status":"已通过",
+	"operation":"<a onclick='detail(6)'>详细</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick='export1(5)'>导出</a>"
+	
+}]

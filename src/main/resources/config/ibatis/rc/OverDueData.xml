@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="OVERDUEDATA">
+	<typeAlias alias="overDueData" type="com.creditease.rc.domain.OverDueData" />
+    <typeAlias alias="overDueQueryInfo" type="com.creditease.rc.vo.OverDueQueryInfo" />
+    <typeAlias alias="overDueListVo" type="com.creditease.rc.vo.OverDueListVo" />
+	<resultMap class="overDueData" id="overDueDataMAP">
+		<result property="overdueDataId" column="overdue_data_id" />
+		<result property="laonBalanceDataId" column="laon_balance_data_id" />
+		<result property="overdueDays" column="overdue_days" />
+		<result property="overduestart" column="overduestart" />
+		<result property="odCorpus" column="od_corpus" />
+		<result property="odInterest" column="od_interest" />
+		<result property="odOverhead" column="od_overhead" />
+		<result property="odCharges" column="od_charges" />
+		<result property="odForfeit" column="od_forfeit" />
+		<result property="odLatefee" column="od_latefee" />
+		<result property="odDamages" column="od_damages" />
+		<result property="ofCorpus" column="of_corpus" />
+		<result property="ofInterest" column="of_interest" />
+		<result property="ofOverhead" column="of_overhead" />
+		<result property="ofCharges" column="of_charges" />
+		<result property="ofForfeit" column="of_forfeit" />
+		<result property="ofLatefee" column="of_latefee" />
+		<result property="ofDamages" column="of_damages" />
+		<result property="odfCorpus" column="odf_corpus" />
+		<result property="odfInterest" column="odf_interest" />
+		<result property="odfOverhead" column="odf_overhead" />
+		<result property="odfCharges" column="odf_charges" />
+		<result property="odfForfeit" column="odf_forfeit" />
+		<result property="odfLatefee" column="odf_latefee" />
+		<result property="odfDamages" column="odf_damages" />
+	</resultMap>
+	<insert id="dynamicInsert" parameterClass="overDueData">
+		<selectKey keyProperty="overdueDataId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into rl_overdue_data(
+			overdue_data_id
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="laonBalanceDataId">
+				,laon_balance_data_id
+			</isNotEmpty>
+			<isNotEmpty property="overdueDays">
+				,overdue_days
+			</isNotEmpty>
+			<isNotEmpty property="overduestart">
+				,overduestart
+			</isNotEmpty>
+			<isNotEmpty property="odCorpus">
+				,od_corpus
+			</isNotEmpty>
+			<isNotEmpty property="odInterest">
+				,od_interest
+			</isNotEmpty>
+			<isNotEmpty property="odOverhead">
+				,od_overhead
+			</isNotEmpty>
+			<isNotEmpty property="odCharges">
+				,od_charges
+			</isNotEmpty>
+			<isNotEmpty property="odForfeit">
+				,od_forfeit
+			</isNotEmpty>
+			<isNotEmpty property="odLatefee">
+				,od_latefee
+			</isNotEmpty>
+			<isNotEmpty property="odDamages">
+				,od_damages
+			</isNotEmpty>
+			<isNotEmpty property="ofCorpus">
+				,of_corpus
+			</isNotEmpty>
+			<isNotEmpty property="ofInterest">
+				,of_interest
+			</isNotEmpty>
+			<isNotEmpty property="ofOverhead">
+				,of_overhead
+			</isNotEmpty>
+			<isNotEmpty property="ofCharges">
+				,of_charges
+			</isNotEmpty>
+			<isNotEmpty property="ofForfeit">
+				,of_forfeit
+			</isNotEmpty>
+			<isNotEmpty property="ofLatefee">
+				,of_latefee
+			</isNotEmpty>
+			<isNotEmpty property="ofDamages">
+				,of_damages
+			</isNotEmpty>
+			<isNotEmpty property="odfCorpus">
+				,odf_corpus
+			</isNotEmpty>
+			<isNotEmpty property="odfInterest">
+				,odf_interest
+			</isNotEmpty>
+			<isNotEmpty property="odfOverhead">
+				,odf_overhead
+			</isNotEmpty>
+			<isNotEmpty property="odfCharges">
+				,odf_charges
+			</isNotEmpty>
+			<isNotEmpty property="odfForfeit">
+				,odf_forfeit
+			</isNotEmpty>
+			<isNotEmpty property="odfLatefee">
+				,odf_latefee
+			</isNotEmpty>
+			<isNotEmpty property="odfDamages">
+				,odf_damages
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#overdueDataId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="laonBalanceDataId">
+				,#laonBalanceDataId#
+			</isNotEmpty>
+			<isNotEmpty property="overdueDays">
+				,#overdueDays#
+			</isNotEmpty>
+			<isNotEmpty property="overduestart">
+				,#overduestart#
+			</isNotEmpty>
+			<isNotEmpty property="odCorpus">
+				,#odCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="odInterest">
+				,#odInterest#
+			</isNotEmpty>
+			<isNotEmpty property="odOverhead">
+				,#odOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="odCharges">
+				,#odCharges#
+			</isNotEmpty>
+			<isNotEmpty property="odForfeit">
+				,#odForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="odLatefee">
+				,#odLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="odDamages">
+				,#odDamages#
+			</isNotEmpty>
+			<isNotEmpty property="ofCorpus">
+				,#ofCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="ofInterest">
+				,#ofInterest#
+			</isNotEmpty>
+			<isNotEmpty property="ofOverhead">
+				,#ofOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="ofCharges">
+				,#ofCharges#
+			</isNotEmpty>
+			<isNotEmpty property="ofForfeit">
+				,#ofForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="ofLatefee">
+				,#ofLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="ofDamages">
+				,#ofDamages#
+			</isNotEmpty>
+			<isNotEmpty property="odfCorpus">
+				,#odfCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="odfInterest">
+				,#odfInterest#
+			</isNotEmpty>
+			<isNotEmpty property="odfOverhead">
+				,#odfOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="odfCharges">
+				,#odfCharges#
+			</isNotEmpty>
+			<isNotEmpty property="odfForfeit">
+				,#odfForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="odfLatefee">
+				,#odfLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="odfDamages">
+				,#odfDamages#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="overDueData">
+		<![CDATA[
+			update rl_overdue_data
+		]]>
+		<dynamic prepend="set">
+			<isNotEmpty property="laonBalanceDataId">
+				laon_balance_data_id = #laonBalanceDataId#
+			</isNotEmpty>
+			<isNotEmpty property="overdueDays">
+				overdue_days = #overdueDays#
+			</isNotEmpty>
+			<isNotEmpty property="overduestart">
+				overduestart = #overduestart#
+			</isNotEmpty>
+			<isNotEmpty property="odCorpus">
+				od_corpus = #odCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="odInterest">
+				od_interest = #odInterest#
+			</isNotEmpty>
+			<isNotEmpty property="odOverhead">
+				od_overhead = #odOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="odCharges">
+				od_charges = #odCharges#
+			</isNotEmpty>
+			<isNotEmpty property="odForfeit">
+				od_forfeit = #odForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="odLatefee">
+				od_latefee = #odLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="odDamages">
+				od_damages = #odDamages#
+			</isNotEmpty>
+			<isNotEmpty property="ofCorpus">
+				of_corpus = #ofCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="ofInterest">
+				of_interest = #ofInterest#
+			</isNotEmpty>
+			<isNotEmpty property="ofOverhead">
+				of_overhead = #ofOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="ofCharges">
+				of_charges = #ofCharges#
+			</isNotEmpty>
+			<isNotEmpty property="ofForfeit">
+				of_forfeit = #ofForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="ofLatefee">
+				of_latefee = #ofLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="ofDamages">
+				of_damages = #ofDamages#
+			</isNotEmpty>
+			<isNotEmpty property="odfCorpus">
+				odf_corpus = #odfCorpus#
+			</isNotEmpty>
+			<isNotEmpty property="odfInterest">
+				odf_interest = #odfInterest#
+			</isNotEmpty>
+			<isNotEmpty property="odfOverhead">
+				odf_overhead = #odfOverhead#
+			</isNotEmpty>
+			<isNotEmpty property="odfCharges">
+				odf_charges = #odfCharges#
+			</isNotEmpty>
+			<isNotEmpty property="odfForfeit">
+				odf_forfeit = #odfForfeit#
+			</isNotEmpty>
+			<isNotEmpty property="odfLatefee">
+				odf_latefee = #odfLatefee#
+			</isNotEmpty>
+			<isNotEmpty property="odfDamages">
+				odf_damages = #odfDamages#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			where
+			overdue_data_id = #overdueDataId#
+		]]>
+	</update>
+	<delete id="deleteAll" parameterClass="java.lang.Long">
+		delete rl_overdue_data
+	</delete>
+
+  <!-- 查询逾期信息-->
+    <sql id="queryOverdueGridSql"  >
+        <![CDATA[
+          select distinct ca.creditapplication_id   as creditapplicationId,
+                          ca.business_number        as groupNumber,
+                          bsa.name                  as groupName,
+                          ca.loan_officer_name      as loanOfficerName,
+                          ca.business_type          as businessType,
+                          ca.company_id             as companyId,
+                          ca.company_name           as companyName,
+                          ca.default_returnment_way as defaultReturnmentWay,
+                          ca.repayment_plan_name    as repaymentPlanName,
+                          ca.signagreement_date     as signagreementDate,
+                          os.aoverdue_count         as aOverdueCount,
+                          os.aoverdue_money         as aOverdueMoney,
+                          os.aoverdue_start         as aOverdueStart,
+                          os.overdue_daycount       as overdueDayCount,
+						  os.historyMax_OverDays    as historyMaxOverDays
+            from rl_credit_application ca
+            join rl_overdue_summary os
+              on os.creditapplication_id = ca.creditapplication_id
+            join sid_view sv
+              on sv.object_id_identity = ca.creditapplication_id
+             and sv.class = 'com.creditease.rc.domain.CreditApplication'
+            left join rl_borrower_service_app bsa
+              on bsa.creditapplication_id = ca.creditapplication_id
+             and bsa.leader = '1'
+             and bsa.valid_state = '1'
+           where ca.audit_status in( '15','29','30')
+            ]]>
+        <dynamic prepend="AND">
+        <isNotEmpty property="fuzzyValue" prepend="and">
+            (ca.business_number
+            like
+            '%$fuzzyValue$%'
+            or
+            bsa.name
+            like
+            '%$fuzzyValue$%'
+            or
+            ca.loan_officer_name
+            like
+            '%$fuzzyValue$%'
+            )
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="and">
+            ca.business_number = #businessNumber#
+        </isNotEmpty>
+        <isNotEmpty property="borrowerName" prepend="and">
+            bsa.name = #borrowerName#
+        </isNotEmpty>
+        <isNotEmpty property="customerName" prepend="and">
+            ca.loan_officer_name like
+            '%$customerName$%'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="startDate">
+            <![CDATA[     #startDate# <= ca.signagreement_date         ]]>
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="endDate">
+        <![CDATA[   ca.signagreement_date <= #endDate#     ]]>
+        </isNotEmpty>
+        <isNotEmpty property="returnWayType" prepend="and">
+            ca.default_returnment_way = #returnWayType#
+        </isNotEmpty>
+        <isNotEmpty property="companyId" prepend="and">
+            ca.company_id in ($companyId$)
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="authList">
+            sv.ace_sid  IN
+            ($authList$)
+        </isNotEmpty>
+       </dynamic>
+        <![CDATA[
+					ORDER BY  os.aoverdue_start asc, ca.signagreement_date   asc
+		]]>
+    </sql>
+
+    <select id="queryOverdueGrid" resultClass="overDueListVo" parameterClass="overDueQueryInfo">
+        <include refid="queryOverdueGridSql" />
+    </select>
+    <select id="countQueryOverdueGrid" resultClass="int" parameterClass="overDueQueryInfo">
+        select count(*) from(
+        <include refid="queryOverdueGridSql" />
+        )
+    </select>
+
+   <!--查询逾期信息 供导出使用-->
+    <sql id="queryOverdueListForExportSql"  >
+        <![CDATA[
+          select distinct ca.creditapplication_id   as creditapplicationId,
+                          ca.business_number        as groupNumber,
+                          bsa.name                  as groupName,
+                          ca.loan_officer_name      as loanOfficerName,
+                          ca.business_type          as businessType,
+                          ca.company_id             as companyId,
+                          ca.company_name           as companyName,
+                          decode(ca.default_returnment_way,0,'自动划扣','现金') as defaultReturnmentWay,
+                          ca.repayment_plan_name    as repaymentPlanName,
+                          ca.signagreement_date     as signagreementDate,
+                          os.aoverdue_count         as aOverdueCount,
+                          os.aoverdue_money         as aOverdueMoney,
+                          os.aoverdue_start         as aOverdueStart,
+                          os.overdue_daycount       as overdueDayCount
+            from rl_credit_application ca
+            join rl_overdue_summary os
+              on os.creditapplication_id = ca.creditapplication_id
+            join sid_view sv
+              on sv.object_id_identity = ca.creditapplication_id
+             and sv.class = 'com.creditease.rc.domain.CreditApplication'
+            left join rl_borrower_service_app bsa
+              on bsa.creditapplication_id = ca.creditapplication_id
+             and bsa.leader = '1'
+             and bsa.valid_state = '1'
+           where ca.audit_status in('15','29','30')
+            ]]>
+        <dynamic prepend="AND">
+            <isNotEmpty property="fuzzyValue" prepend="and">
+                (ca.business_number
+                like
+                '%$fuzzyValue$%'
+                or
+                bsa.name
+                like
+                '%$fuzzyValue$%'
+                or
+                ca.loan_officer_name
+                like
+                '%$fuzzyValue$%'
+                )
+            </isNotEmpty>
+            <isNotEmpty property="businessNumber" prepend="and">
+                ca.business_number = #businessNumber#
+            </isNotEmpty>
+            <isNotEmpty property="borrowerName" prepend="and">
+                bsa.name = #borrowerName#
+            </isNotEmpty>
+            <isNotEmpty property="customerName" prepend="and">
+                ca.loan_officer_name like
+                '%$customerName$%'
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="startDate">
+             <![CDATA[  #startDate# <= ca.signagreement_date  ]]>
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="endDate">
+                <![CDATA[   ca.signagreement_date <= #endDate#     ]]>
+            </isNotEmpty>
+            <isNotEmpty property="returnWayType" prepend="and">
+                ca.default_returnment_way = #returnWayType#
+            </isNotEmpty>
+            <isNotEmpty property="companyId" prepend="and">
+                ca.company_id in ($companyId$)
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="authList">
+                sv.ace_sid  IN
+                ($authList$)
+            </isNotEmpty>
+        </dynamic>
+        <![CDATA[
+					ORDER BY  os.aoverdue_start asc, ca.signagreement_date   asc
+		]]>
+    </sql>
+    <select id="queryOverdueListForExport" resultClass="overDueListVo" parameterClass="overDueQueryInfo">
+        <include refid="queryOverdueListForExportSql" />
+    </select>
+</sqlMap>

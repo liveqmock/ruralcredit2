@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 黑名单！ -->
+<sqlMap namespace="BLACKLIST">
+	<typeAlias alias="blacklist" type="com.creditease.rc.domain.Blacklist" />
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="blacklistVo" type="com.creditease.rc.vo.BlacklistVo" />
+	<resultMap class="blacklist" id="blacklistMap">
+		<result property="blacklistId" column="BLACKLIST_ID" jdbcType="INTEGER" />
+		<result property="name" column="NAME" jdbcType="VARCHAR" />
+		<result property="credentialsNumber" column="CREDENTIALS_NUMBER" jdbcType="VARCHAR" />
+		<result property="blacklistedTime" column="BLACKLISTED_TIME" jdbcType="TIMESTAMP" />
+		<result property="blacklistedOperatorName" column="BLACKLISTED_OPERATOR_NAME" jdbcType="VARCHAR" />
+		<result property="blacklistedOperatorId" column="BLACKLISTED_OPERATOR_ID" jdbcType="INTEGER" />
+		<result property="blacklistedReason" column="BLACKLISTED_REASON" jdbcType="VARCHAR" />
+		<result property="removeTime" column="REMOVE_TIME" jdbcType="TIMESTAMP" />
+		<result property="removeOperatorName" column="REMOVE_OPERATOR_NAME" jdbcType="VARCHAR" />
+		<result property="removeOperatorId" column="REMOVE_OPERATOR_ID" jdbcType="INTEGER" />
+		<result property="removeReason" column="REMOVE_REASON" jdbcType="VARCHAR" />
+		<result property="historyFlag" column="HISTORY_FLAG" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap class="blacklistVo" id="blacklistVoMap">
+		<result property="blacklistId" column="BLACKLIST_ID" jdbcType="INTEGER" />
+		<result property="blackName" column="BLACKNAME" jdbcType="VARCHAR" />
+		<result property="blackCredentialsNumber" column="BLACKCREDENTIALSNUMBER" jdbcType="VARCHAR" />
+		<result property="blacklistedTime" column="BLACKLISTED_TIME" jdbcType="TIMESTAMP" />
+		<result property="blacklistedOperatorName" column="BLACKLISTED_OPERATOR_NAME" jdbcType="VARCHAR" />
+		<result property="blacklistedOperatorId" column="BLACKLISTED_OPERATOR_ID" jdbcType="INTEGER" />
+		<result property="blacklistedReason" column="BLACKLISTED_REASON" jdbcType="VARCHAR" />
+		<result property="removeTime" column="REMOVE_TIME" jdbcType="TIMESTAMP" />
+		<result property="removeOperatorName" column="REMOVE_OPERATOR_NAME" jdbcType="VARCHAR" />
+		<result property="removeOperatorId" column="REMOVE_OPERATOR_ID" jdbcType="INTEGER" />
+		<result property="removeReason" column="REMOVE_REASON" jdbcType="VARCHAR" />
+		<result property="historyFlag" column="HISTORY_FLAG" jdbcType="VARCHAR" />
+
+		<result property="customerBasicId" jdbcType="INTEGER" column="CUSTOMER_BASIC_ID" />
+		<result property="former" jdbcType="VARCHAR" column="FORMER" />
+		<result property="credentialsType" jdbcType="CHAR" column="CREDENTIALS_TYPE" />
+		<result property="gender" jdbcType="CHAR" column="GENDER" />
+		<result property="national" jdbcType="CHAR" column="NATIONAL" />
+		<result property="maritalStatus" jdbcType="CHAR" column="MARITAL_STATUS" />
+		<result property="mobilephone" jdbcType="VARCHAR" column="MOBILEPHONE" />
+		<result property="telephone" jdbcType="VARCHAR" column="TELEPHONE" />
+		<result property="personIncome" jdbcType="INTEGER" column="PERSON_INCOME" />
+		<result property="highestEducation" jdbcType="VARCHAR" column="HIGHEST_EDUCATION" />
+		<result property="presentAddress" jdbcType="VARCHAR" column="HOME_ADDRESS" />
+		<result property="residenceAddress" jdbcType="VARCHAR" column="RESIDENCE_ADDRESS" />
+		<result property="remark" jdbcType="VARCHAR" column="REMARK" />
+		<result property="createTime" jdbcType="TIMESTAMP" column="CREATE_DATE" />
+		<result property="operateName" jdbcType="VARCHAR" column="OPERATOR_NAME" />
+		<result property="operateId" jdbcType="INTEGER" column="OPERATOR_ID" />
+		<result property="vallageId" jdbcType="INTEGER" column="VILLAGE_ID" />
+		<result property="customerType" jdbcType="VARCHAR" column="CUSTOMER_TYPE" />
+		<result property="guaranor" jdbcType="VARCHAR" column="GUARANOR" />
+		
+		<result property="nationalDetail" jdbcType="VARCHAR" column="NATIONALDETAIL" />
+		<result property="maritalStatusDetail" jdbcType="VARCHAR" column="MARITALSTATUSDETAIL" />
+		<result property="highestEducationDetail" jdbcType="VARCHAR" column="HIGHESTEDUCATIONDETAIL" />
+	</resultMap>
+
+
+	<insert id="dynamicInsert" parameterClass="blacklist">
+		<selectKey keyProperty="blacklistId" resultClass="long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_BLACKLIST(
+			BLACKLIST_ID
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="name">
+				,NAME
+			</isNotEmpty>
+			<isNotEmpty property="credentialsNumber">
+				,CREDENTIALS_NUMBER
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedTime">
+				,BLACKLISTED_TIME
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedOperatorName">
+				,BLACKLISTED_OPERATOR_NAME
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedOperatorId">
+				,BLACKLISTED_OPERATOR_ID
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedReason">
+				,BLACKLISTED_REASON
+			</isNotEmpty>
+			<isNotEmpty property="removeTime">
+				,REMOVE_TIME
+			</isNotEmpty>
+			<isNotEmpty property="removeOperatorName">
+				,REMOVE_OPERATOR_NAME
+			</isNotEmpty>
+			<isNotEmpty property="removeOperatorId">
+				,REMOVE_OPERATOR_ID
+			</isNotEmpty>
+			<isNotEmpty property="removeReason">
+				,REMOVE_REASON
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,HISTORY_FLAG
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#blacklistId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="name">
+				,#name#
+			</isNotEmpty>
+			<isNotEmpty property="credentialsNumber">
+				,#credentialsNumber#
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedTime">
+				,#blacklistedTime#
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedOperatorName">
+				,#blacklistedOperatorName#
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedOperatorId">
+				,#blacklistedOperatorId#
+			</isNotEmpty>
+			<isNotEmpty property="blacklistedReason">
+				,#blacklistedReason#
+			</isNotEmpty>
+			<isNotEmpty property="removeTime">
+				,#removeTime#
+			</isNotEmpty>
+			<isNotEmpty property="removeOperatorName">
+				,#removeOperatorName#
+			</isNotEmpty>
+			<isNotEmpty property="removeOperatorId">
+				,#removeOperatorId#
+			</isNotEmpty>
+			<isNotEmpty property="removeReason">
+				,#removeReason#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,#historyFlag#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="blacklist">
+		<![CDATA[
+			update RL_BLACKLIST
+		]]>
+		<dynamic prepend="SET">
+			<isNotNull property="name" prepend=",">
+				NAME = #name#
+			</isNotNull>
+			<isNotNull property="credentialsNumber" prepend=",">
+				CREDENTIALS_NUMBER = #credentialsNumber#
+			</isNotNull>
+			<isNotNull property="blacklistedTime" prepend=",">
+				BLACKLISTED_TIME = #blacklistedTime#
+			</isNotNull>
+			<isNotNull property="blacklistedOperatorName" prepend=",">
+				BLACKLISTED_OPERATOR_NAME = #blacklistedOperatorName#
+			</isNotNull>
+			<isNotNull property="blacklistedOperatorId" prepend=",">
+				BLACKLISTED_OPERATOR_ID =#blacklistedOperatorId#
+			</isNotNull>
+			<isNotNull property="blacklistedReason" prepend=",">
+				BLACKLISTED_REASON = #blacklistedReason#
+			</isNotNull>
+			<isNotNull property="removeTime" prepend=",">
+				REMOVE_TIME = #removeTime#
+			</isNotNull>
+			<isNotNull property="removeOperatorName" prepend=",">
+				REMOVE_OPERATOR_NAME = #removeOperatorName#
+			</isNotNull>
+			<isNotNull property="removeOperatorId" prepend=",">
+				REMOVE_OPERATOR_ID = #removeOperatorId#
+			</isNotNull>
+			<isNotNull property="removeReason" prepend=",">
+				REMOVE_REASON = #removeReason#
+			</isNotNull>
+			<isNotNull property="historyFlag" prepend=",">
+				HISTORY_FLAG = #historyFlag#
+			</isNotNull>
+		</dynamic>
+		<![CDATA[
+			where
+			BLACKLIST_ID = #blacklistId#
+		]]>
+	</update>
+	<sql id="dynamicSelectSQL">
+		select * from rl_balcklist
+	</sql>
+	<sql id="dynamicSelectVoSQL">
+		select 
+		c.*,
+			        (select ct.code_value  from rl_codetable ct where ct.code_key = C.National and ct.section='national') as nationalDetail,
+            		(select ct.code_value  from rl_codetable ct where ct.code_key = C.Marital_Status and ct.section='maritalStatus') as maritalStatusDetail,
+             		(select ct.code_value  from rl_codetable ct where ct.code_key = C.Highest_Education and ct.section='highestEducation') as highestEducationDetail
+		,
+		b.blacklist_id as blacklist_id,
+		b.name as blackName,
+		b.credentials_number as BLACKCREDENTIALSNUMBER,
+		b.blacklisted_time as blacklisted_time,
+		b.blacklisted_operator_name as blacklisted_operator_name,
+		b.blacklisted_operator_id as blacklisted_operator_id,
+		b.blacklisted_reason as blacklisted_reason,
+		b.remove_time as remove_time,
+		b.remove_operator_name as remove_operator_name,
+		b.remove_operator_id as remove_operator_id,
+		b.remove_reason as remove_reason,
+		b.history_flag as history_flag
+		from rl_blacklist b
+		left join rl_customer_basic_info c
+		on b.credentials_number = c.credentials_number
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="fuzzyValue">
+				(b.credentials_number
+				like
+				'%$fuzzyValue$%'
+				or
+				b.name
+				like
+				'%$fuzzyValue$%')
+		    </isNotEmpty>
+			<isNotEmpty prepend="AND" property="blackCredentialsNumber">
+				b.credentials_number = #blackCredentialsNumber#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="blackName">
+				b.name = #blackName#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="historyFlag">
+				b.history_flag =#historyFlag#
+			</isNotEmpty>
+		</dynamic>
+		order by history_flag asc
+	</sql>
+	<select id="queryBlackList">
+		<include refid="dynamicSelectSQL" />
+	</select>
+	<select id="queryBlacklistVoList" resultMap="blacklistVoMap" parameterClass="java.util.Map">
+		<include refid="dynamicSelectVoSQL" />
+	</select>
+	<select id="countBlacklistVoList" resultClass="int" parameterClass="java.util.Map">
+		select count(*) from(
+		<include refid="dynamicSelectVoSQL" />
+		)
+	</select>
+	<select id="checkIdNumber" parameterClass="java.lang.String" resultClass="int">
+		select count(*) from rl_blacklist b where b.history_flag = 'F' and b.credentials_number = #value#
+	</select>
+	<update id="updateCustomer" parameterClass="blacklist">
+		update rl_customer_basic_info cbi
+		set cbi.name = #name#
+		where cbi.credentials_number = #credentialsNumber#
+	</update>
+</sqlMap>

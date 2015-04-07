@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="RL_CREDIT_INVESTIGATIO">
+	<resultMap id="abatorgenerated_CreditInvestigatioResult" class="com.creditease.rc.domain.CreditInvestigation">
+		<result column="CREDIT_INVESTIGATIO_ID" property="creditInvestigatioId" jdbcType="DECIMAL" />
+		<result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="SPOUSE_NAME" property="spouseName" jdbcType="VARCHAR" />
+		<result column="RESULT" property="result" jdbcType="CHAR" />
+		<result column="RISK_MANAGER_NAME" property="riskManagerName" jdbcType="VARCHAR" />
+		<result column="RISK_MANAGER_ID" property="riskManagerId" jdbcType="VARCHAR" />
+		<result column="INVESTIGATION_DATE" property="investigationDate" jdbcType="TIMESTAMP" />
+		<result column="IS_VALID" property="isValid" jdbcType="CHAR" />
+		<result column="IS_SUBMIT" property="isSubmit" jdbcType="CHAR" />
+	</resultMap>
+	<resultMap id="creditInvestigationVoResult" class="com.creditease.rc.vo.CreditInvestigationVo">
+		<result column="CREDIT_INVESTIGATIO_ID" property="creditInvestigatioId" jdbcType="DECIMAL" />
+		<result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL" />
+		<result column="BUSINESS_NUMBER" property="groupNumber" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="SPOUSE_NAME" property="spouseName" jdbcType="VARCHAR" />
+		<result column="RESULT" property="result" jdbcType="CHAR" />
+		<result column="RISK_MANAGER_NAME" property="riskManagerName" jdbcType="VARCHAR" />
+		<result column="RISK_MANAGER_ID" property="riskManagerId" jdbcType="VARCHAR" />
+		<result column="INVESTIGATION_DATE" property="investigationDate" jdbcType="TIMESTAMP" />
+		<result column="IS_VALID" property="isValid" jdbcType="CHAR" />
+		<result column="IS_SUBMIT" property="isSubmit" jdbcType="CHAR" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="abatorgenerated_CreditInvestigatioResult" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		select CREDIT_INVESTIGATIO_ID, CREDITAPPLICATION_ID, NAME, SPOUSE_NAME, RESULT,
+		RISK_MANAGER_NAME, RISK_MANAGER_ID, INVESTIGATION_DATE, IS_VALID,IS_SUBMIT
+		from RL_CREDIT_INVESTIGATIO
+		where CREDIT_INVESTIGATIO_ID = #creditInvestigatioId:DECIMAL#
+  </select>
+	<select id="selectCreditInvestigationVoByPrimaryKey" resultMap="creditInvestigationVoResult" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		select CREDIT_INVESTIGATIO_ID, ci.CREDITAPPLICATION_ID, ca.BUSINESS_NUMBER, NAME, SPOUSE_NAME, RESULT,
+		RISK_MANAGER_NAME, RISK_MANAGER_ID, INVESTIGATION_DATE, IS_VALID,IS_SUBMIT
+		from RL_CREDIT_INVESTIGATIO ci, Rl_Credit_Application ca
+		where ci.creditapplication_id = ca.creditapplication_id
+		and ci.CREDIT_INVESTIGATIO_ID = #creditInvestigatioId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		delete from RL_CREDIT_INVESTIGATIO
+		where CREDIT_INVESTIGATIO_ID = #creditInvestigatioId:DECIMAL#
+  </delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		<selectKey keyProperty="creditInvestigatioId" resultClass="java.lang.Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+            insert into RL_CREDIT_INVESTIGATIO (CREDIT_INVESTIGATIO_ID, CREDITAPPLICATION_ID, NAME,
+              SPOUSE_NAME, RESULT, RISK_MANAGER_NAME, RISK_MANAGER_ID, INVESTIGATION_DATE, IS_VALID,IS_SUBMIT)
+            values (#creditInvestigatioId:DECIMAL#, #creditapplicationId:DECIMAL#, #name:VARCHAR#,
+              #spouseName:VARCHAR#, #result:CHAR#, #riskManagerName:VARCHAR#, #riskManagerId:VARCHAR#,
+              #investigationDate:TIMESTAMP#, #isValid:CHAR#,#isSubmit:CHAR#)
+        ]]>
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		update RL_CREDIT_INVESTIGATIO
+		set CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#,
+		NAME = #name:VARCHAR#,
+		SPOUSE_NAME = #spouseName:VARCHAR#,
+		RESULT = #result:CHAR#,
+		RISK_MANAGER_NAME = #riskManagerName:VARCHAR#,
+		RISK_MANAGER_ID = #riskManagerId:VARCHAR#,
+		INVESTIGATION_DATE = #investigationDate:TIMESTAMP#,
+		IS_SUBMIT = #isSubmit:CHAR#,
+		IS_VALID = #isValid:CHAR#
+		where CREDIT_INVESTIGATIO_ID = #creditInvestigatioId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		update RL_CREDIT_INVESTIGATIO
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="creditapplicationId">
+				CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="name">
+				NAME = #name:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="spouseName">
+				SPOUSE_NAME = #spouseName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="result">
+				RESULT = #result:CHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="riskManagerName">
+				RISK_MANAGER_NAME = #riskManagerName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="riskManagerId">
+				RISK_MANAGER_ID = #riskManagerId:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="investigationDate">
+				INVESTIGATION_DATE = #investigationDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="isValid">
+				IS_VALID = #isValid:CHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="isSubmit">
+				IS_SUBMIT = #isSubmit:CHAR#
+      </isNotNull>
+		</dynamic>
+		where CREDIT_INVESTIGATIO_ID = #creditInvestigatioId:DECIMAL#
+	</update>
+	<select id="quertyReportList" parameterClass="java.lang.Long" resultMap="creditInvestigationVoResult">
+		<![CDATA[
+			select CREDIT_INVESTIGATIO_ID, ci.CREDITAPPLICATION_ID, ca.BUSINESS_NUMBER, NAME, SPOUSE_NAME , RESULT,
+			RISK_MANAGER_NAME, RISK_MANAGER_ID, INVESTIGATION_DATE, IS_VALID,IS_SUBMIT
+			from RL_CREDIT_INVESTIGATIO ci, Rl_Credit_Application ca
+			where ci.creditapplication_id = ca.creditapplication_id
+			and ca.creditapplication_id = #value#
+		]]>
+	</select>
+	<select id="select" parameterClass="java.lang.Long" resultMap="creditInvestigationVoResult">
+		<![CDATA[
+			select CREDIT_INVESTIGATIO_ID, ci.CREDITAPPLICATION_ID, ca.BUSINESS_NUMBER, NAME, SPOUSE_NAME, RESULT,
+			RISK_MANAGER_NAME, RISK_MANAGER_ID, INVESTIGATION_DATE, IS_VALID,IS_SUBMIT
+			from RL_CREDIT_INVESTIGATIO ci, Rl_Credit_Application ca
+			where ci.creditapplication_id = ca.creditapplication_id
+			and ci.CREDIT_INVESTIGATIO_ID = #value#
+		]]>
+	</select>
+	<update id="updateSubmit" parameterClass="java.lang.Long">
+		<![CDATA[
+			update RL_CREDIT_INVESTIGATIO
+			set IS_SUBMIT = '1'
+			where
+			CREDIT_INVESTIGATIO_ID = #value#
+		]]>
+	</update>
+	<select id="selectNameAndSpousName" parameterClass="java.lang.Long" resultClass="com.creditease.rc.vo.CreditInvestigationVo">
+		<![CDATA[
+		select bsa.name as name, COALESCE(cb.name,fam.name) as spouseName,c.creditapplication_id as creditapplicationId, c.business_number as groupNumber, ci.credit_investigatio_id as creditInvestigatioId
+        from rl_credit_application c
+        left join rl_credit_investigatio ci
+        on c.creditapplication_id = ci.creditapplication_id
+        left  join rl_borrower_service_app bsa on bsa.creditapplication_id=c.creditapplication_id
+        left join (select * from  rl_family_member   fam where fam.borrowerre_rationship = '2') fam on bsa.borrower_service_app_id = fam.borrower_service_app_id 
+    	left join rl_credit_coborrower cb on cb.borrower_service_app_id = bsa.borrower_service_app_id
+ 	 	where bsa.leader = '1'
+   		and  bsa.valid_state = '1'
+   		and bsa.creditapplication_id = #value#
+		]]>
+	</select>
+	<select id="queryBycreditapplicationId" resultClass="com.creditease.rc.vo.CreditInvestigationVo" parameterClass="java.lang.Long">
+		<![CDATA[
+			select ci.creditapplication_id as creditapplicationId from rl_credit_investigatio ci where ci.creditapplication_id = #value#
+		]]>
+	</select>
+	<update id="updateCreditInvestigationName" parameterClass="com.creditease.rc.domain.CreditInvestigation">
+		<![CDATA[
+			update RL_CREDIT_INVESTIGATIO cr
+			set cr.name=#name#
+			,cr.SPOUSE_NAME=#spouseName#
+			where
+			cr.creditapplication_id = #creditapplicationId#
+		]]>
+	</update>
+</sqlMap>

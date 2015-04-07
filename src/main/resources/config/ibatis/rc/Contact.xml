@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CONTACT">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="contact" type="com.creditease.rc.domain.Contact" />
+    <resultMap class="com.creditease.rc.domain.Contact" id="ContactMap">
+		<result property="contactId" column="CONTACT_ID" jdbcType="INTEGER"/>
+		<result property="borrowerServiceAppId" column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER"/>
+	    <result property="contactType" column="CONTACT_TYPE" jdbcType="VARCHAR"/>
+	    <result property="name" column="NAME" jdbcType="VARCHAR"/>
+	    <result property="telphone" column="TELPHONE" jdbcType="VARCHAR"/>
+	    <result property="borrowerreRationship" column="BORROWERRE_RATIONSHIP" jdbcType="VARCHAR"/>
+	    <result property="workUnit" column="WORK_UNIT" jdbcType="VARCHAR"/>
+	    <result property="addressfamilyOrWorkunit" column="ADDRESSFAMILY_OR_WORKUNIT" jdbcType="VARCHAR"/>
+	    <result property="post" column="POST" jdbcType="VARCHAR"/>
+	    
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="contact" >
+    	 <selectKey keyProperty="contactId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_CONTACT
+        		(
+					CONTACT_ID,
+					BORROWER_SERVICE_APP_ID,
+					CONTACT_TYPE,
+					NAME,
+					TELPHONE,
+					BORROWERRE_RATIONSHIP,
+					WORK_UNIT,
+					ADDRESSFAMILY_OR_WORKUNIT,
+					POST
+					)
+        	values(
+					#contactId:INTEGER#,
+					#borrowerServiceAppId:INTEGER#,
+					#contactType:VARCHAR#,
+					#name:VARCHAR#,
+					#telphone:VARCHAR#,
+					#borrowerreRationship:VARCHAR#,
+					#workUnit:VARCHAR#,
+					#addressfamilyOrWorkunit:VARCHAR#,
+					#post:VARCHAR#
+					)
+        ]]>
+    </insert>
+
+     <select id="selectAll" parameterClass="int" resultMap="ContactMap">
+     	<![CDATA[
+     		SELECT * FROM RL_CONTACT
+     			WHERE BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+     			ORDER BY CONTACT_TYPE ASC
+     	]]>
+     </select>
+     
+     <update id="update" parameterClass="contact">
+     	update RL_CONTACT set 
+     				 
+					CONTACT_TYPE=#contactType:VARCHAR#,
+					NAME=#name:VARCHAR#,
+					TELPHONE=#telphone:VARCHAR#,
+					BORROWERRE_RATIONSHIP=#borrowerreRationship:VARCHAR#,
+					WORK_UNIT=	#workUnit:VARCHAR#,
+					ADDRESSFAMILY_OR_WORKUNIT=#addressfamilyOrWorkunit:VARCHAR#,
+					POST=#post:VARCHAR#
+		where
+				CONTACT_ID=#contactId:INTEGER#
+     </update>
+     
+     <delete id="deleteByBSAId" parameterClass="int">
+     	<![CDATA[
+     		DELETE FROM RL_CONTACT WHERE  BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+     	]]>
+     </delete>
+     
+     <select id="selectByContact" parameterClass="contact" resultMap="ContactMap">
+     	<![CDATA[
+     		SELECT * FROM RL_CONTACT
+     	]]>
+     	<dynamic prepend="WHERE">
+     		<isNotEmpty prepend="AND" property="borrowerServiceAppId">
+     			BORROWER_SERVICE_APP_ID =#borrowerServiceAppId#
+     		</isNotEmpty>
+     		<isNotEmpty prepend="AND" property="contactType">
+     			CONTACT_TYPE =#contactType#
+     		</isNotEmpty>
+     	</dynamic>
+     </select>
+</sqlMap>

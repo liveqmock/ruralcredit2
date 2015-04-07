@@ -1,0 +1,965 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RECEIVEDRECORD">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="receivedRecord" type="com.creditease.rc.domain.ReceivedRecord"></typeAlias>
+	<typeAlias alias="creditApplication" type="com.creditease.rc.domain.CreditApplication" />
+	<typeAlias alias="receivedRecordVo" type="com.creditease.rc.vo.ReceivedRecordVo" />
+	<resultMap class="com.creditease.rc.domain.ReceivedRecord" id="receivedRecordMap">
+		<result column="RECEIVED_RECORD_ID" jdbcType="INTEGER" property="receivedRecordId"></result>
+		<result column="CREDITAPPLICATION_ID" jdbcType="INTEGER" property="creditapplicationId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId"></result>
+		<result column="RECEIVED_TIME" jdbcType="DATE" property="receivedTime"></result>
+		<result column="RECEIVED_AMOUNT" jdbcType="DOUBLE" property="receivedAmount"></result>
+		<result column="RECEIVED_TYPE" jdbcType="CHAR" property="receivedType"></result>
+		<result column="OPERATOR_ID" jdbcType="INTEGER" property="operatorId"></result>
+		<result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName"></result>
+		<result column="RECEIVED_STATUS" jdbcType="CHAR" property="receivedStatus"></result>
+		<result column="CAPITAL_SOURCE" jdbcType="VARCHAR" property="capitalSource"></result>
+		<result column="OPERATE_DATE" jdbcType="DATE" property="operateDate"></result>
+		<result column="HISTORY_FLAG" jdbcType="VARCHAR" property="historyFlag"></result>
+		<result column="ACCOUNT_INFO_ID" jdbcType="INTEGER" property="accountInfoId"></result>
+		<result column="REVOCATION_TIME" jdbcType="DATE" property="revocationTime"></result>
+		<result column="REVOCATION_OPERATOR_ID" jdbcType="INTEGER" property="revocationOperatorId"></result>
+		<result column="PLACE" jdbcType="CHAR" property="place"></result>
+	</resultMap>
+	<resultMap class="com.creditease.rc.vo.ReceivedRecordVo" id="nReceivedRecord">
+		<result column="RECEIVED_RECORD_ID" jdbcType="INTEGER" property="receivedRecordId"></result>
+		<result column="CREDITAPPLICATION_ID" jdbcType="INTEGER" property="creditapplicationId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId"></result>
+		<result column="RECEIVED_TIME" jdbcType="DATE" property="receivedTime"></result>
+		<result column="RECEIVED_AMOUNT" jdbcType="DOUBLE" property="receivedAmount"></result>
+		<result column="RECEIVED_TYPE" jdbcType="CHAR" property="receivedType"></result>
+		<result column="OPERATOR_ID" jdbcType="INTEGER" property="operatorId"></result>
+		<result column="OPERATOR_NAME" jdbcType="VARCHAR" property="operatorName"></result>
+		<result column="RECEIVED_STATUS" jdbcType="CHAR" property="receivedStatus"></result>
+		<result column="CAPITAL_SOURCE" jdbcType="VARCHAR" property="capitalSource"></result>
+		<result column="OPERATE_DATE" jdbcType="DATE" property="operateDate"></result>
+		<result column="HISTORY_FLAG" jdbcType="VARCHAR" property="historyFlag"></result>
+		<result column="ACCOUNT_INFO_ID" jdbcType="INTEGER" property="accountInfoId"></result>
+		<result column="REVOCATION_TIME" jdbcType="DATE" property="revocationTime"></result>
+		<result column="REVOCATION_OPERATOR_ID" jdbcType="INTEGER" property="revocationOperatorId"></result>
+		<result column="PLACE" jdbcType="CHAR" property="place"></result>
+
+		<result column="CONTACT_NUMBER" jdbcType="VARCHAR" property="contactNumber" />
+		<result column="BUSINESS_NUMBER" jdbcType="VARCHAR" property="businessNumber" />
+		<result column="BORROWER_NAME" jdbcType="VARCHAR" property="borrowerName" />
+		<result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+		<result column="DEFAULT_RETURNMENT_WAY" jdbcType="CHAR" property="defaultReturnmentWay" />
+
+		<result column="BRANCH_NAME" jdbcType="VARCHAR" property="branchName"></result>
+		<result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName"></result>
+		<result column="ACCOUNT" jdbcType="VARCHAR" property="account"></result>
+		<result column="BANK_NAME" jdbcType="VARCHAR" property="bankName"></result>
+		<result column="ACCOUNT_TYPE" jdbcType="CHAR" property="accountType"></result>
+
+	</resultMap>
+	<select id="select" resultMap="receivedRecordMap">
+		select * from RL_RECEIVED_RECORD
+	</select>
+	<select id="selectCreditapplicationId" parameterClass="List" resultClass="creditApplication">
+		select * from RL_RECEIVED_RECORD R,RL_CREDIT_APPLICATION C
+		WHERE
+		R.CREDITAPPLICATION_ID=C.CREDITAPPLICATION_ID
+		AND
+		<iterate open="(" close=")" conjunction=",">
+			#integerVector[]#
+		</iterate>
+	</select>
+	<select id="count" resultClass="int">
+		select count(*) from
+		RL_RECEIVED_RECORD
+	</select>
+	<select id="selectReceivedRecordByList" resultClass="creditApplication" parameterClass="List">
+		SELECT R.CREDITAPPLICATION_ID creditapplicationId ,C.COMPANY_NAME
+		companyName
+		FROM RL_RECEIVED_RECORD R,RL_CREDIT_APPLICATION C
+		WHERE
+		R.CREDITAPPLICATION_ID=C.CREDITAPPLICATION_ID AND
+		R.HISTORY_FLAG = 'F'
+		AND R.RECEIVED_RECORD_ID IN
+		<iterate open="(" close=")" conjunction=",">
+			#receivedRecordIdList[]#
+		</iterate>
+		UNION
+		SELECT C.CREDITAPPLICATION_ID creditapplicationId,
+		C.COMPANY_NAME companyName
+		FROM RL_AMOUNT_CONFIRM A, RL_CREDIT_APPLICATION C
+		WHERE A.CREDIT_APPLICATION_ID = C.CREDITAPPLICATION_ID
+		AND A.AMOUNT_CONFIRM_ID IN
+		<iterate open="(" close=")" conjunction=",">
+			#receivedRecordIdList[]#
+		</iterate>
+	</select>
+	<select id="selectReceivedRecordStatus" resultClass="receivedRecord" parameterClass="List">
+		SELECT
+		'S' receivedType,
+		R.RECEIVED_STATUS receivedStatus ,
+		R.RECEIVED_RECORD_ID receivedRecordId
+		FROM
+		RL_RECEIVED_RECORD R
+		WHERE
+		R.HISTORY_FLAG = 'F' AND R.RECEIVED_RECORD_ID
+		IN
+		<iterate open="(" close=")" conjunction=",">
+			#receivedRecordIdList[]#
+		</iterate>
+		UNION
+		SELECT 'U' receivedType,
+		F.FINANCE_STATUS receivedStatus,
+		F.ASSOCIATION_ID receivedRecordId
+		FROM RL_AMOUNT_CONFIRM A LEFT JOIN RL_FINANCE_MONEY F ON A.AMOUNT_CONFIRM_ID=F.ASSOCIATION_ID
+		WHERE A.HISTORY_FLAG = '0'
+		AND F.TYPE!='F'
+		AND F.HISTORY_FLAG='F'
+		AND A.AMOUNT_CONFIRM_ID IN
+		<iterate open="(" close=")" conjunction=",">
+			#receivedRecordIdList[]#
+		</iterate>
+	</select>
+	<select id="dynamicSelect" resultMap="receivedRecordMap" parameterClass="receivedRecord">
+		<![CDATA[
+			select * from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				RECEIVED_TIME
+				= #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				RECEIVED_TYPE
+				= #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				OPERATOR_NAME
+				= #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="capitalSource" prepend="AND">
+				CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				OPERATE_DATE =
+				#operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG =
+				#historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="selectH" resultMap="receivedRecordMap" parameterClass="receivedRecord">
+		<![CDATA[
+			select * from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				RECEIVED_TIME
+				= #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				RECEIVED_TYPE
+				= #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				OPERATOR_NAME
+				= #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			<isEmpty property="receivedStatus" prepend="AND">
+				(RECEIVED_STATUS =
+				'0' or RECEIVED_STATUS = '1' or RECEIVED_STATUS = '2' or
+				RECEIVED_STATUS = '4') 
+			</isEmpty>
+			<isNotEmpty property="capitalSource" prepend="AND">
+				CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				OPERATE_DATE =
+				#operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG =
+				#historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG = 'F'
+			</isEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="selectF" resultMap="receivedRecordMap" parameterClass="java.lang.String">
+		<![CDATA[
+			select * from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="java.util.String">
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="dynamicCount" resultClass="int" parameterClass="receivedRecord">
+		<![CDATA[
+			select count(*) from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				RECEIVED_TIME
+				= #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				RECEIVED_TYPE
+				= #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				OPERATOR_NAME
+				= #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="capitalSource" prepend="AND">
+				CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				OPERATE_DATE =
+				#operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG =
+				#historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="coutH" resultClass="int" parameterClass="receivedRecord">
+		<![CDATA[
+			select count(*) from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				RECEIVED_TIME
+				= #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				RECEIVED_TYPE
+				= #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				OPERATOR_NAME
+				= #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			<isEmpty property="receivedStatus" prepend="AND">
+				(RECEIVED_STATUS =
+				'0' or RECEIVED_STATUS = '1' or RECEIVED_STATUS = '2' or
+				RECEIVED_STATUS = '4') 
+			</isEmpty>
+			<isNotEmpty property="capitalSource" prepend="AND">
+				CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				OPERATE_DATE =
+				#operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG =
+				#historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isEmpty property="historyFlag" prepend="AND">
+				HISTORY_FLAG = 'F'
+			</isEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="countF" resultClass="int" parameterClass="java.lang.String">
+		<![CDATA[
+			select count(*) from RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="java.util.String">
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<insert id="insert" parameterClass="receivedRecord">
+		<selectKey keyProperty="receivedRecordId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RECEIVED_RECORD
+			(RECEIVED_RECORD_ID,CREDITAPPLICATION_ID,BORROWER_SERVICE_APP_ID,RECEIVED_TIME,
+			RECEIVED_AMOUNT,RECEIVED_TYPE,OPERATOR_ID,
+			OPERATOR_NAME,RECEIVED_STATUS,
+			CAPITAL_SOURCE,OPERATE_DATE,HISTORY_FLAG,
+			ACCOUNT_INFO_ID,REVOCATION_TIME,REVOCATION_OPERATOR_ID,PLACE
+			)
+			values
+			(#receivedRecordId:INTEGER#,#creditapplicationId:INTEGER#,#borrowerServiceAppId:INTEGER#,#receivedTime:DATE#,
+			#receivedAmount:DOUBLE#,#receivedType#,#operatorId:INTEGER#,
+			#operatorName:VARCHAR#,#receivedStatus#,
+			#capitalSource:VARCHAR#,#operateDate:DATE#,#historyFlag:VARCHAR#,
+			#accountInfoId:INTEGER#,#revocationTime:DATE#,#revocationOperatorId:INTEGER#,#place:CHAR#
+			)
+		]]>
+	</insert>
+	<insert id="dynamicInsert" parameterClass="receivedRecord">
+		<selectKey keyProperty="receivedRecordId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RECEIVED_RECORD(
+			RECEIVED_RECORD_ID
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,CREDITAPPLICATION_ID
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId">
+				,BORROWER_SERVICE_APP_ID
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime">
+				,RECEIVED_TIME
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount">
+				,RECEIVED_AMOUNT
+			</isNotEmpty>
+			<isNotEmpty property="receivedType">
+				,RECEIVED_TYPE
+			</isNotEmpty>
+			<isNotEmpty property="operatorId">
+				,OPERATOR_ID
+			</isNotEmpty>
+			<isNotEmpty property="operatorName">
+				,OPERATOR_NAME
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus">
+				,RECEIVED_STATUS
+			</isNotEmpty>
+			<isNotEmpty property="capitalSource">
+				,CAPITAL_SOURCE
+			</isNotEmpty>
+			<isNotEmpty property="operateDate">
+				,OPERATE_DATE
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,HISTORY_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId">
+				,ACCOUNT_INFO_ID
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime">
+				,REVOCATION_TIME 
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId">
+				,REVOCATION_OPERATOR_ID
+			</isNotEmpty>
+			<isNotEmpty property="place">
+				,PLACE
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#receivedRecordId:INTEGER#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,#creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId">
+				,#borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime">
+				,#receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount">
+				,#receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType">
+				,#receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId">
+				,#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName">
+				,#operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus">
+				,#receivedStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="capitalSource">
+				,#capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate">
+				,#operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag">
+				,#historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId">
+				,#accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime">
+				,#revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId">
+				,#revocationOperatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="place">
+				,#place:CHAR#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="update" parameterClass="receivedRecord">
+		<![CDATA[
+			update RL_RECEIVED_RECORD
+			set
+			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#,
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#,
+			RECEIVED_TIME = #receivedTime:DATE#,
+			RECEIVED_AMOUNT = #receivedAmount:DOUBLE#,
+			RECEIVED_TYPE = #receivedType:CHAR#,
+			OPERATOR_ID = #operatorId:INTEGER#,
+			OPERATOR_NAME = #operatorName:VARCHAR#,
+			RECEIVED_STATUS = #receivedStatus:CHAR#
+			CAPITAL_SOURCE = #capitalSource:VARCHAR#,
+			OPERATE_DATE = #operateDate:DATE#,
+			HISTORY_FLAG = #historyFlag:VARCHAR#,
+			ACCOUNT_INFO_ID = #accountInfoId:INTEGER#,
+			REVOCATION_TIME = #revocationTime:DATE#,
+			REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			PLACE = #place:CHAR#
+			where
+			RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+		]]>
+	</update>
+	<update id="dynamicUpdate" parameterClass="receivedRecord">
+		<![CDATA[
+			update RL_RECEIVED_RECORD
+		]]>
+		<dynamic prepend="SET">
+			<isNotNull property="creditapplicationId" prepend=",">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotNull>
+			<isNotNull property="borrowerServiceAppId" prepend=",">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotNull>
+			<isNotNull property="receivedTime" prepend=",">
+				RECEIVED_TIME =
+				#receivedTime:DATE#
+			</isNotNull>
+			<isNotNull property="receivedAmount" prepend=",">
+				RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotNull>
+			<isNotNull property="receivedType" prepend=",">
+				RECEIVED_TYPE =
+				#receivedType:CHAR#
+			</isNotNull>
+			<isNotNull property="operatorId" prepend=",">
+				OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotNull>
+			<isNotNull property="operatorName" prepend=",">
+				OPERATOR_NAME =
+				#operatorName:VARCHAR#
+			</isNotNull>
+			<isNotNull property="receivedStatus" prepend=",">
+				RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotNull>
+			<isNotNull property="capitalSource" prepend=",">
+				CAPITAL_SOURCE
+				= #capitalSource:VARCHAR#
+			</isNotNull>
+			<isNotNull property="operateDate" prepend=",">
+				OPERATE_DATE =
+				#operateDate:DATE#
+			</isNotNull>
+			<isNotNull property="historyFlag" prepend=",">
+				HISTORY_FLAG =
+				#historyFlag:VARCHAR#
+			</isNotNull>
+			<isNotNull property="accountInfoId" prepend=",">
+				ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotNull>
+			<isNotNull property="revocationTime" prepend=",">
+				REVOCATION_TIME = #revocationTime:DATE#
+			</isNotNull>
+			<isNotNull property="revocationOperatorId" prepend=",">
+				REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotNull>
+			<isNotNull property="place" prepend=",">
+				PLACE = #place:CHAR#
+			</isNotNull>
+		</dynamic>
+		<![CDATA[
+			where
+			RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+		]]>
+	</update>
+	<delete id="deleteReceivedRecordByCreditapplicationId" parameterClass="int">
+		<![CDATA[
+			delete from RL_RECEIVED_RECORD
+			where
+			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+		]]>
+	</delete>
+	<select id="selectForCancel" parameterClass="int" resultMap="receivedRecordMap">
+		<![CDATA[
+			select *
+  			from rl_received_record r
+ 			where r.history_flag = 'F'
+   			and (r.received_status = '4' or r.received_status = '0')
+   			and r.creditapplication_id = #value#
+		]]>
+	</select><!-- -->
+	<select id="selectForGrid" resultMap="nReceivedRecord" parameterClass="receivedRecordVo">
+		<![CDATA[
+		select distinct r.*,
+		
+		c.BUSINESS_NUMBER,
+		c.CONTACT_NUMBER,
+		bsa.name as BORROWER_NAME,
+		c.ADDRESS,
+		c.DEFAULT_RETURNMENT_WAY,
+		a.BRANCH_NAME,
+		a.ACCOUNT_NAME,
+		a.ACCOUNT,
+		a.BANK_NAME,
+		a.ACCOUNT_TYPE,
+		decode ( r.received_status , '4','0','0','1','1','2','2','3','3','4','5','5')
+  		as orderCol
+		from rl_received_record r, rl_credit_application c, rl_account_info a, sid_view v,rl_borrower_service_app bsa
+		where r.creditapplication_id = c.creditapplication_id
+		and r.account_info_id = a.account_info_id
+		and r.creditapplication_id = bsa.creditapplication_id
+   		and bsa.leader = '1'
+   		and bsa.valid_state = '1'
+		]]>
+		<dynamic prepend="">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				r.RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				r.CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				r.BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				r.RECEIVED_TIME = #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				r.RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				r.RECEIVED_TYPE = #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				r.OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				r.OPERATOR_NAME = #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				r.RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			
+			<isNotEmpty property="capitalSource" prepend="AND">
+				r.CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				r.OPERATE_DATE
+				= #operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				r.HISTORY_FLAG
+				= #historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				r.ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				r.REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				r.REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+
+
+			<isNotEmpty property="contactNumber" prepend="AND">
+				c.CONTACT_NUMBER = #contactNumber:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="businessNumber" prepend="AND">
+				c.BUSINESS_NUMBER = #businessNumber:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerName" prepend="AND">
+				c.BORROWER_NAME = #borrowerName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="address" prepend="AND">
+				c.ADDRESS =
+				#address:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="defaultReturnmentWay" prepend="AND">
+				c.DEFAULT_RETURNMENT_WAY = #defaultReturnmentWay:CAHR#
+			</isNotEmpty>
+
+
+			<isNotEmpty property="branchName" prepend="AND">
+				a.BRANCH_NAME =
+				#branchName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountName" prepend="AND">
+				a.ACCOUNT_NAME
+				= #accountName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="account" prepend="AND">
+				a.ACCOUNT =
+				#account:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="bankName" prepend="AND">
+				a.BANK_NAME =
+				#bankName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountType" prepend="AND">
+				a.ACCOUNT_TYPE
+				= #accountType:CHAR#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="AND" property="authList">
+				c.CREDITAPPLICATION_ID
+				= v.object_id_identity
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		    </isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by history_flag,orderCol,received_time desc
+		]]>
+	</select>
+	<select id="countForGrid" resultClass="int" parameterClass="receivedRecordVo">
+		<![CDATA[
+		select count (*) from(select distinct  r.received_record_id,
+		decode ( r.received_status , '4','0','0','1','1','2','2','3','3','4','5','5')
+  		as orderCol
+		from rl_received_record r, rl_credit_application c, rl_account_info a, sid_view v,rl_borrower_service_app bsa
+		where r.creditapplication_id = c.creditapplication_id
+		and r.account_info_id = a.account_info_id
+		and r.creditapplication_id = bsa.creditapplication_id
+   		and bsa.leader = '1'
+   		and bsa.valid_state = '1'
+		]]>
+		<dynamic prepend="">
+			<isNotEmpty property="receivedRecordId" prepend="AND">
+				r.RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				r.CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerServiceAppId" prepend="AND">
+				r.BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedTime" prepend="AND">
+				r.RECEIVED_TIME = #receivedTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedAmount" prepend="AND">
+				r.RECEIVED_AMOUNT = #receivedAmount:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receivedType" prepend="AND">
+				r.RECEIVED_TYPE = #receivedType:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operatorId" prepend="AND">
+				r.OPERATOR_ID =
+				#operatorId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="operatorName" prepend="AND">
+				r.OPERATOR_NAME = #operatorName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receivedStatus" prepend="AND">
+				r.RECEIVED_STATUS = #receivedStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="capitalSource" prepend="AND">
+				r.CAPITAL_SOURCE = #capitalSource:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="operateDate" prepend="AND">
+				r.OPERATE_DATE
+				= #operateDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="historyFlag" prepend="AND">
+				r.HISTORY_FLAG
+				= #historyFlag:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				r.ACCOUNT_INFO_ID = #accountInfoId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="revocationTime" prepend="AND">
+				r.REVOCATION_TIME = #revocationTime:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="revocationOperatorId" prepend="AND">
+				r.REVOCATION_OPERATOR_ID = #revocationOperatorId:INTEGER#
+			</isNotEmpty>
+
+
+			<isNotEmpty property="contactNumber" prepend="AND">
+				c.CONTACT_NUMBER = #contactNumber:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="businessNumber" prepend="AND">
+				c.BUSINESS_NUMBER = #businessNumber:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerName" prepend="AND">
+				c.BORROWER_NAME = #borrowerName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="address" prepend="AND">
+				c.ADDRESS =
+				#address:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="defaultReturnmentWay" prepend="AND">
+				c.DEFAULT_RETURNMENT_WAY = #defaultReturnmentWay:CAHR#
+			</isNotEmpty>
+
+
+			<isNotEmpty property="branchName" prepend="AND">
+				a.BRANCH_NAME =
+				#branchName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountName" prepend="AND">
+				a.ACCOUNT_NAME
+				= #accountName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="account" prepend="AND">
+				a.ACCOUNT =
+				#account:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="bankName" prepend="AND">
+				a.BANK_NAME =
+				#bankName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="accountType" prepend="AND">
+				a.ACCOUNT_TYPE
+				= #accountType:CHAR#
+			</isNotEmpty>
+
+			<isNotEmpty prepend="AND" property="authList">
+				c.CREDITAPPLICATION_ID
+				= v.object_id_identity
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		    </isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by history_flag,orderCol,received_time desc)
+		]]>
+	</select>
+	<select id="selectFuzzy" resultMap="nReceivedRecord" parameterClass="receivedRecordVo">
+		<![CDATA[
+		select distinct r.*,
+		c.BUSINESS_NUMBER,
+		c.CONTACT_NUMBER,
+		bsa.name as BORROWER_NAME,
+		c.ADDRESS,
+		c.DEFAULT_RETURNMENT_WAY,
+		a.BRANCH_NAME,
+		a.ACCOUNT_NAME,
+		a.ACCOUNT,
+		a.BANK_NAME,
+		a.ACCOUNT_TYPE
+		from rl_received_record r, rl_credit_application c, rl_account_info a, sid_view v,rl_borrower_service_app bsa
+		where r.creditapplication_id = c.creditapplication_id
+		and r.account_info_id = a.account_info_id
+		and (r.RECEIVED_STATUS = '0' or r.RECEIVED_STATUS = '1' or r.RECEIVED_STATUS = '2' or r.RECEIVED_STATUS = '4')
+		and r.HISTORY_FLAG = 'F'
+		and r.creditapplication_id = bsa.creditapplication_id
+   		and bsa.leader = '1'
+   		and bsa.valid_state = '1'
+		]]>
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="fuzzyValue">
+				(c.BUSINESS_NUMBER
+				like
+				'%$fuzzyValue$%'
+				or
+				bsa.NAME
+				like
+				'%$fuzzyValue$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				c.CREDITAPPLICATION_ID
+				= v.object_id_identity
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		    </isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by received_record_id desc
+		]]>
+	</select>
+	<select id="countFuzzy" resultClass="int" parameterClass="receivedRecordVo">
+		<![CDATA[
+		select count (*) from(select distinct  r.received_record_id
+		from rl_received_record r, rl_credit_application c, rl_account_info a, sid_view v,rl_borrower_service_app bsa
+		where r.creditapplication_id = c.creditapplication_id
+		and r.account_info_id = a.account_info_id
+		and (r.RECEIVED_STATUS = '0' or r.RECEIVED_STATUS = '1' or r.RECEIVED_STATUS = '2' or r.RECEIVED_STATUS = '4')
+		and r.HISTORY_FLAG = 'F'
+		and r.creditapplication_id = bsa.creditapplication_id
+   		and bsa.leader = '1'
+   		and bsa.valid_state = '1'
+		]]>
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="fuzzyValue">
+				(c.BUSINESS_NUMBER
+				like
+				'%$fuzzyValue$%'
+				or
+				bsa.NAME
+				like
+				'%$fuzzyValue$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				c.CREDITAPPLICATION_ID
+				= v.object_id_identity
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.class='com.creditease.rc.domain.CreditApplication'
+		        </isNotEmpty>
+			<isNotEmpty prepend="AND" property="authList">
+				v.ace_sid IN
+				($authList$)
+		    </isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by received_record_id desc)
+		]]>
+	</select>
+	<select id="queryReceivedRecordByPrimaryKey" resultMap="receivedRecordMap" parameterClass="java.lang.Integer">
+		<![CDATA[
+			select * from rl_received_record rr where rr.received_record_id = #value#
+		]]>
+	</select>
+	
+	<select id="queryreceivedRecords" resultMap="receivedRecordMap" parameterClass="List">
+		select * from rl_received_record rr where rr.received_record_id in
+		<iterate open="(" close=")" conjunction=",">
+			#receivedRecordIdList[]#
+		</iterate>
+	</select>
+</sqlMap>

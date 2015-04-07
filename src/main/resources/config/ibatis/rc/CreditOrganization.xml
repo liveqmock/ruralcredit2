@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CREDITORGANYZATION">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="creditOrganization" type="com.creditease.rc.domain.CreditOrganization" />
+    
+    <resultMap class="com.creditease.rc.domain.CreditOrganization" id="CreditOrganizationMap">
+		<result property="creditOrgId" column="CREDIT_ORG_ID" jdbcType="INTEGER"/>
+		<result property="creditCardInfoId" column="CREDIT_CARD_INFO_ID" jdbcType="INTEGER"/>
+	    <result property="creditCardIssue" column="CREDIT_CARD_ISSUE" jdbcType="VARCHAR"/>
+	    <result property="openingDate" column="OPENING_DATE" jdbcType="DATE"/>
+	    <result property="creditLimit" column="CREDIT_LIMIT" jdbcType="INTEGER"/>
+	    <result property="creditUsedAmount" column="CREDIT_USED_AMOUNT" jdbcType="INTEGER"/>
+	    
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="creditOrganization" >
+    	 <selectKey keyProperty="creditOrgId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_CREDIT_ORGANIZATION
+        		(
+					CREDIT_ORG_ID,
+					CREDIT_CARD_INFO_ID,
+					CREDIT_CARD_ISSUE,
+					OPENING_DATE,
+					CREDIT_LIMIT,
+					CREDIT_USED_AMOUNT
+					)
+        	values(
+					#creditOrgId:INTEGER#,
+					#creditCardInfoId:INTEGER#,
+					#creditCardIssue:VARCHAR#,
+					#openingDate#,
+					#creditLimit:INTEGER#,
+					#creditUsedAmount:INTEGER#
+					)
+        ]]>
+    </insert>
+     
+     <update id="update" parameterClass="creditOrganization">
+     	update RL_CREDIT_ORGANIZATION set
+     				CREDIT_CARD_ISSUE=#creditCardIssue:VARCHAR#,
+					OPENING_DATE=#openingDate#,
+					CREDIT_LIMIT=#creditLimit:INTEGER#,
+					CREDIT_USED_AMOUNT=	#creditUsedAmount:INTEGER#
+		where 
+					CREDIT_ORG_ID=#creditOrgId:INTEGER#
+     </update>
+     
+     <select id="selectAll" resultMap="CreditOrganizationMap">
+     	select * from RL_CREDIT_ORGANIZATION
+     		where CREDIT_CARD_INFO_ID=#creditCardInfoId:INTEGER#
+     </select>
+     
+     <delete id="deleteByCreditCardId" parameterClass="int">
+     	<![CDATA[
+     		DELETE FROM RL_CREDIT_ORGANIZATION WHERE CREDIT_CARD_INFO_ID=#creditCardInfoId:INTEGER#
+     	]]>
+     		
+     </delete>
+     <delete id="deleteById" parameterClass="int">
+     	<![CDATA[
+     		DELETE FROM RL_CREDIT_ORGANIZATION WHERE CREDIT_ORG_ID=#creditOrgId:INTEGER#
+     	]]>
+     </delete>
+</sqlMap>

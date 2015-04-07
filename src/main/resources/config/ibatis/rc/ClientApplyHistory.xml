@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CLIENTAPPLYHISTORY">
+	<typeAlias alias="clientApplyHistory" type="com.creditease.rc.domain.ClientApplyHistory" />
+	<resultMap class="clientApplyHistory" id="clientApplyHistoryMAP">
+		<result property="clientApplyHistoryId" column="client_apply_history_id" />
+		<result property="creditapplicationId" column="creditapplication_id" />
+		<result property="sysGuid" column="sys_guid" />
+		<result property="isSuccess" column="is_success" />
+		<result property="message" column="message" />
+	</resultMap>
+
+	<insert id="dynamicInsert" parameterClass="clientApplyHistory">
+		<selectKey keyProperty="clientApplyHistoryId" resultClass="long" type="pre">
+			select seq_basic_info.nextval as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into rl_client_apply_history(
+			client_apply_history_id
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,creditapplication_id
+			</isNotEmpty>
+			<isNotEmpty property="sysGuid">
+				,sys_guid
+			</isNotEmpty>
+			<isNotEmpty property="isSuccess">
+				,is_success
+			</isNotEmpty>
+			<isNotEmpty property="message">
+				,message
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#clientApplyHistoryId#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,#creditapplicationId#
+			</isNotEmpty>
+			<isNotEmpty property="sysGuid">
+				,#sysGuid#
+			</isNotEmpty>
+			<isNotEmpty property="isSuccess">
+				,#isSuccess#
+			</isNotEmpty>
+			<isNotEmpty property="message">
+				,#message#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="dynamicUpdate" parameterClass="clientApplyHistory">
+		<![CDATA[
+			update rl_client_apply_history
+			
+		]]>
+		<dynamic prepend="set">
+			<isNotNull property="creditapplicationId" prepend=",">
+				creditapplication_id = #creditapplicationId#
+			</isNotNull>
+			<isNotNull property="sysGuid" prepend=",">
+				sys_guid = #sysGuid#
+			</isNotNull>
+			<isNotNull property="isSuccess" prepend=",">
+				is_success = #isSuccess#
+			</isNotNull>
+			<isNotNull property="message" prepend=",">
+				message = #message#
+			</isNotNull>
+		</dynamic>
+		<![CDATA[
+			where
+			client_apply_history_id = #clientApplyHistoryId#
+		]]>
+	</update>
+	<update id="update">
+	<![CDATA[
+		update rl_client_apply_history
+		set
+		creditapplication_id = #creditapplicationId#,
+		sys_guid = #sysGuid#,
+		is_success = #isSuccess#,
+		message = #message#
+		where
+		client_apply_history_id = #clientApplyHistoryId#
+	]]>
+	</update>
+	<delete id="delete" parameterClass="clientApplyHistory">
+		delete rl_client_apply_history where sys_guid = #sysGuid#
+	</delete>
+	<delete id="dynamicDelete" parameterClass="clientApplyHistory">
+		delete rl_client_apply_history where creditapplication_id = #creditapplicationId#
+		<isNotEmpty prepend="and" property="isSuccess">
+			is_success = #isSuccess# 
+		</isNotEmpty>
+	</delete>
+	<select id="dynamicSelect" parameterClass="clientApplyHistory" resultClass="clientApplyHistory">
+		select 
+		cah.client_apply_history_id as clientApplyHistoryId,
+		cah.creditapplication_id as creditapplicationId,
+		cah.sys_guid as sysGuid,
+		cah.is_success as isSuccess,
+		cah.message as message
+		from rl_client_apply_history cah
+		<dynamic prepend="where">
+			<isNotNull property="clientApplyHistoryId" prepend="and">
+				cah.client_apply_history_id = #clientApplyHistoryId#
+			</isNotNull>
+			<isNotNull property="creditapplicationId" prepend="and">
+				cah.creditapplication_id = #creditapplicationId#
+			</isNotNull>
+			<isNotNull property="sysGuid" prepend="and">
+				cah.sys_guid = #sysGuid#
+			</isNotNull>
+			<isNotNull property="isSuccess" prepend="and">
+				cah.is_success = #isSuccess#
+			</isNotNull>
+			<isNotNull property="message" prepend="and">
+				cah.message = #message#
+			</isNotNull>
+		</dynamic>
+	</select>
+</sqlMap>

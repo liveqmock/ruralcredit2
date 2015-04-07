@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RETURNPLAN">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="returnPlan" type="com.creditease.rc.domain.ReturnPlan" />
+	<resultMap class="com.creditease.rc.domain.ReturnPlan" id="returnPlanMap">
+		<result column="RETURN_PLAN_ID" jdbcType="INTEGER" property="returnPlanId" />
+		<result column="CREDITAPPLICATION_ID" jdbcType="INTEGER" property="creditapplicationId" />
+		<result column="CONTRACT_NO" jdbcType="VARCHAR" property="contractNo" />
+		<result column="CURR_MON_PRINCIPAL" jdbcType="DOUBLE" property="currMonPrincipal" />
+		<result column="CURR_MON_INTEREST" jdbcType="DOUBLE" property="currMonInterest" />
+		<result column="CURR_MON_MANAGE_FREE" jdbcType="DOUBLE" property="currMonManageFree" />
+		<result column="CURR_MON_LATER_FREE" jdbcType="DOUBLE" property="currMonLaterFree" />
+		<result column="CURR_MON_PENALTY" jdbcType="DOUBLE" property="currMonPenalty" />
+		<result column="CURR_ACCOUNT_TOTAL" jdbcType="DOUBLE" property="currAccountTotal" />
+		<result column="CURR_PAINDIN_CAPITAL" jdbcType="DOUBLE" property="currPaindinCapital" />
+		<result column="CURR_PAINDIN_INTEREST" jdbcType="DOUBLE" property="currPaindinInterest" />
+		<result column="CURR_PAINDIN_MANAGE_FREE" jdbcType="DOUBLE" property="currPaindinManageFree" />
+		<result column="CURR_LATE_FREE_PAID" jdbcType="DOUBLE" property="currLateFreePaid" />
+		<result column="CURR_MON_PAID_PENALTY" jdbcType="DOUBLE" property="currMonPaidPenalty" />
+		<result column="CURR_MON_PAY_TOTAL" jdbcType="DOUBLE" property="currMonPayTotal" />
+		<result column="COLLECTION_STATUS" jdbcType="CHAR" property="collectionStatus" />
+		<result column="PRE_REGIST_FLAG" jdbcType="CHAR" property="preRegistFlag" />
+		<result column="CURR_REDUCE_PRINCIPAL" jdbcType="DOUBLE" property="currReducePrincipal" />
+		<result column="CURR_REDUCE_INTEREST" jdbcType="DOUBLE" property="currReduceInterest" />
+		<result column="CURR_REDUCE_MANAGE_FREE" jdbcType="DOUBLE" property="currReduceManageFree" />
+		<result column="CURR_REDUCE_PENALTY" jdbcType="DOUBLE" property="currReducePenalty" />
+		<result column="CURR_REDUCE_LATER_FREE" jdbcType="DOUBLE" property="currReduceLaterFree" />
+		<result column="CURR_REDUCE_TOTAL" jdbcType="DOUBLE" property="currReduceTotal" />
+		<result column="OVERDUE_FLAG" jdbcType="CHAR" property="overdueFlag" />
+		<result column="RECE_EARLY_DAMAGES" jdbcType="DOUBLE" property="receEarlyDamages" />
+		<result column="PAID_EARLY_DAMAGES" jdbcType="DOUBLE" property="paidEarlyDamages" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="REPAYMENT_DATE" jdbcType="DATE" property="repaymentDate" />
+		<result column="AUTO_SWITCH" jdbcType="CHAR" property="autoSwitch" />
+		<result column="PERIOD" jdbcType="CHAR" property="period" />
+		<result column="ALL_HEAD_MONEY" jdbcType="DOUBLE" property="allHeadMoney" />
+	</resultMap>
+	<select id="select" resultClass="returnPlan">
+		select * from RL_RETURN_PLAN
+	</select>
+	<select id="queryForShow" resultMap="returnPlanMap" parameterClass="returnPlan">
+		<![CDATA[
+			select * from RL_RETURN_PLAN
+			where
+			(COLLECTION_STATUS = '0' or   COLLECTION_STATUS = '1' or COLLECTION_STATUS = '2')and
+			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			order by to_number(period) asc
+		]]>
+	</select>
+	<select id="queryForGroupNum" resultMap="returnPlanMap" parameterClass="string">
+		<![CDATA[
+			select rp.* from RL_RETURN_PLAN rp,rl_credit_application ca
+      		where ca.creditapplication_id = rp.creditapplication_id
+      		and ca.business_number = #groupNum:VARCHAR#
+		]]>
+	</select>
+	<select id="countForShow" parameterClass="returnPlan" resultClass="int">
+		<![CDATA[
+			select count(*) from RL_RETURN_PLAN
+			where
+			(COLLECTION_STATUS = '0' or   COLLECTION_STATUS = '1' or COLLECTION_STATUS = '2')and
+			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			order by to_number(period) asc
+		]]>
+	</select>
+	<select id="dynamicSelect" parameterClass="returnPlan" resultMap="returnPlanMap">
+		<![CDATA[
+			select * from RL_RETURN_PLAN
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="returnPlanId" prepend="AND">
+				RETURN_PLAN_ID = #returnPlanId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="contractNo" prepend="AND">
+				CONTRACT_NO = #contractNo:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPrincipal" prepend="AND">
+				CURR_MON_PRINCIPAL = #currMonPrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonInterest" prepend="AND">
+				CURR_MON_INTEREST = #currMonInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonManageFree" prepend="AND">
+				CURR_MON_MANAGE_FREE = #currMonManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonLaterFree" prepend="AND">
+				CURR_MON_LATER_FREE = #currMonLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPenalty" prepend="AND">
+				CURR_MON_PENALTY = #currMonPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currAccountTotal" prepend="AND">
+				CURR_ACCOUNT_TOTAL = #currAccountTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinCapital" prepend="AND">
+				CURR_PAINDIN_CAPITAL = #currPaindinCapital:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinInterest" prepend="AND">
+				CURR_PAINDIN_INTEREST = #currPaindinInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinManageFree" prepend="AND">
+				CURR_PAINDIN_MANAGE_FREE = #currPaindinManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currLateFreePaid" prepend="AND">
+				CURR_LATE_FREE_PAID = #currLateFreePaid:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPaidPenalty" prepend="AND">
+				CURR_MON_PAID_PENALTY = #currMonPaidPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPayTotal" prepend="AND">
+				CURR_MON_PAY_TOTAL = #currMonPayTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="collectionStatus" prepend="AND">
+				COLLECTION_STATUS = #collectionStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="preRegistFlag" prepend="AND">
+				PRE_REGIST_FLAG = #preRegistFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal" prepend="AND">
+				CURR_REDUCE_PRINCIPAL = #currReducePrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest" prepend="AND">
+				CURR_REDUCE_INTEREST = #currReduceInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree" prepend="AND">
+				CURR_REDUCE_MANAGE_FREE = #currReduceManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty" prepend="AND">
+				CURR_REDUCE_PENALTY = #currReducePenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree" prepend="AND">
+				CURR_REDUCE_LATER_FREE = #currReduceLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal" prepend="AND">
+				CURR_REDUCE_TOTAL = #currReduceTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="overdueFlag" prepend="AND">
+				OVERDUE_FLAG = #overdueFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages" prepend="AND">
+				RECE_EARLY_DAMAGES = #receEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages" prepend="AND">
+				PAID_EARLY_DAMAGES = #paidEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="remark" prepend="AND">
+				REMARK = #remark:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate" prepend="AND">
+				REPAYMENT_DATE = #repaymentDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="autoSwitch" prepend="AND">
+				AUTO_SWITCH = #autoSwitch:CHAR#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by to_number(period) asc
+		]]>
+	</select>
+	<select id="dynamicCount" parameterClass="returnPlan" resultClass="int">
+        <![CDATA[
+            select count(*) from RL_RETURN_PLAN
+        ]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="returnPlanId" prepend="AND">
+				RETURN_PLAN_ID = #returnPlanId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="creditapplicationId" prepend="AND">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="contractNo" prepend="AND">
+				CONTRACT_NO = #contractNo:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPrincipal" prepend="AND">
+				CURR_MON_PRINCIPAL = #currMonPrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonInterest" prepend="AND">
+				CURR_MON_INTEREST = #currMonInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonManageFree" prepend="AND">
+				CURR_MON_MANAGE_FREE = #currMonManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonLaterFree" prepend="AND">
+				CURR_MON_LATER_FREE = #currMonLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPenalty" prepend="AND">
+				CURR_MON_PENALTY = #currMonPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currAccountTotal" prepend="AND">
+				CURR_ACCOUNT_TOTAL = #currAccountTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinCapital" prepend="AND">
+				CURR_PAINDIN_CAPITAL = #currPaindinCapital:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinInterest" prepend="AND">
+				CURR_PAINDIN_INTEREST = #currPaindinInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinManageFree" prepend="AND">
+				CURR_PAINDIN_MANAGE_FREE = #currPaindinManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currLateFreePaid" prepend="AND">
+				CURR_LATE_FREE_PAID = #currLateFreePaid:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPaidPenalty" prepend="AND">
+				CURR_MON_PAID_PENALTY = #currMonPaidPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPayTotal" prepend="AND">
+				CURR_MON_PAY_TOTAL = #currMonPayTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="collectionStatus" prepend="AND">
+				COLLECTION_STATUS = #collectionStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="preRegistFlag" prepend="AND">
+				PRE_REGIST_FLAG = #preRegistFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal" prepend="AND">
+				CURR_REDUCE_PRINCIPAL = #currReducePrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest" prepend="AND">
+				CURR_REDUCE_INTEREST = #currReduceInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree" prepend="AND">
+				CURR_REDUCE_MANAGE_FREE = #currReduceManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty" prepend="AND">
+				CURR_REDUCE_PENALTY = #currReducePenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree" prepend="AND">
+				CURR_REDUCE_LATER_FREE = #currReduceLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal" prepend="AND">
+				CURR_REDUCE_TOTAL = #currReduceTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="overdueFlag" prepend="AND">
+				OVERDUE_FLAG = #overdueFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages" prepend="AND">
+				RECE_EARLY_DAMAGES = #receEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages" prepend="AND">
+				PAID_EARLY_DAMAGES = #paidEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="remark" prepend="AND">
+				REMARK = #remark:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate" prepend="AND">
+				REPAYMENT_DATE = #repaymentDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="autoSwitch" prepend="AND">
+				AUTO_SWITCH = #autoSwitch:CHAR#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			order by to_number(period) asc
+		]]>
+	</select>
+	<insert id="insert" parameterClass="returnPlan">
+		<selectKey keyProperty="returnPlanId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RETURN_PLAN
+			(RETURN_PLAN_ID,CREDITAPPLICATION_ID,CONTRACT_NO,
+			CURR_MON_PRINCIPAL,CURR_MON_INTEREST,CURR_MON_MANAGE_FREE,
+			CURR_MON_LATER_FREE,CURR_MON_PENALTY,
+			CURR_ACCOUNT_TOTAL,CURR_PAINDIN_CAPITAL,CURR_PAINDIN_INTEREST,
+			CURR_PAINDIN_MANAGE_FREE,CURR_LATE_FREE_PAID,CURR_MON_PAID_PENALTY,
+			CURR_MON_PAY_TOTAL,
+			COLLECTION_STATUS,PRE_REGIST_FLAG,
+			CURR_REDUCE_PRINCIPAL,CURR_REDUCE_INTEREST,CURR_REDUCE_MANAGE_FREE,
+			CURR_REDUCE_PENALTY,CURR_REDUCE_LATER_FREE,CURR_REDUCE_TOTAL,
+			OVERDUE_FLAG,RECE_EARLY_DAMAGES,PAID_EARLY_DAMAGES,
+			REMARK,REPAYMENT_DATE,AUTO_SWITCH,ALL_HEAD_MONEY,PERIOD)
+			values 
+			(#returnPlanId:INTEGER#,#creditapplicationId:INTEGER#,#contractNo:VARCHAR#,
+			#currMonPrincipal:DOUBLE#,#currMonInterest:DOUBLE#,#currMonManageFree:DOUBLE#,
+			#currMonLaterFree:DOUBLE#,#currMonPenalty:DOUBLE#,
+			#currAccountTotal:DOUBLE#,#currPaindinCapital:DOUBLE#,#currPaindinInterest:DOUBLE#,
+			#currPaindinManageFree:DOUBLE#,#currLateFreePaid:DOUBLE#,#currMonPaidPenalty:DOUBLE#,
+			#currMonPayTotal:DOUBLE#,
+			#collectionStatus:CHAR#,#preRegistFlag:CHAR#,
+			#currReducePrincipal:DOUBLE#,#currReduceInterest:DOUBLE#,#currReduceManageFree:DOUBLE#,
+			#currReducePenalty:DOUBLE#,#currReduceLaterFree:DOUBLE#,#currReduceTotal:DOUBLE#,
+			#overdueFlag:CHAR#,#receEarlyDamages:DOUBLE#,#paidEarlyDamages:DOUBLE#,
+			#remark:VARCHAR#,#repaymentDate:DATE#,#autoSwitch:CHAR#,#allHeadMoney:DOUBLE#,#period:CHAR#)
+		]]>
+	</insert>
+	<insert id="dynamicInsert" parameterClass="returnPlan">
+		<selectKey keyProperty="returnPlanId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RETURN_PLAN(
+			RETURN_PLAN_ID
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,CREDITAPPLICATION_ID
+			</isNotEmpty>
+			<isNotEmpty property="contractNo">
+				,CONTRACT_NO
+			</isNotEmpty>
+			<isNotEmpty property="currMonPrincipal">
+				,CURR_MON_PRINCIPAL
+			</isNotEmpty>
+			<isNotEmpty property="currMonInterest">
+				,CURR_MON_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="currMonManageFree">
+				,CURR_MON_MANAGE_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currMonLaterFree">
+				,CURR_MON_LATER_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currMonPenalty">
+				,CURR_MON_PENALTY
+			</isNotEmpty>
+			<isNotEmpty property="currAccountTotal">
+				,CURR_ACCOUNT_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinCapital">
+				,CURR_PAINDIN_CAPITAL
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinInterest">
+				,CURR_PAINDIN_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinManageFree">
+				,CURR_PAINDIN_MANAGE_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currLateFreePaid">
+				,CURR_LATE_FREE_PAID
+			</isNotEmpty>
+			<isNotEmpty property="currMonPaidPenalty">
+				,CURR_MON_PAID_PENALTY
+			</isNotEmpty>
+			<isNotEmpty property="currMonPayTotal">
+				,CURR_MON_PAY_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="collectionStatus">
+				,COLLECTION_STATUS
+			</isNotEmpty>
+			<isNotEmpty property="preRegistFlag">
+				,PRE_REGIST_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal">
+				,CURR_REDUCE_PRINCIPAL
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest">
+				,CURR_REDUCE_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree">
+				,CURR_REDUCE_MANAGE_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty">
+				,CURR_REDUCE_PENALTY
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree">
+				,CURR_REDUCE_LATER_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal">
+				,CURR_REDUCE_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="overdueFlag">
+				,OVERDUE_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages">
+				,RECE_EARLY_DAMAGES
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages">
+				,PAID_EARLY_DAMAGES
+			</isNotEmpty>
+			<isNotEmpty property="remark">
+				,REMARK
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate">
+				,REPAYMENT_DATE
+			</isNotEmpty>
+			<isNotEmpty property="autoSwitch">
+				,AUTO_SWITCH
+			</isNotEmpty>
+			<isNotEmpty property="allHeadMoney">
+				,ALL_HEAD_MONEY
+			</isNotEmpty>
+			<isNotEmpty property="period">
+				,period
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#returnPlanId:INTEGER#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="creditapplicationId">
+				,#creditapplicationId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="contractNo">
+				,#contractNo:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPrincipal">
+				,#currMonPrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonInterest">
+				,#currMonInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonManageFree">
+				,#currMonManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonLaterFree">
+				,#currMonLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPenalty">
+				,#currMonPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currAccountTotal">
+				,#currAccountTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinCapital">
+				,#currPaindinCapital:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinInterest">
+				,#currPaindinInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaindinManageFree">
+				,#currPaindinManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currLateFreePaid">
+				,#currLateFreePaid:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPaidPenalty">
+				,#currMonPaidPenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currMonPayTotal">
+				,#currMonPayTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="collectionStatus">
+				,#collectionStatus:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="preRegistFlag">
+				,#preRegistFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal">
+				,#currReducePrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest">
+				,#currReduceInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree">
+				,#currReduceManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty">
+				,#currReducePenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree">
+				,#currReduceLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal">
+				,#currReduceTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="overdueFlag">
+				,#overdueFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages">
+				,#receEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages">
+				,#paidEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="remark">
+				,#remark:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate">
+				,#repaymentDate:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="autoSwitch">
+				,#autoSwitch:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="allHeadMoney">
+				,#allHeadMoney:DATE#
+			</isNotEmpty>
+			<isNotEmpty property="period">
+				,#period:CHAR#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="update" parameterClass="returnPlan">
+		<![CDATA[
+			update RL_RETURN_PLAN
+			set
+			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#,
+			CONTRACT_NO = #contractNo:VARCHAR#,
+			CURR_MON_PRINCIPAL = #currMonPrincipal:DOUBLE#,
+			CURR_MON_INTEREST = #currMonInterest:DOUBLE#,
+			CURR_MON_MANAGE_FREE = #currMonManageFree:DOUBLE#,
+			CURR_MON_LATER_FREE = #currMonLaterFree:DOUBLE#,
+			CURR_MON_PENALTY = #currMonPenalty:DOUBLE#,
+			CURR_ACCOUNT_TOTAL = #currAccountTotal:DOUBLE#,
+			CURR_PAINDIN_CAPITAL = #currPaindinCapital:DOUBLE#,
+			CURR_PAINDIN_INTEREST = #currPaindinInterest:DOUBLE#,
+			CURR_PAINDIN_MANAGE_FREE = #currPaindinManageFree:DOUBLE#,
+			CURR_LATE_FREE_PAID = #currLateFreePaid:DOUBLE#,
+			CURR_MON_PAID_PENALTY = #currMonPaidPenalty:DOUBLE#,
+			CURR_MON_PAY_TOTAL = #currMonPayTotal:DOUBLE#,
+			COLLECTION_STATUS = #collectionStatus:CHAR#,
+			PRE_REGIST_FLAG = #preRegistFlag:CHAR#,
+			CURR_REDUCE_PRINCIPAL = #currReducePrincipal:DOUBLE#,
+			CURR_REDUCE_INTEREST = #currReduceInterest:DOUBLE#,
+			CURR_REDUCE_MANAGE_FREE = #currReduceManageFree:DOUBLE#,
+			CURR_REDUCE_PENALTY = #currReducePenalty:DOUBLE#,
+			CURR_REDUCE_LATER_FREE = #currReduceLaterFree:DOUBLE#,
+			CURR_REDUCE_TOTAL = #currReduceTotal:DOUBLE#,
+			OVERDUE_FLAG = #overdueFlag:CHAR#,
+			RECE_EARLY_DAMAGES = #receEarlyDamages:DOUBLE#,
+			PAID_EARLY_DAMAGES = #paidEarlyDamages:DOUBLE#,
+			REMARK = #remark:VARCHAR#,
+			REPAYMENT_DATE = #repaymentDate:DATE#,
+			AUTO_SWITCH = #autoSwitch:CHAR#
+			where
+			RETURN_PLAN_ID = #returnPlanId:INTEGER#
+		]]>
+	</update>
+	<update id="dynamicUpdate" parameterClass="returnPlan">
+		<![CDATA[
+			update RL_RETURN_PLAN
+		]]>
+		<dynamic prepend="SET">
+			<isNotNull property="creditapplicationId" prepend=",">
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+			</isNotNull>
+			<isNotNull property="contractNo" prepend=",">
+				CONTRACT_NO = #contractNo:VARCHAR#
+			</isNotNull>
+			<isNotNull property="currMonPrincipal" prepend=",">
+				CURR_MON_PRINCIPAL = #currMonPrincipal:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonInterest" prepend=",">
+				CURR_MON_INTEREST = #currMonInterest:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonManageFree" prepend=",">
+				CURR_MON_MANAGE_FREE = #currMonManageFree:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonLaterFree" prepend=",">
+				CURR_MON_LATER_FREE = #currMonLaterFree:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonPenalty" prepend=",">
+				CURR_MON_PENALTY = #currMonPenalty:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currAccountTotal" prepend=",">
+				CURR_ACCOUNT_TOTAL = #currAccountTotal:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currPaindinCapital" prepend=",">
+				CURR_PAINDIN_CAPITAL = #currPaindinCapital:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currPaindinInterest" prepend=",">
+				CURR_PAINDIN_INTEREST = #currPaindinInterest:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currPaindinManageFree" prepend=",">
+				CURR_PAINDIN_MANAGE_FREE = #currPaindinManageFree:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currLateFreePaid" prepend=",">
+				CURR_LATE_FREE_PAID = #currLateFreePaid:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonPaidPenalty" prepend=",">
+				CURR_MON_PAID_PENALTY = #currMonPaidPenalty:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currMonPayTotal" prepend=",">
+				CURR_MON_PAY_TOTAL = #currMonPayTotal:DOUBLE#
+			</isNotNull>
+			<isNotNull property="collectionStatus" prepend=",">
+				COLLECTION_STATUS = #collectionStatus:CHAR#
+			</isNotNull>
+			<isNotNull property="preRegistFlag" prepend=",">
+				PRE_REGIST_FLAG = #preRegistFlag:CHAR#
+			</isNotNull>
+			<isNotNull property="currReducePrincipal" prepend=",">
+				CURR_REDUCE_PRINCIPAL = #currReducePrincipal:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currReduceInterest" prepend=",">
+				CURR_REDUCE_INTEREST = #currReduceInterest:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currReduceManageFree" prepend=",">
+				CURR_REDUCE_MANAGE_FREE = #currReduceManageFree:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currReducePenalty" prepend=",">
+				CURR_REDUCE_PENALTY = #currReducePenalty:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currReduceLaterFree" prepend=",">
+				CURR_REDUCE_LATER_FREE = #currReduceLaterFree:DOUBLE#
+			</isNotNull>
+			<isNotNull property="currReduceTotal" prepend=",">
+				CURR_REDUCE_TOTAL = #currReduceTotal:DOUBLE#
+			</isNotNull>
+			<isNotNull property="overdueFlag" prepend=",">
+				OVERDUE_FLAG = #overdueFlag:CHAR#
+			</isNotNull>
+			<isNotNull property="receEarlyDamages" prepend=",">
+				RECE_EARLY_DAMAGES = #receEarlyDamages:DOUBLE#
+			</isNotNull>
+			<isNotNull property="paidEarlyDamages" prepend=",">
+				PAID_EARLY_DAMAGES = #paidEarlyDamages:DOUBLE#
+			</isNotNull>
+			<isNotNull property="remark" prepend=",">
+				REMARK = #remark:VARCHAR#
+			</isNotNull>
+			<isNotNull property="repaymentDate" prepend=",">
+				REPAYMENT_DATE = #repaymentDate:DATE#
+			</isNotNull>
+			<isNotNull property="autoSwitch" prepend=",">
+				AUTO_SWITCH = #autoSwitch:CHAR#
+			</isNotNull>
+		</dynamic>
+		<![CDATA[
+			where
+			RETURN_PLAN_ID = #returnPlanId:INTEGER#
+		]]>
+	</update>
+	<delete id="deleteReturnPlanByCreditapplicationId" parameterClass="int">
+		<![CDATA[
+			delete from RL_RETURN_PLAN
+			where
+			CREDITAPPLICATION_ID=#creditapplicationId:INTEGER#
+		]]>
+	</delete>
+	<select id="queryProductMap" resultClass="java.util.HashMap">
+		<![CDATA[
+			select to_char(ca.repayment_plan_id) as PRODUCTID, ca.repayment_plan_name as PRODUCTNAME
+  			from rl_credit_application ca
+ 			group by ca.repayment_plan_id, ca.repayment_plan_name
+		]]>
+	</select>
+
+	<select id="queryHasNoReturnPlan" resultClass="java.lang.Long">
+		select ca.creditapplication_id
+		from rl_credit_application ca
+		where ca.creditapplication_id not in
+		(select rp.creditapplication_id
+		from rl_return_plan rp
+		group by rp.creditapplication_id)
+		and ca.audit_status in ('15','16', '20')
+		and ca.valid_state = '1'
+	</select>
+
+	<sql id="queryHaveNoReturnPlanList">
+		select ca.creditapplication_id as creditapplicationId,
+		ca.business_number as businessNumber,
+		ca.sys_guid as sysGuid
+		from rl_credit_application ca
+		where ca.creditapplication_id not in
+		(select rp.creditapplication_id
+		from rl_return_plan rp
+		group by rp.creditapplication_id)
+		and ca.audit_status in ('15','16', '20')
+		and ca.valid_state = '1'
+		order by ca.creditapplication_id asc
+	</sql>
+
+	<select id="queryHaveNoReturnPlanListEntity" resultClass="com.creditease.rc.vo.HaveNoReturnPlanList" parameterClass="java.util.HashMap">
+		<include refid="queryHaveNoReturnPlanList" />
+	</select>
+	<select id="queryHaveNoReturnPlanCount" resultClass="int" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="queryHaveNoReturnPlanList" />
+		)
+	</select>
+
+	<insert id="insertNoType" parameterClass="returnPlan">
+		<selectKey keyProperty="returnPlanId" resultClass="Long" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RETURN_PLAN
+			(RETURN_PLAN_ID,CREDITAPPLICATION_ID,CONTRACT_NO,
+			CURR_MON_PRINCIPAL,CURR_MON_INTEREST,CURR_MON_MANAGE_FREE,
+			CURR_MON_LATER_FREE,CURR_MON_PENALTY,
+			CURR_ACCOUNT_TOTAL,CURR_PAINDIN_CAPITAL,CURR_PAINDIN_INTEREST,
+			CURR_PAINDIN_MANAGE_FREE,CURR_LATE_FREE_PAID,CURR_MON_PAID_PENALTY,
+			CURR_MON_PAY_TOTAL,
+			COLLECTION_STATUS,PRE_REGIST_FLAG,
+			CURR_REDUCE_PRINCIPAL,CURR_REDUCE_INTEREST,CURR_REDUCE_MANAGE_FREE,
+			CURR_REDUCE_PENALTY,CURR_REDUCE_LATER_FREE,CURR_REDUCE_TOTAL,
+			OVERDUE_FLAG,RECE_EARLY_DAMAGES,PAID_EARLY_DAMAGES,
+			REMARK,REPAYMENT_DATE,AUTO_SWITCH,ALL_HEAD_MONEY,PERIOD)
+			values 
+			(#returnPlanId#,#creditapplicationId#,#contractNo#,
+			#currMonPrincipal#,#currMonInterest#,#currMonManageFree#,
+			#currMonLaterFree#,#currMonPenalty#,
+			#currAccountTotal#,#currPaindinCapital#,#currPaindinInterest#,
+			#currPaindinManageFree#,#currLateFreePaid#,#currMonPaidPenalty#,
+			#currMonPayTotal#,
+			#collectionStatus#,#preRegistFlag#,
+			#currReducePrincipal#,#currReduceInterest#,#currReduceManageFree#,
+			#currReducePenalty#,#currReduceLaterFree#,#currReduceTotal#,
+			#overdueFlag#,#receEarlyDamages#,#paidEarlyDamages#,
+			#remark#,#repaymentDate#,#autoSwitch#,#allHeadMoney#,#period#)
+		]]>
+	</insert>
+</sqlMap>

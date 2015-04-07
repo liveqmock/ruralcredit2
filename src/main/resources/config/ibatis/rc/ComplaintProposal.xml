@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="COMPLAINTPROPOSAL" >
+	  <typeAlias alias="complaintProposalRequestParam" type="com.creditease.rc.domain.ComplaintProposalRequestParam"/>
+	  <resultMap id="ComplaintProposalResult" class="com.creditease.rc.domain.ComplaintProposalRequestParam" >
+	    
+	    <result column="PROPOSAL_ID" property="proposalId" jdbcType="DECIMAL" />
+	    <result column="COMPLAINT_PROPOSAL" property="complaintProposal" jdbcType="VARCHAR" />
+	    <result column="PHONE_NUMBER" property="phoneNumber" jdbcType="VARCHAR" />
+	  </resultMap>
+	<insert id="insert" parameterClass="complaintProposalRequestParam">
+		<selectKey resultClass="java.lang.Long" keyProperty="proposalId" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+		</selectKey>
+
+		insert into RL_COMPLAINT_PROPOSAL (
+		PROPOSAL_ID,
+		COMPLAINT_PROPOSAL,
+		PHONE_NUMBER
+		<isNotEmpty prepend="," property="proposer">
+			NAME
+		</isNotEmpty>)
+		values (
+		#proposalId:DECIMAL#,
+		#complaintProposal:VARCHAR#,
+		#phoneNumber:VARCHAR#
+		<isNotEmpty prepend="," property="proposer">
+			#proposer#
+		</isNotEmpty>)
+	</insert>
+</sqlMap>

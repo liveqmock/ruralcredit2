@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="NSC">
+
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+     <typeAlias alias="nationalStandardCode" type="com.creditease.rc.domain.NationalStandardCode" />
+    
+	<resultMap class="com.creditease.rc.domain.NationalStandardCode" id="nationalStandardCodeMap">
+		<result column="NATIONAL_STANDARD_CODE_ID" jdbcType="INTEGER" property="nationalStandardCodeId" />
+		<result column="CITY_ID" jdbcType="INTEGER" property="cityId" />
+		<result column="CITY_NAME" jdbcType="VARCHAR" property="cityName" />
+		<result column="PARENT_ID" jdbcType="INTEGER" property="parentId" />
+		<result column="CITY_CODE" jdbcType="INTEGER" property="cityCode" />
+		<result column="ONLINE_FLAG" jdbcType="VARCHAR" property="onlineFlag" />
+		<result column="CITY_TEL_CODE" jdbcType="INTEGER" property="cityTelCode" />
+	</resultMap>
+
+	
+	<select id="selectProvince" parameterClass="nationalStandardCode" resultMap="nationalStandardCodeMap"> 
+		 <![CDATA[
+            select * from RL_NATIONAL_STANDARD_CODE  WHERE  parent_id is null
+        ]]>
+        
+        <dynamic prepend="AND">
+        	<isPropertyAvailable property="cityName" >
+     			<isNotEmpty property="cityName" >
+     				CITY_NAME like '%$cityName$%' 
+     			</isNotEmpty>
+        	</isPropertyAvailable>
+        </dynamic>
+	</select>
+	
+	<select id="selectCity"  parameterClass="nationalStandardCode" resultMap="nationalStandardCodeMap">
+		 <![CDATA[
+            select * from RL_NATIONAL_STANDARD_CODE 
+        ]]>
+         <dynamic prepend="WHERE">
+     			<isNotEmpty property="parentId" prepend="AND">
+     				parent_id = #parentId# 
+     			</isNotEmpty>
+     			<isNotEmpty property="cityName"  prepend="AND" >
+     				CITY_NAME like '%$cityName$%' 
+     			</isNotEmpty>
+        </dynamic>
+	</select>
+	
+	<select id="selectPrefecture" resultMap="nationalStandardCodeMap">
+		 <![CDATA[
+             SELECT *
+          FROM RL_NATIONAL_STANDARD_CODE
+         WHERE NATIONAL_STANDARD_CODE_ID NOT in
+               (select S.NATIONAL_STANDARD_CODE_ID
+                  from RL_NATIONAL_STANDARD_CODE s,
+                       (select *
+                          from RL_NATIONAL_STANDARD_CODE t
+                         where t.parent_id is not null) w
+                 where s.city_code = w.parent_id
+                UNION
+                SELECT NATIONAL_STANDARD_CODE_ID
+                  FROM RL_NATIONAL_STANDARD_CODE
+                 WHERE PARENT_ID IS NULL)
+        ]]>
+         
+         <dynamic>
+        	<isPropertyAvailable property="cityName" >
+     			<isNotEmpty property="cityName" prepend="and">
+     				CITY_NAME like '%$cityName$%' 
+     			</isNotEmpty>
+        	</isPropertyAvailable>
+        </dynamic>
+	</select>
+	<select id="selectByCode" parameterClass="int" resultMap="nationalStandardCodeMap">
+		 <![CDATA[
+            select * from RL_NATIONAL_STANDARD_CODE  WHERE  CITY_CODE = #cityCode#
+        ]]>
+	</select>
+
+    <!--通过city_name获取省、市、区-->
+    <select id="selectByCityName" parameterClass="java.lang.String" resultMap="nationalStandardCodeMap">
+		 <![CDATA[
+            select * from RL_NATIONAL_STANDARD_CODE  WHERE  CITY_NAME = #cityName#
+        ]]>
+	</select>
+		
+</sqlMap>

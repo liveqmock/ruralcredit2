@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring" xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring   
+  	http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-lazy-init="true">
+
+	<context:annotation-config />
+
+	<aop:aspectj-autoproxy />
+
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:config/jdbc.properties</value>
+				<value>classpath*:config/spring/smp/smp.properties</value>
+				<value>classpath*:config/spring/settle/settle.properties</value>
+				<value>classpath*:config/spring/pdf/pdf.properties</value>
+				<value>classpath*:config/spring/cm/cm.properties</value>
+				<value>classpath*:config/spring/credit/credit.properties</value>
+				<value>classpath*:config/spring/comprehensive/comprehensive.properties</value>
+				<value>classpath*:config/spring/orgams/orgams.properties</value>
+				<value>classpath*:config/spring/orgams2/orgams2.properties</value>
+                <value>classpath*:config/spring/icp/icp.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	 -->
+	<!-- 配置数据连接池 c3p0 -->
+	<!--<bean id="dataSource" name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		 指定连接数据库的驱动
+	    <property name="driverClass" value="${jdbc.driverClass}"/>
+	     指定连接数据库的URL
+	    <property name="jdbcUrl" value="${jdbc.url}"/>
+	     指定连接数据库的用户名
+	    <property name="user" value="${jdbc.username}"/>
+	     指定连接数据库的密码
+	    <property name="password" value="${jdbc.password}"/>
+	     指定连接池中保留的最大连接数. Default:15
+	    <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+	     指定连接池中保留的最小连接数
+	    <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+	     指定连接池的初始化连接数  取值应在minPoolSize 与 maxPoolSize 之间.Default:3
+	    <property name="initialPoolSize" value="${jdbc.initialPoolSize}"/>
+	     最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。 Default:0
+	    <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>
+	     当连接池中的连接耗尽的时候c3p0一次同时获取的连接数. Default:3
+	    <property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>
+	     JDBC的标准,用以控制数据源内加载的PreparedStatements数量。
+			    但由于预缓存的statements属于单个connection而不是整个连接池所以设置这个参数需要考虑到多方面的因数.如果maxStatements与maxStatementsPerConnection均为0,则缓存被关闭。Default:0
+	    <property name="maxStatements" value="${jdbc.maxStatements}"/>
+	     每60秒检查所有连接池中的空闲连接.Default:0 
+	    <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/>
+	    定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 
+		<property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}"/>
+		获取连接失败将会引起所有等待连接池来获取连接的线程抛出异常。但是数据源仍有效
+			保留，并在下次调用getConnection()的时候继续尝试获取连接。如果设为true，那么在尝试
+			获取连接失败后该数据源将申明已断开并永久关闭。Default: false
+		<property name="breakAfterAcquireFailure" value="false"/>
+		c3p0是异步操作的，缓慢的JDBC操作通过帮助进程完成。扩展这些操作可以有效的提升性能
+			通过多线程实现多个操作同时被执行。Default: 3
+		<property name="numHelperThreads" value="${jdbc.numHelperThreads}"/>
+	</bean>
+	-->
+	<!-- dbcp连接池 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" /> 
+		<!--initialSize: 初始化连接-->  
+		<property name="initialSize" value="${jdbc.initialSize}" />
+		<!--maxActive: 最大连接数量-->  
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		 <!-- 连接被泄露时是否打印 -->  
+        <property name="logAbandoned" value="${jdbc.logAbandoned}"/> 
+         <!--removeAbandoned: 是否自动回收超时连接-->    
+        <property name="removeAbandoned"  value="${jdbc.removeAbandoned}"/>  
+        <!--removeAbandonedTimeout: 超时时间(以秒数为单位)--> 
+		<property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>  
+		<!--maxWait: 超时等待时间以毫秒为单位 6000毫秒/1000等于60秒-->  
+		<property name="maxWait" value="${jdbc.maxWait}" />
+		<!--maxIdle: 最大空闲连接-->  
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="poolPreparedStatements" value="${jdbc.poolPreparedStatements}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" />
+		<property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}" />
+	</bean>
+	
+	
+	<bean id="dataSource1" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc1.url}" />
+		<property name="username" value="${jdbc1.username}" />
+		<property name="password" value="${jdbc1.password}" />
+	</bean>
+
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.creditease.rc" />
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"></bean>
+
+	<!-- 上传拦截，如最大上传值及最小上传值 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>
+	</bean>
+
+	<!-- ibatis -->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:config/ibatis/rc/sqlmap-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<!-- 农商贷一期ibatis配置 -->
+	<bean id="sqlMapClient1" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:config/ibatis/rc/sqlmap-config1.xml" />
+		<property name="dataSource" ref="dataSource1" />
+	</bean>
+
+	<!-- 事务管理器配置,单数据源事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="transactionManager1" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource1" />
+	</bean>
+
+
+	<aop:config>
+		<aop:pointcut id="servicesPointcut" expression="execution(* com.creditease.rc.service.*.*(..))" />
+		<!-- 用于推送综合信贷审批控制事物，只针对该类的改方法 -->
+		<aop:pointcut id="servicesPointcut2" expression="execution(* com.creditease.rc.action.CreditApplication2ApprovalController.updateAppraval(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="servicesPointcut2" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="servicesPointcut" />
+		<aop:advisor advice-ref="txAdvice1" pointcut-ref="servicesPointcut" />
+	</aop:config>
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="del*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="audit*" propagation="REQUIRED" />
+			<tx:method name="confirm*" propagation="REQUIRED" />
+			<tx:method name="payment*" propagation="REQUIRED" />
+			<tx:method name="receive*" propagation="REQUIRED" />
+			<tx:method name="change*" propagation="REQUIRED" />
+			<tx:method name="rollback*" propagation="REQUIRED" />
+			<tx:method name="send*" propagation="REQUIRED" />
+			<tx:method name="inCrease*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<tx:advice id="txAdvice1" transaction-manager="transactionManager1">
+		<tx:attributes>
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="del*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="audit*" propagation="REQUIRED" />
+			<tx:method name="confirm*" propagation="REQUIRED" />
+			<tx:method name="payment*" propagation="REQUIRED" />
+			<tx:method name="receive*" propagation="REQUIRED" />
+			<tx:method name="change*" propagation="REQUIRED" />
+			<tx:method name="rollback*" propagation="REQUIRED" />
+			<tx:method name="send*" propagation="REQUIRED" />
+			<tx:method name="inCrease*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+</beans>

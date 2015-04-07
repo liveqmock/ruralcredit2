@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CREDITCARD">
+
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="creditCardInfo" type="com.creditease.rc.domain.CreditCardInfo" />
+    
+    <resultMap class="com.creditease.rc.domain.CreditCardInfo" id="CreditCardInfoMap">
+    
+		<result property="creditCardInfoId" column="CREDIT_CARD_INFO_ID" jdbcType="INTEGER"/>
+		<result property="borrowerServiceAppId" column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER"/>
+	    <result property="creditCondition" column="CREDIT_CONDITION" jdbcType="CHAR"/>
+	    <result property="creditCardChargeTotal" column="CREDIT_CARD_CHARGE_TOTAL" jdbcType="INTEGER"/>
+	    <result property="loanGuaranteesOther" column="LOAN_GUARANTEES_OTHER" jdbcType="INTEGER"/>
+	    <result property="creditBorrowCondition" column="CREDIT_BORROW_CONDITION" jdbcType="CHAR"/>
+	    <result property="creditBorrowConditionTime" column="CREDIT_BORROW_CONDITION_TIME" jdbcType="VARCHAR"/>
+	    <result	property="loanChargeTotal"	column="LOAN_CHARGE_TOTAL" jdbcType="INTEGER"/>
+    </resultMap>
+    
+
+    <insert id="insert" parameterClass="creditCardInfo" >
+    	 <selectKey keyProperty="creditCardInfoId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_CREDIT_CARD_INFO  
+        		(CREDIT_CARD_INFO_ID,
+				BORROWER_SERVICE_APP_ID,
+				CREDIT_CONDITION,
+				CREDIT_CARD_CHARGE_TOTAL,
+				LOAN_GUARANTEES_OTHER,
+				CREDIT_BORROW_CONDITION,
+				LOAN_CHARGE_TOTAL,
+				CREDIT_BORROW_CONDITION_TIME
+					)
+        	values(
+					#creditCardInfoId:INTEGER#,
+					#borrowerServiceAppId:INTEGER#,
+					#creditCondition:CHAR#,
+					#creditCardChargeTotal:INTEGER#,
+					#loanGuaranteesOther:INTEGER#,
+					#creditBorrowCondition:CHAR#,
+					#loanChargeTotal:INTEGER#,
+					#creditBorrowConditionTime:VARCHAR#
+					)
+        ]]>
+    </insert>
+     <update id="update" parameterClass="creditCardInfo">
+     	update RL_CREDIT_CARD_INFO  set 
+     			CREDIT_CONDITION=#creditCondition:CHAR#,
+				CREDIT_CARD_CHARGE_TOTAL=#creditCardChargeTotal:INTEGER#,
+				LOAN_GUARANTEES_OTHER=#loanGuaranteesOther:INTEGER#,
+				CREDIT_BORROW_CONDITION=#creditBorrowCondition:CHAR#,
+				LOAN_CHARGE_TOTAL=#loanChargeTotal:INTEGER#,
+				CREDIT_BORROW_CONDITION_TIME=#creditBorrowConditionTime:VARCHAR#
+		where 
+			CREDIT_CARD_INFO_ID=#creditCardInfoId:INTEGER#
+     </update>
+     
+     <select id="selectAll" parameterClass="int" resultMap="CreditCardInfoMap">
+			SELECT * FROM  RL_CREDIT_CARD_INFO
+				WHERE  	BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+     </select>
+     
+     <delete id="deleteByBorrowerServiceAppId" parameterClass="int">
+     	<![CDATA[
+     		DELETE FROM RL_CREDIT_CARD_INFO  WHERE BORROWER_SERVICE_APP_ID=#borrowerServiceAppId:INTEGER#
+     	]]>
+     </delete>
+</sqlMap>

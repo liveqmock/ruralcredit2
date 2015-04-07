@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="SPECIALAPPLY">
+	<typeAlias alias="specialapply" type="com.creditease.rc.domain.SpecialApply" />
+	<typeAlias alias="specialApplyVo" type="com.creditease.rc.vo.SpecialApplyVo" />
+	<resultMap id="specialapplyMap" class="specialapply">
+		<result column="SPECIAL_APPLY_ID" property="specialApplyId" jdbcType="DECIMAL" />
+		<result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL" />
+		<result column="SPECIAL_APPLY_TYPE" property="specialApplyType" jdbcType="VARCHAR" />
+		<result column="SPECIAL_APPLY_STATE" property="specialApplyState" jdbcType="VARCHAR" />
+		<result column="SPECIAL_APPLY_VIEW_CONTENT" property="specialApplyViewContent" jdbcType="VARCHAR" />
+		<result column="SPECIAL_APPLY_COMMENT" property="specialApplyComment" jdbcType="VARCHAR" />
+		<result column="SPECIAL_APPROVE_COMMENT" property="specialApproveComment" jdbcType="VARCHAR" />
+		<result column="AUDITOR_ID" property="auditorId" jdbcType="DECIMAL" />
+		<result column="AUDITOR_NAME" property="auditorName" jdbcType="VARCHAR" />
+		<result column="AUDIT_TIME" property="auditTime" jdbcType="TIMESTAMP" />
+		<result column="AUDIT_SPECIAL_APPLY_STATE" property="auditSpecialApplyState" jdbcType="VARCHAR" />
+		<result column="APPLY_TIME" property="applyTime" jdbcType="TIMESTAMP" />
+		<result column="PROPOSER_ID" property="proposerId" jdbcType="DECIMAL" />
+		<result column="PROPOSER_NAME" property="proposerName" jdbcType="VARCHAR" />
+		<result column="BUSINESS_STATE" property="businessState" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_MANAGER_PHONE" property="customerManagerPhone" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 根据申请id查询特殊申请情况 -->
+	<select id="querySpecial" resultMap="specialapplyMap" parameterClass="long">
+		select * from rl_special_apply t where t.creditapplication_id=#creditapplicationId#
+		</select>
+	
+	<select id="select" resultMap="specialapplyMap" parameterClass="specialapply">
+		select SPECIAL_APPLY_ID, CREDITAPPLICATION_ID, SPECIAL_APPLY_TYPE,
+		SPECIAL_APPLY_STATE,
+		SPECIAL_APPLY_VIEW_CONTENT,SPECIAL_APPLY_COMMENT, AUDITOR_ID, AUDITOR_NAME,
+		AUDIT_TIME,AUDIT_SPECIAL_APPLY_STATE,APPLY_TIME,PROPOSER_ID,PROPOSER_NAME,
+		BUSINESS_STATE,SPECIAL_APPROVE_COMMENT,CUSTOMER_MANAGER_PHONE
+		from RL_SPECIAL_APPLY
+		where SPECIAL_APPLY_ID = #specialApplyId:DECIMAL#
+  </select>
+	<delete id="delete" parameterClass="specialapply">
+		delete from RL_SPECIAL_APPLY
+		where SPECIAL_APPLY_ID = #specialApplyId:DECIMAL#
+  </delete>
+	<insert id="insert" parameterClass="specialapply">
+		insert into RL_SPECIAL_APPLY (SPECIAL_APPLY_ID,CREDITAPPLICATION_ID,
+		SPECIAL_APPLY_TYPE, SPECIAL_APPLY_STATE,
+		SPECIAL_APPLY_VIEW_CONTENT,SPECIAL_APPLY_COMMENT, AUDITOR_ID, AUDITOR_NAME, AUDIT_TIME,AUDIT_SPECIAL_APPLY_STATE,
+		APPLY_TIME,PROPOSER_ID,PROPOSER_NAME,
+		BUSINESS_STATE,SPECIAL_APPROVE_COMMENT,CUSTOMER_MANAGER_PHONE)
+		values (#specialApplyId:DECIMAL#,#creditapplicationId:DECIMAL#,
+		#specialApplyType:VARCHAR#, #specialApplyState:VARCHAR#,
+		#specialApplyViewContent:VARCHAR#,#specialApplyComment:VARCHAR#,
+		#auditorId:DECIMAL#,#auditorName:VARCHAR#,
+		#auditTime:TIMESTAMP#,#auditSpecialApplyState:VARCHAR#,
+		#applyTime:TIMESTAMP#,#proposerId:DECIMAL#,#proposerName:VARCHAR#,
+		#businessState:VARCHAR#,#specialApproveComment:VARCHAR#,#customerManagerPhone:VARCHAR#)
+		<selectKey resultClass="java.lang.Long" keyProperty="specialApplyId" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+	</insert>
+	<update id="update" parameterClass="specialapply">
+		update RL_SPECIAL_APPLY
+		set CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#,
+		SPECIAL_APPLY_TYPE = #specialApplyType:VARCHAR#,
+		SPECIAL_APPLY_STATE = #specialApplyState:VARCHAR#,
+		SPECIAL_APPLY_VIEW_CONTENT = #specialApplyViewContent:VARCHAR#,
+		SPECIAL_APPLY_COMMENT = #specialApplyComment:VARCHAR#,
+		SPECIAL_APPROVE_COMMENT = #specialApproveComment:VARCHAR#,
+		AUDITOR_ID = #auditorId:DECIMAL#,
+		AUDITOR_NAME = #auditorName:VARCHAR#,
+		AUDIT_TIME = #auditTime:TIMESTAMP#,
+		AUDIT_SPECIAL_APPLY_STATE=#auditSpecialApplyState:VARCHAR#,
+		APPLY_TIME = #applyTime:TIMESTAMP#,
+		PROPOSER_ID=#proposerId:DECIMAL#,
+		PROPOSER_NAME = #proposerName:VARCHAR#,
+		BUSINESS_STATE = #businessState:VARCHAR#
+		CUSTOMER_MANAGER_PHONE = #customerManagerPhone:VARCHAR#
+		where SPECIAL_APPLY_ID = #specialApplyId:DECIMAL#
+  </update>
+	<update id="dynamicUpdate" parameterClass="specialapply">
+		update RL_SPECIAL_APPLY
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="creditapplicationId">
+				CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="specialApplyType">
+				SPECIAL_APPLY_TYPE = #specialApplyType:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="specialApplyState">
+				SPECIAL_APPLY_STATE = #specialApplyState:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="specialApplyViewContent">
+				SPECIAL_APPLY_VIEW_CONTENT = #specialApplyViewContent:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="specialApplyComment">
+				SPECIAL_APPLY_COMMENT = #specialApplyComment:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="specialApproveComment">
+				SPECIAL_APPROVE_COMMENT = #specialApproveComment:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="auditorId">
+				AUDITOR_ID = #auditorId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="auditorName">
+				AUDITOR_NAME = #auditorName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="auditTime">
+				AUDIT_TIME = #auditTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="auditSpecialApplyState">
+				AUDIT_SPECIAL_APPLY_STATE=#auditSpecialApplyState:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="applyTime">
+				APPLY_TIME = #applyTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="proposerId">
+				PROPOSER_NAME = #proposerName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="proposerId">
+				PROPOSER_Id= #proposerId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="businessState">
+				BUSINESS_STATE = #businessState:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="customerManagerPhone">
+				CUSTOMER_MANAGER_PHONE = #customerManagerPhone:VARCHAR#
+      </isNotNull>
+		</dynamic>
+		where SPECIAL_APPLY_ID = #specialApplyId:DECIMAL#
+	</update>
+	<sql id="querySpecialApplyList">
+		select s.special_apply_id as specialApplyId,
+		ca.business_number as businessNumber,
+		bsa.name as name,
+		ca.company_name as companyName,
+		ca.audit_status as auditStatus,
+		s.creditapplication_id as creditapplicationId,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'auditStatus'
+		and t.code_key = ca.audit_status) as auditStatusShow,
+		ca.company_id as companyId,
+		ca.loan_officer_name as loanOfficerName,
+		s.special_apply_type as specialApplyType,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'applyType'
+		and t.code_key = s.special_apply_type) as specialApplyTypeShow,
+		s.special_apply_state as specialApplyState,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'auditStatus'
+		and t.code_key = s.special_apply_state) as specialApplyStateShow,
+		s.special_apply_view_content as specialApplyViewContent,
+		s.special_apply_comment as specialApplyComment,
+		s.special_approve_comment as specialApproveComment,
+		s.auditor_id as auditorId,
+		s.auditor_name as auditorName,
+		s.audit_time as auditTime,
+		s.audit_special_apply_state as auditSpecialApplyState,
+		(select
+		t.code_value
+		from rl_codetable t
+		where t.section = 'auditSpecialApplyState'
+		and t.code_key = s.audit_special_apply_state) as auditSpecialApplyStateShow,
+		s.apply_time as applyTime,
+		s.proposer_id as proposerId,
+		s.proposer_name as proposerName,
+		s.business_state as businessState,
+		s.customer_manager_phone as customerManagerPhone
+		from rl_special_apply s,
+		rl_credit_application ca,
+		rl_borrower_service_app bsa,
+		sid_view v
+		where ca.creditapplication_id = v.object_id_identity
+		and v.class = 'com.creditease.rc.domain.CreditApplication'
+		and v.ace_sid in ($authList$)
+		and s.creditapplication_id = ca.creditapplication_id
+		and bsa.creditapplication_id = ca.creditapplication_id
+		and bsa.leader = '1'
+		and bsa.valid_state = '1'
+		<isNotEmpty property="businessNumber" prepend="and">
+			ca.business_number = #businessNumber#
+		</isNotEmpty>
+		<isNotEmpty property="name" prepend="and">
+			bsa.name = #name#
+		</isNotEmpty>
+		<isNotEmpty property="loanOfficerName" prepend="and">
+			ca.loan_officer_name = #loanOfficerName#
+		</isNotEmpty>
+		<isNotEmpty property="companyId" prepend="and">
+			ca.company_id in ($companyId$)
+		</isNotEmpty>
+		<isNotEmpty property="auditSpecialApplyState" prepend="and">
+			s.audit_special_apply_state = #auditSpecialApplyState#
+		</isNotEmpty>
+		<isNotEmpty property="specialApplyType" prepend="and">
+			s.special_apply_type = #specialApplyType#
+		</isNotEmpty>
+		<isNotEmpty property="auditStatus" prepend="and">
+			ca.audit_status
+			= #auditStatus#
+		</isNotEmpty>
+		<isNotEmpty property="specialApplyState" prepend="and">
+			s.special_apply_state = #specialApplyState#
+		</isNotEmpty>
+		<isNotEmpty property="proposerName" prepend="and">
+			ca.proposer_name = #proposerName#
+		</isNotEmpty>
+		order by s.apply_time desc, s.special_apply_id desc
+	</sql>
+	<select id="queryApplyListEntity" resultClass="specialApplyVo" parameterClass="java.util.HashMap">
+		<include refid="querySpecialApplyList" />
+	</select>
+	<select id="queryApplyListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap">
+		select count(*) from (
+		<include refid="querySpecialApplyList" />
+		)
+	</select>
+	<select id="queryApplyById" resultClass="specialApplyVo" parameterClass="java.lang.Long">
+		select s.special_apply_id as specialApplyId,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'auditStatus'
+		and t.code_key = ca.audit_status) as auditStatusShow,
+		s.special_apply_type as specialApplyType,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'applyType'
+		and t.code_key = s.special_apply_type) as specialApplyTypeShow,
+		s.special_apply_state as specialApplyState,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'auditStatus'
+		and t.code_key = s.special_apply_state) as specialApplyStateShow,
+		s.audit_special_apply_state as auditSpecialApplyState,
+		(select t.code_value
+		from rl_codetable t
+		where t.section = 'auditSpecialApplyState'
+		and t.code_key = s.audit_special_apply_state) as
+		auditSpecialApplyStateShow,
+		s.special_apply_view_content as specialApplyViewContent,
+		s.customer_manager_phone as customerManagerPhone,
+		s.special_apply_comment as specialApplyComment,
+		s.special_approve_comment as specialApproveComment
+		from rl_special_apply s,
+		rl_credit_application ca
+		where s.creditapplication_id =
+		ca.creditapplication_id
+		and s.special_apply_id=#specialApplyId:DECIMAL#
+	</select>
+	<select id="selectSpecialState" resultClass="specialApplyVo" parameterClass="java.lang.Long">
+		select s.audit_special_apply_state as auditSpecialApplyState from
+		rl_special_apply s
+		where s.audit_special_apply_state='0' and
+		s.creditapplication_id=#creditapplicationId:DECIMAL#
+		</select>
+
+	<!--根据信贷申请单ID查询特殊情况申请-->
+	<sql id="sql_searchApplyByCreditId">
+		SELECT
+		  PROPOSER_NAME                                      AS applyer,
+		  (SELECT t.code_value
+		   FROM rl_codetable t
+		   WHERE t.section = 'applyType'
+				 AND t.code_key = special_apply_type)        AS applyType,
+		  AUDITOR_NAME                                       AS approver,
+		  (SELECT t.code_value
+		   FROM rl_codetable t
+		   WHERE t.section = 'auditSpecialApplyState'
+				 AND t.code_key = audit_special_apply_state) AS applyResult,
+		  SPECIAL_APPLY_VIEW_CONTENT                         AS applyContent
+		FROM (SELECT
+				rank()
+				OVER (PARTITION BY RSA.CREDITAPPLICATION_ID
+				  ORDER BY RSA.SPECIAL_APPLY_ID DESC) AS rn,
+				RSA.*
+			  FROM RL_SPECIAL_APPLY RSA
+			  WHERE RSA.CREDITAPPLICATION_ID = #cid#)
+		WHERE rn = 1
+	</sql>
+	<select id="searchApplyByCreditId" parameterClass="java.lang.Long" resultClass="java.util.HashMap">
+		<include refid="sql_searchApplyByCreditId"/>
+	</select>
+	<select id="selectSearchApplyByCreditIdCount" parameterClass="java.lang.Long" resultClass="java.lang.Integer">
+		SELECT COUNT(1) FROM (<include refid="sql_searchApplyByCreditId"/> )
+	</select>
+</sqlMap>

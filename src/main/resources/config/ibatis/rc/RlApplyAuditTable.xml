@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RLAPPLYAUDITTABLE">
+	<typeAlias alias="rlapplyaudittable" type="com.creditease.rc.domain.RlApplyAuditTable" />
+	<typeAlias alias="rlauditdetail" type="com.creditease.rc.domain.RlAuditDetail" />
+	
+	
+	<!-- 映射  zhangman  -->
+	<resultMap class="com.creditease.rc.domain.RlApplyAuditTable" id="rlapplyaudittableMap">
+		<result property="applyaudittableId"   column="APPLYAUDITTABLE_ID"   jdbcType="INTEGER"/>
+		<result property="creditapplicationId"   column="CREDITAPPLICATION_ID"   jdbcType="INTEGER"/>
+		<result property="examResult"   column="EXAM_RESULT"   jdbcType="CHAR"/>
+		<result property="examAmount"   column="EXAM_AMOUNT"   jdbcType="DOUBLE"/>
+		<result property="examPaerson"   column="EXAM_PAERSON"   jdbcType="VARCHAR"/>
+		<result property="examDate"   column="EXAM_DATE"   jdbcType="DATE"/>
+		<result property="loanTime"   column="LOAN_TIME"   jdbcType="DATE"/>
+		<result property="revokeStatus"   column="REVOKE_STATUS"   jdbcType="CHAR"/>
+		<result property="borrRemark"   column="BORR_REMARK"   jdbcType="VARCHAR"/>
+		<result property="auditType"   column="AUDIT_TYPE"   jdbcType="CHAR"/>		 
+
+	</resultMap>
+	<insert id="insertRlApplyAuditTable" parameterClass="rlapplyaudittable">
+		<selectKey keyProperty="applyaudittableId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_APPLY_AUDIT_TABLE (
+				APPLYAUDITTABLE_ID,
+				CREDITAPPLICATION_ID,
+				EXAM_RESULT,
+				EXAM_AMOUNT,
+				EXAM_PAERSON,
+				EXAM_DATE,
+				LOAN_TIME,
+				REVOKE_STATUS,
+				BORR_REMARK,
+				AUDIT_TYPE
+			)
+			values (
+				#applyaudittableId:INTEGER#,
+				#creditapplicationId:INTEGER#,
+				#examResult:CHAR#,
+				#examAmount:DOUBLE#,
+				#examPaerson:VARCHAR#,
+				to_date(#examDate:TIMESTAMP#,'yyyy-mm-dd hh24:mi:ss'),
+				to_date(#loanTime:TIMESTAMP#,'yyyy-mm-dd hh24:mi:ss'),
+				#revokeStatus:CHAR#,
+				#borrRemark:VARCHAR#,
+				#auditType:CHAR#
+			)
+		]]>
+	</insert>
+	<select id="selectById" parameterClass="rlapplyaudittable" resultClass="rlauditdetail"> 
+		 <![CDATA[
+            select 
+            	BORROWER_SERVICE_APP_ID borrowerAppId,
+            	NAME borrowerName,
+            	APPLY_LIMIT amount
+			from RL_BORROWER_SERVICE_APP  WHERE  CREDITAPPLICATION_ID =#creditapplicationId# order by borrowerAppId
+        ]]>
+	</select>
+	<select id="selectExamAmount" parameterClass="Integer" resultClass="rlapplyaudittable"> 
+		 <![CDATA[
+            select 
+            	min(EXAM_AMOUNT) examAmount
+			from RL_APPLY_AUDIT_TABLE  WHERE  CREDITAPPLICATION_ID =#value# and EXAM_RESULT='04'
+        ]]>
+	</select>
+	<select id="selectRemarks" parameterClass="Integer" resultClass="rlapplyaudittable"> 
+		 <![CDATA[
+           select 
+              EXAM_PAERSON examPaerson,
+              to_char(EXAM_DATE,'yyyy-mm-dd hh24:mi:ss') examDate,
+              DECODE(AUDIT_TYPE，0,'审查',1,'审批') auditType,
+              BORR_REMARK borrRemark,
+              DECODE(EXAM_RESULT,
+		        '00','审批通过',       
+		        '11','审批拒绝',
+		        '04','审批通过',
+		        '18','审批拒绝'    
+	             )examResult,
+	           to_char(LOAN_TIME,'yyyy-MM-dd') loanTime  
+          from RL_APPLY_AUDIT_TABLE  WHERE  CREDITAPPLICATION_ID =#value#
+          order by APPLYAUDITTABLE_ID
+        ]]>
+	</select>
+	<!-- zhangman -->
+	<select id="selectLastExamAmount" parameterClass="int" resultMap="rlapplyaudittableMap">
+		<![CDATA[
+			SELECT * FROM RL_APPLY_AUDIT_TABLE
+			WHERE APPLYAUDITTABLE_ID =(
+				SELECT MAX(APPLYAUDITTABLE_ID) FROM RL_APPLY_AUDIT_TABLE
+				WHERE   CREDITAPPLICATION_ID = #creditapplicationId#
+			)
+		]]>
+	</select>
+	
+	<select id="selectAuditRecord" parameterClass="rlapplyaudittable" resultMap="rlapplyaudittableMap">
+			SELECT * FROM RL_APPLY_AUDIT_TABLE
+			WHERE  CREDITAPPLICATION_ID = #creditapplicationId#
+			<isNotEmpty property="examPaerson" prepend="and">
+				EXAM_PAERSON=#examPaerson#
+			</isNotEmpty>
+			<isNotEmpty property="examResult" prepend="and">
+				EXAM_RESULT=#examResult#
+			</isNotEmpty>
+			AND HISTORY_FLAG='F'
+	</select>
+	
+	<update id="updateRlApplyAuditTable" parameterClass="rlapplyaudittable">
+		update RL_APPLY_AUDIT_TABLE 
+		<dynamic prepend="SET">
+			<isNotEmpty property="historyFlag" prepend=",">
+				HISTORY_FLAG=#historyFlag#
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	<update id="updateApplyAuditByCreditapplicationId" parameterClass="int">
+	       UPDATE RL_APPLY_AUDIT_TABLE A SET A.HISTORY_FLAG='T' WHERE A.CREDITAPPLICATION_ID=#value#
+	</update>
+	
+	<select id="selectApplyAuditTable" parameterClass="int" resultMap="rlapplyaudittableMap">
+		<![CDATA[
+			SELECT * FROM RL_APPLY_AUDIT_TABLE
+			WHERE CREDITAPPLICATION_ID = #value# AND HISTORY_FLAG='F'
+		]]>
+	</select>
+	
+	<update id="updateApplyAuditById" parameterClass="int">
+		<![CDATA[
+			UPDATE RL_APPLY_AUDIT_TABLE A SET A.HISTORY_FLAG='T' WHERE A.APPLYAUDITTABLE_ID=#applyAuditTableId#
+	    ]]>
+	</update>
+
+    <select id="getMinExamineAmount" parameterClass="int" resultClass="int">
+        SELECT MIN(T1.EXAM_AMOUNT)
+        FROM RL_APPLY_AUDIT_TABLE T1
+        WHERE T1.CREDITAPPLICATION_ID = #creditapplicationId#
+        AND T1.AUDIT_TYPE IN ('0','1')
+        AND T1.HISTORY_FLAG='F'
+    </select>
+</sqlMap>

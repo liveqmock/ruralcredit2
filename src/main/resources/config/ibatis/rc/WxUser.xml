@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXUSER">
+	<resultMap id="wxUserMap" class="com.creditease.rc.domain.WxUser">
+		<result column="WX_USER_ID" property="wxUserId" jdbcType="DECIMAL" />
+		<result column="USER_CODE" property="userCode" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="PHONE" property="phone" jdbcType="VARCHAR" />
+		<result column="LOGIN_DATE" property="loginDate" jdbcType="TIMESTAMP" />
+		<result column="ANSWER_DATE" property="answerDate" jdbcType="TIMESTAMP" />
+		<result column="SCORE" property="score" jdbcType="DECIMAL" />
+		<result column="IDENTITY_CARD_SUB" property="identityCardSub" jdbcType="VARCHAR" />
+		<result column="AGGREGATE_SCORE" property="aggregateScore" jdbcType="VARCHAR" />
+		<result column="USED_SCORE" property="usedScore" jdbcType="VARCHAR" />
+
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxUserMap" parameterClass="com.creditease.rc.domain.WxUser">
+		select WX_USER_ID, USER_CODE, NAME, PHONE, LOGIN_DATE,
+		ANSWER_DATE, SCORE, IDENTITY_CARD_SUB, AGGREGATE_SCORE, USED_SCORE
+		from RL_WX_USER
+		where WX_USER_ID = #wxUserId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxUser">
+		delete from RL_WX_USER
+		where WX_USER_ID = #wxUserId:DECIMAL#
+  </delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxUser">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxUserId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_USER (WX_USER_ID, USER_CODE, NAME, PHONE, LOGIN_DATE, ANSWER_DATE, SCORE, IDENTITY_CARD_SUB, AGGREGATE_SCORE, USED_SCORE)
+		values
+		(#wxUserId:DECIMAL#,
+		#userCode:VARCHAR#, #name:VARCHAR#,
+		#phone:VARCHAR#, #loginDate:TIMESTAMP#,
+		#answerDate:TIMESTAMP#, #score:DECIMAL#,
+		#identityCardSub:VARCHAR#, #aggregateScore:DECIMAL#, #usedScore:DECIMAL#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxUser">
+		update RL_WX_USER
+		set USER_CODE = #userCode:VARCHAR#,
+		NAME = #name:VARCHAR#,
+		PHONE = #phone:VARCHAR#,
+		LOGIN_DATE = #loginDate:TIMESTAMP#,
+		ANSWER_DATE = #answerDate:TIMESTAMP#,
+		SCORE = #score:DECIMAL#,
+		IDENTITY_CARD_SUB =
+		#identityCardSub:VARCHAR#,
+		AGGREGATE_SCORE = #aggregateScore:DECIMAL#,
+		USED_SCORE = #usedScore:DECIMAL#
+		where WX_USER_ID = #wxUserId:DECIMAL#
+	</update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxUser">
+		update RL_WX_USER
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="userCode">
+				USER_CODE = #userCode:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="name">
+				NAME = #name:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="phone">
+				PHONE = #phone:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="loginDate">
+				LOGIN_DATE = #loginDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="answerDate">
+				ANSWER_DATE = #answerDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="score">
+				SCORE = #score:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="identityCardSub">
+				IDENTITY_CARD_SUB = #identityCardSub:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="aggregateScore">
+				AGGREGATE_SCORE = #aggregateScore:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="usedScore">
+				USED_SCORE = #usedScore:DECIMAL#
+      </isNotNull>
+		</dynamic>
+		where WX_USER_ID = #wxUserId:DECIMAL#
+	</update>
+	<select id="queryWxUserByUserCode" parameterClass="java.lang.String" resultMap="wxUserMap">
+		select * from rl_wx_user wu where wu.user_code = #userCode#
+	</select>
+	<select id="qyChangedGetPrizeUser" parameterClass="java.lang.String" resultMap="wxUserMap">
+	select * from rl_wx_user wu where wu.user_code=#userCode#
+	and wu.wx_user_id in (select wup.wx_user_id from rl_wx_upri_record wup
+	where wup.wx_prize_id='248217')
+	</select>
+</sqlMap>

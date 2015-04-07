@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="LOANREGIST">
+	<typeAlias alias="LoanRegist" type="com.creditease.rc.domain.LoanRegist"/>
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<resultMap class="com.creditease.rc.domain.LoanRegist" id="LoanRegistMap">
+		<result property="LoanregistId" column="LOANREGIST_ID" jdbcType="INTEGER" />
+		<result property="groupLoanRegistId" column="GROUP_LOAN_REGIST_ID" jdbcType="INTEGER" />
+		<result property="borrowerName" column="BORROWER_NAME" jdbcType="VARCHAR" />
+		<result property="loanAmount" column="LOAN_AMOUNT" jdbcType="Double" />
+		<result property="realAmount" column="REAL_AMOUNT" jdbcType="Double" />
+	</resultMap>
+	<insert id="insert" parameterClass="LoanRegist">
+		<selectKey keyProperty="LoanregistId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+		<![CDATA[
+			INSERT INTO RL_LOAN_REGIST
+				(LOANREGIST_ID,
+				GROUP_LOAN_REGIST_ID,
+				BORROWER_NAME,
+				LOAN_AMOUNT,
+				REAL_AMOUNT)
+			VALUES
+				(#LoanregistId:INREGER#,
+				#groupLoanRegistId:INTEGER#,
+				#borrowerName:VARCHAR#,
+				#loanAmount:Double#,
+				#realAmount:Double#)
+		]]>
+	</insert>
+	<select id="listByPID" parameterClass="int" resultMap="LoanRegistMap">
+		<![CDATA[
+			SELECT * FROM  RL_LOAN_REGIST
+			WHERE GROUP_LOAN_REGIST_ID= #groupLoanRegistId#
+		]]>
+	</select>
+	<select id="selectLoanRegists" parameterClass="int" resultClass="LoanRegist">
+		<![CDATA[
+				SELECT distinct 
+					  b.name as borrowerName,
+				       ac.amount        as loanAmount,
+				       ac.real_amount   as realAmount
+				  FROM rl_credit_application ca, rl_amount_confirm ac,rl_borrower_service_app b
+				 where ca.creditapplication_id = ac.credit_application_id
+				   and ac.history_flag = 0
+				   and ca.creditapplication_id = #creditapplicationId#
+				   and b.valid_state = '1'
+				   and b.leader = '1'
+				   and b.creditapplication_id = #creditapplicationId#
+		]]>
+	</select>
+</sqlMap>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="familytotalcost">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="familytotalcost" type="com.creditease.rc.domain.Familytotalcost" />
+	<resultMap class="com.creditease.rc.domain.Familytotalcost" id="familytotalcostMap">
+		<result column="FAMILY_TOTAL_COST_ID" jdbcType="INTEGER" property="familyTotalCostId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="TOTAL_COST_TYPE" jdbcType="CHAR" property="totalCostType" />
+		<result column="AMOUNT" jdbcType="DOUBLE" property="amount" />
+	</resultMap>
+	<sql id="byfamilyTotalCostIdCondition">
+        <![CDATA[
+           FAMILY_TOTAL_COST_ID as familyTotalCostId = #familyTotalCostId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertIntoFamilytotalcost" parameterClass="familytotalcost">
+		<selectKey keyProperty="familyTotalCostId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_FAMILY_TOTAL_COST (FAMILY_TOTAL_COST_ID,BORROWER_SERVICE_APP_ID,TOTAL_COST_TYPE,AMOUNT)
+			values (#familyTotalCostId:INTEGER#, #borrowerServiceAppId:INTEGER#, #totalCostType:CHAR#, #amount:DOUBLE#)
+		]]>
+	</insert>
+	<select id="selectfamilytotalcostByBorrowerServiceAppId" parameterClass="int" resultMap="familytotalcostMap">
+		<![CDATA[
+			select * 
+			from RL_FAMILY_TOTAL_COST
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<update id="updateFamilytotalcostByPrimaryKey" parameterClass="familytotalcost">
+		<![CDATA[
+			update RL_FAMILY_TOTAL_COST
+			set 
+			TOTAL_COST_TYPE = #totalCostType:CHAR#,
+			AMOUNT = #amount:DOUBLE#
+			where
+			FAMILY_TOTAL_COST_ID = #familyTotalCostId:INTEGER#
+		]]>
+	</update>
+	<delete id="deleteFamilytotalcostByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_FAMILY_TOTAL_COST
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			FAMILY_TOTAL_COST_ID = #deleteFamilytotalcostList[]#
+		</iterate>
+	</delete>
+</sqlMap>

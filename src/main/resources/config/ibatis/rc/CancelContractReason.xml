@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="CANCELCONTRACTREASON" >
+	  <typeAlias alias="cancelContractReason" type="com.creditease.rc.domain.CancelContractReason"/>
+	  <resultMap id="CancelContractReasonResult" class="com.creditease.rc.domain.CancelContractReason" >
+	    
+	    <result column="CANCEL_CONTRACT_REASON_ID" property="cancelContractReasonId" jdbcType="DECIMAL" />
+	    <result column="CANCEL_CONTRACT_REASON_CONTENT" property="cancelContractReasonContent" jdbcType="VARCHAR" />
+	  	<result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL" />
+	  	<result column="HISTORY_FLAG" property="historyFlag" jdbcType="VARCHAR" />
+	  </resultMap>
+	  <insert id="insert" parameterClass="com.creditease.rc.domain.CancelContractReason" >
+	    <selectKey resultClass="java.lang.Long" keyProperty="cancelContractReasonId" type="pre">
+	      select SEQ_BASIC_INFO.NEXTVAL  from dual
+	    </selectKey>
+	    insert into RL_CANCEL_CONTRACT_REASON (CANCEL_CONTRACT_REASON_ID, CANCEL_CONTRACT_REASON_CONTENT,CREDITAPPLICATION_ID,HISTORY_FLAG)
+       values (#cancelContractReasonId:DECIMAL#,#cancelContractReasonContent:VARCHAR#,#creditapplicationId:DECIMAL#,#historyFlag:VARCHAR#)
+	  </insert>
+	  <!-- 更新作废原因对象信息为历史 -->
+	<update id="updateHistory" parameterClass="cancelContractReason">
+		update RL_CANCEL_CONTRACT_REASON
+		set HISTORY_FLAG ='T'
+		where CREDITAPPLICATION_ID = #creditapplicationId:DECIMAL#
+  </update>
+  <select id="selectReason" parameterClass="java.lang.Long" resultClass="com.creditease.rc.domain.CancelContractReason">
+  	select * from RL_CANCEL_CONTRACT_REASON can where can.history_flag='F' and can.creditapplication_id=#creditapplicationId:DECIMAL#
+  </select>
+</sqlMap>

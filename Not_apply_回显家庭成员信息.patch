@@ -1,0 +1,337 @@
+Index: src/main/java/com/creditease/rc/service/impl/GuaranorProfileService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/impl/GuaranorProfileService.java	(revision 8440)
++++ src/main/java/com/creditease/rc/service/impl/GuaranorProfileService.java	(revision )
+@@ -1,27 +1,8 @@
+ package com.creditease.rc.service.impl;
+ 
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.Collections;
+-import java.util.Comparator;
+-import java.util.List;
+-
+-import javax.annotation.Resource;
+-
+-import org.springframework.stereotype.Service;
+-
+ import com.creditease.rc.common.Constants;
+-import com.creditease.rc.dao.IFamilymemberDao;
+-import com.creditease.rc.dao.IGuaranorProfileDao;
+-import com.creditease.rc.dao.IJobInfoDAO;
+-import com.creditease.rc.dao.IOtherQuestionsDao;
+-import com.creditease.rc.dao.ISurveybusinessinfoDao;
+-import com.creditease.rc.domain.BorrowerService;
+-import com.creditease.rc.domain.BorrowerServiceApp;
+-import com.creditease.rc.domain.Familymember;
+-import com.creditease.rc.domain.JobInfo;
+-import com.creditease.rc.domain.OtherQuestions;
+-import com.creditease.rc.domain.Surveybusinessinfo;
++import com.creditease.rc.dao.*;
++import com.creditease.rc.domain.*;
+ import com.creditease.rc.service.IBorrowerServiceAppService;
+ import com.creditease.rc.service.IGuaranorProfileService;
+ import com.creditease.rc.service.IOperateLogService;
+@@ -33,7 +14,11 @@
+ import com.creditease.rc.vo.CustomerBasicInfoVo;
+ import com.creditease.rc.vo.GuaranorProfile;
+ import com.creditease.rc.vo.OperateLogBusinessStruct;
++import org.springframework.stereotype.Service;
+ 
++import javax.annotation.Resource;
++import java.util.*;
++
+ /**
+  * 
+  * @author haoqiang
+@@ -352,13 +337,13 @@
+ 		}
+ 		if (f.getSeq() != null && !"".equals(f.getSeq())) {
+ 
+-			Familymember[] familymembers2 = new Familymember[5];
++			Familymember[] familymembers2 = new Familymember[getFamilymembers.size()];
+ 			for (Familymember familymember : getFamilymembers) {
+ 				if (familymember.getSeq() != null) {
+ 					familymembers2[Integer.valueOf(familymember.getSeq()) - 1] = familymember;
+ 				}
+ 			}
+-			getFamilymembers = Arrays.asList(familymembers2);
++			getFamilymembers = new ArrayList<Familymember>(Arrays.asList(familymembers2));
+ 			// 工作
+ 
+ 			JobInfo[] infos = new JobInfo[2];
+@@ -663,5 +648,19 @@
+ 		}
+ 
+ 		return true;
++	}
++
++	@Override
++	public List<Familymember> getOtherMembersByGuaranorCreditNumber(String creditNumber) {
++
++		List<Long> candidates = borrowerServiceAppService.selectAllCandidates(creditNumber);
++		List<Familymember> familyMembers;
++		for (Long candiId : candidates) {
++			familyMembers = (List<Familymember>) guaranorProfileDao.queryList("familymember.selectfamilymemberByBorrowerServiceAppId", candiId);
++			if (!familyMembers.isEmpty()) {
++				return familyMembers;
++			}
++		}
++		return null;
+ 	}
+ }
+Index: src/main/java/com/creditease/rc/action/GuaranorProfileController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/action/GuaranorProfileController.java	(revision 8440)
++++ src/main/java/com/creditease/rc/action/GuaranorProfileController.java	(revision )
+@@ -1,25 +1,8 @@
+ package com.creditease.rc.action;
+ 
+-import java.text.DateFormat;
+-import java.text.SimpleDateFormat;
+-import java.util.ArrayList;
+-import java.util.Date;
+-import java.util.List;
+-
+-import javax.annotation.Resource;
+-import javax.servlet.http.HttpServletRequest;
+-
+-import org.apache.commons.lang.StringUtils;
+-import org.springframework.beans.propertyeditors.CustomDateEditor;
+-import org.springframework.stereotype.Controller;
+-import org.springframework.web.bind.WebDataBinder;
+-import org.springframework.web.bind.annotation.InitBinder;
+-import org.springframework.web.bind.annotation.RequestMapping;
+-import org.springframework.web.bind.annotation.ResponseBody;
+-import org.springframework.web.servlet.ModelAndView;
+-
+ import com.creditease.rc.common.Constants;
+ import com.creditease.rc.domain.CodeTable;
++import com.creditease.rc.domain.Familymember;
+ import com.creditease.rc.domain.Message;
+ import com.creditease.rc.service.ICreditApplicationService;
+ import com.creditease.rc.service.IDataDictionaryService;
+@@ -28,7 +11,24 @@
+ import com.creditease.rc.vo.BorrowerInfoVo;
+ import com.creditease.rc.vo.CustomerBasicInfoVo;
+ import com.creditease.rc.vo.GuaranorProfile;
++import org.apache.commons.lang.StringUtils;
++import org.springframework.beans.BeanUtils;
++import org.springframework.beans.propertyeditors.CustomDateEditor;
++import org.springframework.stereotype.Controller;
++import org.springframework.web.bind.WebDataBinder;
++import org.springframework.web.bind.annotation.InitBinder;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.ResponseBody;
++import org.springframework.web.servlet.ModelAndView;
+ 
++import javax.annotation.Resource;
++import javax.servlet.http.HttpServletRequest;
++import java.text.DateFormat;
++import java.text.SimpleDateFormat;
++import java.util.ArrayList;
++import java.util.Date;
++import java.util.List;
++
+ /**
+  * 
+  * @author haoqiang
+@@ -92,6 +92,19 @@
+ 		guaranorProfile.getBorrowerService().setBusinessNumber(businessNumber);
+ 		guaranorProfile.getBorrowerService().setBorrowerServiceAppDESId(desId);
+ 		modelAndView.addObject(guaranorProfile);
++
++		List<Familymember> familyMembers = new ArrayList<Familymember>(guaranorProfile.getFamilymembers());
++		try {
++			if (StringUtils.isNotEmpty(param) && param.equals("0") && guaranorProfile.getFamilymembers().size() == 1) {
++				List<Familymember> ms = guaranorProfileService.getOtherMembersByGuaranorCreditNumber(guaranorProfile.getBorrowerService().getCredentialsNumber());
++				if (null != ms && !ms.isEmpty()) {
++					guaranorProfile.setFamilymembers(ms);
++				}
++			}
++		} catch (Exception e) {
++			guaranorProfile.setFamilymembers(familyMembers);
++		}
++
+ 		return modelAndView;
+ 	}
+ 
+Index: src/main/java/com/creditease/rc/service/impl/BorrowerServiceAppService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/impl/BorrowerServiceAppService.java	(revision 8440)
++++ src/main/java/com/creditease/rc/service/impl/BorrowerServiceAppService.java	(revision )
+@@ -12,9 +12,9 @@
+ import com.creditease.rc.vo.*;
+ import org.springframework.stereotype.Service;
+ 
+-import java.text.SimpleDateFormat;
+ import javax.annotation.Resource;
+ import java.text.ParseException;
++import java.text.SimpleDateFormat;
+ import java.util.*;
+ 
+ /**
+@@ -686,5 +686,10 @@
+            msg.setMsg("保存失败");
+        }
+        return msg;
++   }
++
++	@Override
++	public List<Long> selectAllCandidates(String creditNumber) {
++		return borrowerServiceDAO.selectAllCandidates(creditNumber);
+-   }
++	}
+ }
+Index: src/main/java/com/creditease/rc/service/IGuaranorProfileService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/IGuaranorProfileService.java	(revision 8440)
++++ src/main/java/com/creditease/rc/service/IGuaranorProfileService.java	(revision )
+@@ -1,11 +1,12 @@
+ package com.creditease.rc.service;
+ 
+-import java.util.List;
+-
++import com.creditease.rc.domain.Familymember;
+ import com.creditease.rc.vo.BorrowerInfoVo;
+ import com.creditease.rc.vo.CustomerBasicInfoVo;
+ import com.creditease.rc.vo.GuaranorProfile;
+ 
++import java.util.List;
++
+ /**
+  * 
+  * @author haoqiang
+@@ -60,5 +61,6 @@
+ 	 * @return 是否保存成功
+ 	 */
+ 	boolean saveUpdateGuaranorProfile(GuaranorProfile guaranorProfile, String doSaveStatus);
+-	
++
++	public List<Familymember> getOtherMembersByGuaranorCreditNumber(String creditNumber);
+ }
+Index: src/main/java/com/creditease/rc/dao/impl/BorrowerServiceDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/dao/impl/BorrowerServiceDAO.java	(revision 8440)
++++ src/main/java/com/creditease/rc/dao/impl/BorrowerServiceDAO.java	(revision )
+@@ -1,18 +1,16 @@
+ package com.creditease.rc.dao.impl;
+ 
+-import java.util.List;
+-import java.util.Map;
+-
+-import javax.annotation.Resource;
+-
+-import com.creditease.rc.domain.CreditCoBorrower;
+-import com.creditease.rc.domain.CustomerBasicInfo;
+-import org.springframework.stereotype.Repository;
+-
+ import com.creditease.rc.dao.IBorrowerServiceDAO;
+ import com.creditease.rc.domain.BorrowerService;
++import com.creditease.rc.domain.CreditCoBorrower;
++import com.creditease.rc.domain.CustomerBasicInfo;
+ import com.creditease.rc.framework.dao.IBaseDao;
+ import com.creditease.rc.framework.dao.impl.BaseDao;
++import org.springframework.stereotype.Repository;
++
++import javax.annotation.Resource;
++import java.util.List;
++import java.util.Map;
+ /**
+  * 
+  * @author zhangman
+@@ -184,5 +182,10 @@
+     @Override
+     public void updateCreditCoBorrowerIdInfo(CreditCoBorrower creditCoBorrower) {
+         baseDao.update("RL_BORROWER_SERVICE_APP.updateCreditCoBorrowerIdInfo",creditCoBorrower);
++    }
++
++    @Override
++    public List<Long> selectAllCandidates(String creditNumber) {
++        return (List<Long>) baseDao.queryList("RL_BORROWER_SERVICE_APP.selectAllCandidates", creditNumber);
+     }
+ }
+\ No newline at end of file
+Index: src/main/resources/config/ibatis/rc/RL_BORROWER_SERVICE_APP_SqlMap.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/config/ibatis/rc/RL_BORROWER_SERVICE_APP_SqlMap.xml	(revision 8440)
++++ src/main/resources/config/ibatis/rc/RL_BORROWER_SERVICE_APP_SqlMap.xml	(revision )
+@@ -612,4 +612,12 @@
+                 where cb.coborrower_id = #coBorrowerId#
+ 		]]>
+ 	</update>
++
++	<!-- 查询所有候选担保人，供筛选出最新担保人家庭成员关系 -->
++	<select id="selectAllCandidates" parameterClass="java.lang.String" resultClass="java.lang.Long">
++		SELECT BORROWER_SERVICE_APP_ID
++		FROM RL_BORROWER_SERVICE_APP
++		WHERE CREDENTIALS_NUMBER = #creditNumber# AND VALID_STATE = '1' AND LEADER = '0'
++		ORDER BY 1 DESC
++	</select>
+ </sqlMap>
+\ No newline at end of file
+Index: src/main/java/com/creditease/rc/service/IBorrowerServiceAppService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/service/IBorrowerServiceAppService.java	(revision 8440)
++++ src/main/java/com/creditease/rc/service/IBorrowerServiceAppService.java	(revision )
+@@ -204,4 +204,7 @@
+ 	public List<CreditApplicationSearch> selectBorrowerAuditListByTel(String telPhone);
+ 
+ 	public Message checkBorrowerSave(Long creditapplicationId);
++
++	/*查询所有候选担保人，供筛选出最新担保人家庭成员关系*/
++	public List<Long> selectAllCandidates(String creditNumber);
+ }
+Index: src/main/java/com/creditease/rc/dao/IBorrowerServiceDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/creditease/rc/dao/IBorrowerServiceDAO.java	(revision 8440)
++++ src/main/java/com/creditease/rc/dao/IBorrowerServiceDAO.java	(revision )
+@@ -1,13 +1,13 @@
+ package com.creditease.rc.dao;
+ 
+-import java.util.List;
+-import java.util.Map;
+-
+ import com.creditease.rc.domain.BorrowerService;
+ import com.creditease.rc.domain.CreditCoBorrower;
+ import com.creditease.rc.domain.CustomerBasicInfo;
+ import com.creditease.rc.framework.dao.IBaseDao;
+ 
++import java.util.List;
++import java.util.Map;
++
+ /**
+  * 
+  * @author zhangman
+@@ -114,4 +114,6 @@
+      * @param customerBasicInfoList
+      */
+     public void updateCutomerIdListInfo(List<CustomerBasicInfo> customerBasicInfoList);
++
++    public List<Long> selectAllCandidates(String creditNumber);
+ }
+\ No newline at end of file

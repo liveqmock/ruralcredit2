@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="surveybusinessinfo">
+	<typeAlias alias="surveybusinessinfo" type="com.creditease.rc.domain.Surveybusinessinfo" />
+	<resultMap class="com.creditease.rc.domain.Surveybusinessinfo" id="surveybusinessinfoMap">
+		<result column="SURVEY_BUSINESS_INFO_ID" property="surveyBusinessInfoId" jdbcType="DECIMAL" />
+		<result column="BORROWER_SERVICE_APP_ID" property="borrowerServiceAppId" jdbcType="DECIMAL" />
+		<result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+		<result column="START_BUSINESS_TIME" property="startBusinessTime" jdbcType="TIMESTAMP" />
+		<result column="PAY" property="pay" jdbcType="DECIMAL" />
+		<result column="BUSINESS_SCOPE" property="businessScope" jdbcType="VARCHAR" />
+		<result column="SITE_AREA" property="siteArea" jdbcType="VARCHAR" />
+		<result column="BUSINESS_ADDRESS" property="businessAddress" jdbcType="VARCHAR" />
+		<result column="BUSINESS_PLACE_TYPE" property="businessPlaceType" jdbcType="CHAR" />
+		<result column="BUSINESS_PERMIT_NO" property="businessPermitNo" jdbcType="VARCHAR" />
+		<result column="TOTAL_INCOME" property="totalIncome" jdbcType="DECIMAL" />
+		<result column="TAX_REGISTER_NO" property="taxRegisterNo" jdbcType="VARCHAR" />
+		<result column="BUSINESS_PLACE_DATE" property="businessPlaceDate" jdbcType="TIMESTAMP" />
+		<result column="BUSINESS_PLACE_OTHER" property="businessPlaceOther" jdbcType="VARCHAR" />
+		<result column="EMPLOYEE_NUMBER" property="employeeNumber" jdbcType="DECIMAL" />
+		<result column="OPERATING_ITEMS" property="operatingItems" jdbcType="VARCHAR" />
+		<result column="OPERATING_ITEMS_VIEW" property="operatingItemsView" jdbcType="VARCHAR" />
+		<result column="OPERATING_ITEMS_DETAIL" property="operatingItemsDetail" jdbcType="VARCHAR" />
+		<result column="STARTING_DATE" property="startingDate" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<result column="BUSINESS_LICENSE" property="businessLicense" jdbcType="VARCHAR" />
+		<result column="TAX_REGISTRATION_CERTIFICATE" property="taxRegistrationCertificate" jdbcType="VARCHAR" />
+		<result column="MONTH_GROSS_INCOME" property="monthGrossIncome" jdbcType="DOUBLE" />
+		<result column="SEQ" property="seq" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<!-- liuli 2013-04-19 取申请表中的经营项目名 不需要OPERATING_ITEMS_DETAIL -->
+	<resultMap class="com.creditease.rc.domain.Surveybusinessinfo" id="surveybusinessinfoMapForCs">
+		<result column="SURVEY_BUSINESS_INFO_ID" property="surveyBusinessInfoId" jdbcType="DECIMAL" />
+		<result column="BORROWER_SERVICE_APP_ID" property="borrowerServiceAppId" jdbcType="DECIMAL" />
+		<result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+		<result column="START_BUSINESS_TIME" property="startBusinessTime" jdbcType="TIMESTAMP" />
+		<result column="PAY" property="pay" jdbcType="DECIMAL" />
+		<result column="BUSINESS_SCOPE" property="businessScope" jdbcType="VARCHAR" />
+		<result column="SITE_AREA" property="siteArea" jdbcType="VARCHAR" />
+		<result column="BUSINESS_ADDRESS" property="businessAddress" jdbcType="VARCHAR" />
+		<result column="BUSINESS_PLACE_TYPE" property="businessPlaceType" jdbcType="CHAR" />
+		<result column="BUSINESS_PERMIT_NO" property="businessPermitNo" jdbcType="VARCHAR" />
+		<result column="TOTAL_INCOME" property="totalIncome" jdbcType="DECIMAL" />
+		<result column="TAX_REGISTER_NO" property="taxRegisterNo" jdbcType="VARCHAR" />
+		<result column="BUSINESS_PLACE_DATE" property="businessPlaceDate" jdbcType="TIMESTAMP" />
+		<result column="BUSINESS_PLACE_OTHER" property="businessPlaceOther" jdbcType="VARCHAR" />
+		<result column="EMPLOYEE_NUMBER" property="employeeNumber" jdbcType="DECIMAL" />
+		<result column="OPERATING_ITEMS" property="operatingItems" jdbcType="VARCHAR" />
+		<result column="OPERATING_ITEMS_DETAIL" property="operatingItemsDetail" jdbcType="VARCHAR" />
+		<result column="STARTING_DATE" property="startingDate" jdbcType="VARCHAR" />
+		<result column="STATE" property="state" jdbcType="VARCHAR" />
+		<result column="BUSINESS_LICENSE" property="businessLicense" jdbcType="VARCHAR" />
+		<result column="TAX_REGISTRATION_CERTIFICATE" property="taxRegistrationCertificate" jdbcType="VARCHAR" />
+		<result column="MONTH_GROSS_INCOME" property="monthGrossIncome" jdbcType="DOUBLE" />
+	</resultMap>
+	
+	<sql id="bysurveyBusinessInfoIdCondition">
+        <![CDATA[
+           SURVEY_BUSINESS_INFO_ID  = #surveyBusinessInfoId:INTEGER#
+        ]]>
+	</sql>
+	<insert id="insertsurveybusinessinfo" parameterClass="surveybusinessinfo">
+		<selectKey keyProperty="surveyBusinessInfoId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+		 insert into RL_SURVEY_BUSINESS_INFO (SURVEY_BUSINESS_INFO_ID, BORROWER_SERVICE_APP_ID,
+      ORGANIZATION_NAME, START_BUSINESS_TIME, PAY, BUSINESS_SCOPE, SITE_AREA, BUSINESS_ADDRESS,
+      BUSINESS_PLACE_TYPE, BUSINESS_PERMIT_NO, TOTAL_INCOME, TAX_REGISTER_NO, BUSINESS_PLACE_DATE,
+      BUSINESS_PLACE_OTHER, EMPLOYEE_NUMBER, OPERATING_ITEMS, OPERATING_ITEMS_DETAIL, STARTING_DATE,
+      STATE, BUSINESS_LICENSE, TAX_REGISTRATION_CERTIFICATE,SEQ)
+    values (#surveyBusinessInfoId:DECIMAL#, #borrowerServiceAppId:DECIMAL#,
+      #organizationName:VARCHAR#, #startBusinessTime:TIMESTAMP#, #pay:DECIMAL#,
+      #businessScope:VARCHAR#, #siteArea:VARCHAR#, #businessAddress:VARCHAR#,
+      #businessPlaceType:CHAR#, #businessPermitNo:VARCHAR#, #totalIncome:DECIMAL#,
+      #taxRegisterNo:VARCHAR#, #businessPlaceDate:TIMESTAMP#, #businessPlaceOther:VARCHAR#,
+      #employeeNumber:DECIMAL#, #operatingItems:VARCHAR#, #operatingItemsDetail:VARCHAR#,
+      #startingDate:VARCHAR#, #state:VARCHAR#, #businessLicense:VARCHAR#,
+      #taxRegistrationCertificate:VARCHAR#,#seq#)
+		]]>
+	</insert>
+	<insert id="insert" parameterClass="surveybusinessinfo">
+		<selectKey keyProperty="surveyBusinessInfoId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+		 insert into RL_SURVEY_BUSINESS_INFO (SURVEY_BUSINESS_INFO_ID, BORROWER_SERVICE_APP_ID,
+      ORGANIZATION_NAME, START_BUSINESS_TIME, PAY, BUSINESS_SCOPE, SITE_AREA, BUSINESS_ADDRESS,
+      BUSINESS_PLACE_TYPE, BUSINESS_PERMIT_NO, TOTAL_INCOME, TAX_REGISTER_NO, BUSINESS_PLACE_DATE,
+      BUSINESS_PLACE_OTHER, EMPLOYEE_NUMBER, OPERATING_ITEMS, OPERATING_ITEMS_DETAIL, STARTING_DATE,
+      STATE, BUSINESS_LICENSE, TAX_REGISTRATION_CERTIFICATE,MONTH_GROSS_INCOME,SEQ)
+    values (#surveyBusinessInfoId:DECIMAL#, #borrowerServiceAppId:DECIMAL#,
+      #organizationName:VARCHAR#, #startBusinessTime:TIMESTAMP#, #pay:DECIMAL#,
+      #businessScope:VARCHAR#, #siteArea:VARCHAR#, #businessAddress:VARCHAR#,
+      #businessPlaceType:CHAR#, #businessPermitNo:VARCHAR#, #totalIncome:DECIMAL#,
+      #taxRegisterNo:VARCHAR#, #businessPlaceDate:TIMESTAMP#, #businessPlaceOther:VARCHAR#,
+      #employeeNumber:DECIMAL#, #operatingItems:VARCHAR#, #operatingItemsDetail:VARCHAR#,
+      #startingDate:VARCHAR#, #state:VARCHAR#, #businessLicense:VARCHAR#,
+      #taxRegistrationCertificate:VARCHAR#,#monthGrossIncome:DOUBLE#,#seq#)
+		]]>
+	</insert>
+	<select id="selectSurveybusinessinfoByBorrowerServiceAppId" parameterClass="int" resultMap="surveybusinessinfoMap">
+		<![CDATA[
+			select * 
+			from RL_SURVEY_BUSINESS_INFO
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+			order by seq
+		]]>
+	</select>
+	<update id="updatesurveybusinessinfoByPrimaryKey" parameterClass="surveybusinessinfo">
+		<![CDATA[
+			 update RL_SURVEY_BUSINESS_INFO
+    set BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:DECIMAL#,
+      ORGANIZATION_NAME = #organizationName:VARCHAR#,
+      START_BUSINESS_TIME = #startBusinessTime:TIMESTAMP#,
+      PAY = #pay:DECIMAL#,
+      BUSINESS_SCOPE = #businessScope:VARCHAR#,
+      SITE_AREA = #siteArea:VARCHAR#,
+      BUSINESS_ADDRESS = #businessAddress:VARCHAR#,
+      BUSINESS_PLACE_TYPE = #businessPlaceType:CHAR#,
+      BUSINESS_PERMIT_NO = #businessPermitNo:VARCHAR#,
+      TOTAL_INCOME = #totalIncome:DECIMAL#,
+      TAX_REGISTER_NO = #taxRegisterNo:VARCHAR#,
+      BUSINESS_PLACE_DATE = #businessPlaceDate:TIMESTAMP#,
+      BUSINESS_PLACE_OTHER = #businessPlaceOther:VARCHAR#,
+      EMPLOYEE_NUMBER = #employeeNumber:DECIMAL#,
+      OPERATING_ITEMS = #operatingItems:VARCHAR#,
+      OPERATING_ITEMS_DETAIL = #operatingItemsDetail:VARCHAR#,
+      STARTING_DATE = #startingDate:VARCHAR#,
+      STATE = #state:VARCHAR#,
+      BUSINESS_LICENSE = #businessLicense:VARCHAR#,
+      TAX_REGISTRATION_CERTIFICATE = #taxRegistrationCertificate:VARCHAR#,
+      MONTH_GROSS_INCOME = #monthGrossIncome:DOUBLE#
+    where SURVEY_BUSINESS_INFO_ID = #surveyBusinessInfoId:DECIMAL#
+		]]>
+	</update>
+	<update id="update" parameterClass="surveybusinessinfo">
+		<![CDATA[
+			 update RL_SURVEY_BUSINESS_INFO
+    set BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:DECIMAL#,
+      ORGANIZATION_NAME = #organizationName:VARCHAR#,
+      START_BUSINESS_TIME = #startBusinessTime:TIMESTAMP#,
+      PAY = #pay:DECIMAL#,
+      BUSINESS_SCOPE = #businessScope:VARCHAR#,
+      SITE_AREA = #siteArea:VARCHAR#,
+      BUSINESS_ADDRESS = #businessAddress:VARCHAR#,
+      BUSINESS_PLACE_TYPE = #businessPlaceType:CHAR#,
+      BUSINESS_PERMIT_NO = #businessPermitNo:VARCHAR#,
+      TOTAL_INCOME = #totalIncome:DECIMAL#,
+      TAX_REGISTER_NO = #taxRegisterNo:VARCHAR#,
+      BUSINESS_PLACE_DATE = #businessPlaceDate:TIMESTAMP#,
+      BUSINESS_PLACE_OTHER = #businessPlaceOther:VARCHAR#,
+      EMPLOYEE_NUMBER = #employeeNumber:DECIMAL#,
+      OPERATING_ITEMS = #operatingItems:VARCHAR#,
+      OPERATING_ITEMS_DETAIL = #operatingItemsDetail:VARCHAR#,
+      STARTING_DATE = #startingDate:VARCHAR#,
+      STATE = #state:VARCHAR#,
+      BUSINESS_LICENSE = #businessLicense:VARCHAR#,
+      TAX_REGISTRATION_CERTIFICATE = #taxRegistrationCertificate:VARCHAR#,
+      MONTH_GROSS_INCOME = #monthGrossIncome:DOUBLE#
+    where SURVEY_BUSINESS_INFO_ID = #surveyBusinessInfoId:DECIMAL#
+		]]>
+	</update>
+	
+	<update id="updateSurveybusinessinfo" parameterClass="surveybusinessinfo">
+		<![CDATA[
+			 update RL_SURVEY_BUSINESS_INFO
+    set  
+      OPERATING_ITEMS = #operatingItems:VARCHAR#,
+      OPERATING_ITEMS_DETAIL = #operatingItemsDetail:VARCHAR#,
+      STARTING_DATE = #startingDate:VARCHAR#,
+      STATE = #state:VARCHAR#,
+      BUSINESS_LICENSE = #businessLicense:VARCHAR#,
+      TAX_REGISTRATION_CERTIFICATE = #taxRegistrationCertificate:VARCHAR#
+    where SURVEY_BUSINESS_INFO_ID = #surveyBusinessInfoId:DECIMAL#
+		]]>
+	</update>
+	
+	<delete id="deletesurveybusinessinfoByPrimaryKey" parameterClass="int">
+		<![CDATA[
+			delete from RL_SURVEY_BUSINESS_INFO
+			where
+			SURVEY_BUSINESS_INFO_ID = #surveyBusinessInfoId:INTEGER#
+		]]>
+	</delete>
+ 
+	<delete id="deleteByBorrowerServiceAppId" parameterClass="long">
+		<![CDATA[
+			delete from RL_SURVEY_BUSINESS_INFO
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:DECIMAL#
+		]]>
+	</delete>
+	<delete id="deleteByPrimaryKey" parameterClass="java.util.List">
+		<![CDATA[
+			delete from RL_SURVEY_BUSINESS_INFO
+		]]>
+		<iterate prepend="where" open="(" close=")" conjunction="OR">
+			DEPOSITID = #iDList[]#
+		</iterate>
+	</delete>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.Surveybusinessinfo">
+		<!-- WARNING - This element is automatically generated by Abator for iBATIS, do not modify. -->
+		update RL_SURVEY_BUSINESS_INFO
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="borrowerServiceAppId">
+				BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="organizationName">
+				ORGANIZATION_NAME = #organizationName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="startBusinessTime">
+				START_BUSINESS_TIME = #startBusinessTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="pay">
+				PAY = #pay:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="businessScope">
+				BUSINESS_SCOPE = #businessScope:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="siteArea">
+				SITE_AREA = #siteArea:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessAddress">
+				BUSINESS_ADDRESS = #businessAddress:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceType">
+				BUSINESS_PLACE_TYPE = #businessPlaceType:CHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPermitNo">
+				BUSINESS_PERMIT_NO = #businessPermitNo:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="totalIncome">
+				TOTAL_INCOME = #totalIncome:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="taxRegisterNo">
+				TAX_REGISTER_NO = #taxRegisterNo:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceDate">
+				BUSINESS_PLACE_DATE = #businessPlaceDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceOther">
+				BUSINESS_PLACE_OTHER = #businessPlaceOther:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="employeeNumber">
+				EMPLOYEE_NUMBER = #employeeNumber:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="operatingItems">
+				OPERATING_ITEMS = #operatingItems:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="operatingItemsDetail">
+				OPERATING_ITEMS_DETAIL = #operatingItemsDetail:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="startingDate">
+				STARTING_DATE = #startingDate:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="state">
+				STATE = #state:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessLicense">
+				BUSINESS_LICENSE = #businessLicense:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="taxRegistrationCertificate">
+				TAX_REGISTRATION_CERTIFICATE = #taxRegistrationCertificate:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="monthGrossIncome">
+				MONTH_GROSS_INCOME = #monthGrossIncome:DOUBLE#
+      </isNotNull>
+		</dynamic>
+		where SURVEY_BUSINESS_INFO_ID = #surveyBusinessInfoId:DECIMAL#
+	</update>
+	
+	
+	<update id="SurveyBusiness_updateByborrowerServiceAppId" parameterClass="com.creditease.rc.domain.Surveybusinessinfo">
+		<!-- WARNING - This element is automatically generated by Abator for iBATIS, do not modify. -->
+		update RL_SURVEY_BUSINESS_INFO
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="organizationName">
+				ORGANIZATION_NAME = #organizationName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="startBusinessTime">
+				START_BUSINESS_TIME = #startBusinessTime:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="pay">
+				PAY = #pay:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="businessScope">
+				BUSINESS_SCOPE = #businessScope:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="siteArea">
+				SITE_AREA = #siteArea:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessAddress">
+				BUSINESS_ADDRESS = #businessAddress:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceType">
+				BUSINESS_PLACE_TYPE = #businessPlaceType:CHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPermitNo">
+				BUSINESS_PERMIT_NO = #businessPermitNo:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="totalIncome">
+				TOTAL_INCOME = #totalIncome:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="taxRegisterNo">
+				TAX_REGISTER_NO = #taxRegisterNo:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceDate">
+				BUSINESS_PLACE_DATE = #businessPlaceDate:TIMESTAMP#
+      </isNotNull>
+			<isNotNull prepend="," property="businessPlaceOther">
+				BUSINESS_PLACE_OTHER = #businessPlaceOther:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="employeeNumber">
+				EMPLOYEE_NUMBER = #employeeNumber:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="operatingItems">
+				OPERATING_ITEMS = #operatingItems:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="operatingItemsDetail">
+				OPERATING_ITEMS_DETAIL = #operatingItemsDetail:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="startingDate">
+				STARTING_DATE = #startingDate:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="state">
+				STATE = #state:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="businessLicense">
+				BUSINESS_LICENSE = #businessLicense:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="taxRegistrationCertificate">
+				TAX_REGISTRATION_CERTIFICATE = #taxRegistrationCertificate:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="monthGrossIncome">
+				MONTH_GROSS_INCOME = #monthGrossIncome:DOUBLE#
+      </isNotNull>
+		</dynamic>
+		where 	BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:DECIMAL#
+	</update>
+	
+	<select id="selectSurveybusinessinfo" parameterClass="long" resultMap="surveybusinessinfoMap">
+		<![CDATA[
+			select ssi.*,ct.code_value OPERATING_ITEMS_VIEW
+			from RL_SURVEY_BUSINESS_INFO ssi
+      		left join rl_codetable ct on (ct.code_key = ssi.OPERATING_ITEMS and ct.section='industryCategory')
+			where
+			ssi.BORROWER_SERVICE_APP_ID = #borrowerServiceAppId#
+			order by SURVEY_BUSINESS_INFO_ID asc
+		]]>
+	</select>
+	
+	<!-- liuli 2013-04-17 取申请表中的经营项目名 -->
+	<select id="selectSbiByCreditAppId" parameterClass="int" resultMap="surveybusinessinfoMapForCs">
+		<![CDATA[
+			select * from rl_survey_business_info where rl_survey_business_info.borrower_service_app_id =
+				(select rl_borrower_service_app.borrower_service_app_id 
+					from rl_borrower_service_app 
+				where rl_borrower_service_app.creditapplication_id = #creditAppId:INTEGER# 
+				and LEADER = '1')
+		]]>
+	</select>
+	
+	<!--高艳红用于现金流经营项目取前三条-->
+		<select id="selectSbiByCreditAppIdNew" parameterClass="int" resultMap="surveybusinessinfoMapForCs">
+		<![CDATA[
+			
+			select * from rl_survey_business_info where rl_survey_business_info.borrower_service_app_id =
+        	(select rl_borrower_service_app.borrower_service_app_id 
+         		 from rl_borrower_service_app 
+        		where rl_borrower_service_app.creditapplication_id =#creditAppId:INTEGER# 
+       			 and LEADER = '1') and  rownum<4  order by rl_survey_business_info.seq asc
+		]]>
+	</select>
+	
+	</sqlMap>

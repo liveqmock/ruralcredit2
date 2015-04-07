@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WXPRIZE">
+	<resultMap id="wxPrizeMap" class="com.creditease.rc.domain.WxPrize">
+		<result column="WX_PRIZE_ID" property="wxPrizeId" jdbcType="DECIMAL" />
+		<result column="PRIZE_TYPE" property="prizeType" jdbcType="VARCHAR" />
+		<result column="PRIZE_NAME" property="prizeName" jdbcType="VARCHAR" />
+		<result column="PRIZE_SCORE" property="prizeScore" jdbcType="DECIMAL" />
+		<result column="PRIZE_TOTAL_COUNT" property="prizeTotalCount" jdbcType="DECIMAL" />
+		<result column="PICTURE_ADDRESS" property="pictureAddress" jdbcType="VARCHAR" />
+		<result column="CONDITION" property="condition" jdbcType="VARCHAR" />
+		<result column="SPECIAL" property="special" jdbcType="VARCHAR" />
+		<result column="VALID_FLAG" property="validFlag" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="abatorgenerated_selectByPrimaryKey" resultMap="wxPrizeMap" parameterClass="com.creditease.rc.domain.WxPrize">
+		select WX_PRIZE_ID, PRIZE_TYPE, PRIZE_NAME, PRIZE_SCORE,
+		PRIZE_TOTAL_COUNT, PICTURE_ADDRESS, PRIZE_CONTENT, CONDITION, SPECIAL, VALID_FLAG
+		from RL_WX_PRIZE
+		where WX_PRIZE_ID = #wxPrizeId:DECIMAL#
+  </select>
+	<delete id="abatorgenerated_deleteByPrimaryKey" parameterClass="com.creditease.rc.domain.WxPrize">
+		delete from RL_WX_PRIZE
+		where WX_PRIZE_ID = #wxPrizeId:DECIMAL#
+  </delete>
+	<insert id="abatorgenerated_insert" parameterClass="com.creditease.rc.domain.WxPrize">
+		<selectKey resultClass="java.lang.Long" keyProperty="wxPrizeId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+    </selectKey>
+		insert into RL_WX_PRIZE (WX_PRIZE_ID, PRIZE_TYPE, PRIZE_NAME, PRIZE_SCORE, PRIZE_TOTAL_COUNT,
+		PICTURE_ADDRESS, PRIZE_CONTENT, CONDITION, SPECIAL,
+		VALID_FLAG)
+		values (#wxPrizeId:DECIMAL#, #prizeType:VARCHAR#, #prizeName:VARCHAR#, #prizeScore:DECIMAL#,
+		#prizeTotalCount:DECIMAL#,
+		#pictureAddress:VARCHAR#,
+		#prizeContent:VARCHAR#, #condition:VARCHAR#, #special:VARCHAR#, #validFlag:VARCHAR#)
+	</insert>
+	<update id="abatorgenerated_updateByPrimaryKey" parameterClass="com.creditease.rc.domain.WxPrize">
+		update RL_WX_PRIZE
+		set PRIZE_TYPE = #prizeType:VARCHAR#,
+		PRIZE_NAME =
+		#prizeName:VARCHAR#,
+		PRIZE_SCORE = #prizeScore:DECIMAL#,
+		PRIZE_TOTAL_COUNT = #prizeTotalCount:DECIMAL#,
+		PICTURE_ADDRESS = #pictureAddress:VARCHAR#,
+		PRIZE_CONTENT = #prizeContent:VARCHAR#,
+		CONDITION = #condition:VARCHAR#,
+		SPECIAL = #special:VARCHAR#,
+		VALID_FLAG = #validFlag:VARCHAR#
+		where WX_PRIZE_ID
+		= #wxPrizeId:DECIMAL#
+  </update>
+	<update id="abatorgenerated_updateByPrimaryKeySelective" parameterClass="com.creditease.rc.domain.WxPrize">
+		update RL_WX_PRIZE
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="prizeType">
+				PRIZE_TYPE = #prizeType:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="prizeName">
+				PRIZE_NAME = #prizeName:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="prizeScore">
+				PRIZE_SCORE = #prizeScore:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="prizeTotalCount">
+				PRIZE_TOTAL_COUNT = #prizeTotalCount:DECIMAL#
+      </isNotNull>
+			<isNotNull prepend="," property="pictureAddress">
+				PICTURE_ADDRESS = #pictureAddress:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="prizeContent">
+				PRIZE_CONTENT = #prizeContent:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="condition">
+				CONDITION = #condition:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="special">
+				SPECIAL = #special:VARCHAR#
+      </isNotNull>
+			<isNotNull prepend="," property="validFlag">
+				VALID_FLAG = #validFlag:VARCHAR#
+      </isNotNull>
+		</dynamic>
+		where WX_PRIZE_ID = #wxPrizeId:DECIMAL#
+	</update>
+</sqlMap>

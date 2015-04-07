@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CASHSTREAM">
+ 
+    <typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+    <typeAlias alias="cashStream" type="com.creditease.rc.domain.CashStream" />
+    <resultMap id="CashStreamMap" class="com.creditease.rc.domain.CashStream" >
+		<result property="cashStreamId" column="CASHSTREAM_ID" jdbcType="INTEGER"/>
+		<result property="projectName" column="PROJECT_NAME" jdbcType="VARCHAR"/>
+		<result property="projectCodeKey" column="PROJECT_CODEKEY" jdbcType="VARCHAR"/>
+	    <result property="projectType" column="PROJECT_TYPE" jdbcType="VARCHAR"/>
+	    <result property="everyDay" column="EVERY_DAY" jdbcType="DOUBLE"/>
+	    <result property="everyWeek" column="EVERY_WEEK" jdbcType="DOUBLE"/>
+	    <result property="everyMonth" column="EVERY_MONTH" jdbcType="DOUBLE"/>
+	    <result property="everyQuarter" column="EVERY_QUARTER" jdbcType="DOUBLE"/>
+	    <result property="everyHalfYear" column="EVERY_HALF_YEAR" jdbcType="DOUBLE"/><!--
+	    <result property="nineMonth" column="NINE_MONTH" jdbcType="DOUBLE"/>
+	    --><result property="everyYear" column="EVERY_YEAR" jdbcType="DOUBLE"/>
+	    <result property="calculateValue" column="CALCULATE_VALUE" jdbcType="DOUBLE"/>
+	    <result property="createDate" column="CREATDATE" jdbcType="DATE"/>
+	    <result property="creditapplicationId" column="CREDITAPPLICATION_ID" jdbcType="INTEGER"/>
+	    <result property="borrowerName" column="BORROWER_NAME" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--查询出要根据公式的修改重新计算的数据-->
+        <sql id="select_sql">
+        <![CDATA[
+		select ca.creditapplication_id creditapplicationId
+  		from rl_cashstream ca
+  		where ca.creatdate > to_date('2014-05-8 ', 'yyyy-mm-dd')
+ 		and ca.creatdate <= to_date('2014-06-05', 'yyyy-mm-dd')
+  		group by ca.creditapplication_id
+	]]>
+    </sql>
+    
+    <select id="selectOldCashStreamList"   	resultClass="cashStream">
+		<include refid="select_sql" />
+	</select>
+      
+       <!--查询出要根据公式的修改重新计算的数据       计算现金流旧数据2014-05-09做的单子，在05-09计算的现金流的方法-->
+        <sql id="select_sql2">
+        <![CDATA[
+		 select distinct msg.creditapllication_id as creditapplicationId from rl_msg_log msg
+ 		where msg.operate_date > to_date('2014-05-8 23:59:59','YYYY-MM-DD HH24:mi:ss')
+   		and msg.operate_date <= to_date('2014-06-05 23:59:59','YYYY-MM-DD HH24:mi:ss')
+    	and msg.creditapllication_id not in (select ca.creditapplication_id creditapplicationId
+      	from rl_cashstream ca
+      	where ca.creatdate > to_date('2014-05-8 23:59:59','YYYY-MM-DD HH24:mi:ss')
+     	and ca.creatdate <= to_date('2014-06-05 23:59:59','YYYY-MM-DD HH24:mi:ss')
+      	group by ca.creditapplication_id)
+	]]>
+    </sql>
+      <select id="selectOldCashStreamList140509Before"   	resultClass="cashStream">
+		<include refid="select_sql2" />
+	</select>
+      
+      
+     <!-- 根据申请单id查询数据       2014-06-25 -->
+    <select id="selectCashSteamByCreditAppId" parameterClass="int" resultClass="cashStream">
+     	<![CDATA[
+     		select c.creditapplication_id creditapplicationId, c.creatdate createDate
+                       from rl_cashstream c
+                      where c.creatdate is not null and  c.CREDITAPPLICATION_ID =#creditapplicationId:INTEGER#
+                      group by c.creditapplication_id, c.creatdate 
+     	]]>
+    </select>
+	<!-- 插入流入流出表 -->
+    <insert id="insert" parameterClass="cashStream" >
+    	 <selectKey keyProperty="cashStreamId" resultClass="java.lang.Integer" type="pre" >
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        <![CDATA[
+        	insert into RL_CASHSTREAM
+        		(
+					CASHSTREAM_ID,
+					PROJECT_NAME,
+					PROJECT_TYPE,
+					EVERY_DAY,
+					EVERY_WEEK,
+					EVERY_MONTH,
+					EVERY_QUARTER,
+					EVERY_HALF_YEAR,
+					EVERY_YEAR,
+					CALCULATE_VALUE,
+					CREATDATE,
+					CREDITAPPLICATION_ID,
+					BORROWER_NAME,
+					PROJECT_CODEKEY
+					)
+        	values(
+					#cashStreamId:INTEGER#,
+					#projectName:VARCHAR#,
+					#projectType:VARCHAR#,
+					#everyDay:DOUBLE#,
+					#everyWeek:DOUBLE#,
+					#everyMonth:DOUBLE#,
+					#everyQuarter:DOUBLE#,
+					#everyHalfYear:DOUBLE#,
+					#everyYear:DOUBLE#,
+					#calculateValue:DOUBLE#,
+					#createDate:Timestamp#,
+					#creditapplicationId:INTEGER#,
+					#borrowerName:VARCHAR#,
+					#projectCodeKey#
+					)
+        ]]>
+    </insert>
+    
+    <!-- 根据流入流出表id更新对应数据 -->
+    <update id="updateCashStreamById" parameterClass="cashStream">
+		<![CDATA[
+			update RL_CASHSTREAM
+			set
+				PROJECT_NAME = #projectName:VARCHAR#,
+				EVERY_DAY = #everyDay:DOUBLE#,
+				EVERY_WEEK = #everyWeek:DOUBLE#,
+				EVERY_MONTH = #everyMonth:DOUBLE#,
+				EVERY_QUARTER = #everyQuarter:DOUBLE#,
+				EVERY_HALF_YEAR = #everyHalfYear:DOUBLE#,
+				EVERY_YEAR = #everyYear:DOUBLE#,
+				CALCULATE_VALUE = #calculateValue:DOUBLE#,
+				BORROWER_NAME = #borrowerName:VARCHAR#,
+				PROJECT_CODEKEY = #projectCodeKey:VARCHAR#
+			where
+				CASHSTREAM_ID = #cashStreamId:INTEGER#
+		]]>
+	</update>
+	
+	<!-- 根据id更新项目名称 -->
+	<update id="updateCsProjNameById" parameterClass="cashStream">
+		<![CDATA[
+			update RL_CASHSTREAM
+			set 
+				PROJECT_NAME = #projectName:VARCHAR#,
+				PROJECT_CODEKEY = #projectCodeKey:VARCHAR#
+			where
+				CASHSTREAM_ID = #cashStreamId:INTEGER#
+		]]>
+	</update>
+	
+	<!-- 根据id更新项目名称和项目类型 -->
+	<update id="updateCsProjNameAndTypeById" parameterClass="cashStream">
+		<![CDATA[
+			update RL_CASHSTREAM
+			set 
+				PROJECT_NAME = #projectName:VARCHAR#,
+				PROJECT_CODEKEY = #projectCodeKey:VARCHAR#,
+				PROJECT_TYPE = #projectType:VARCHAR#
+			where
+				CASHSTREAM_ID = #cashStreamId:INTEGER#
+		]]>
+	</update>
+
+	<!-- 查询creditapplicationId的数据条数 -->
+   	<select id="selectCountByCreditAppId" parameterClass="int" resultClass="int">
+     	<![CDATA[
+     		SELECT count(*) FROM RL_CASHSTREAM where CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+     	]]>
+    </select>
+    
+    <!-- 根据申请单id查询数据 -->
+    <select id="selectByCreditAppId" parameterClass="int" resultMap="CashStreamMap">
+     	<![CDATA[
+     		SELECT * FROM RL_CASHSTREAM where CREDITAPPLICATION_ID = #creditapplicationId:INTEGER# ORDER BY CASHSTREAM_ID
+     	]]>
+    </select>
+    
+    <!-- 根据申请单id查询项目名 -->
+    <select id="selectPorjsByCreditAppId" parameterClass="int" resultMap="CashStreamMap">
+     	<![CDATA[
+     		SELECT * FROM RL_CASHSTREAM 
+     			where 
+     				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+     			and PROJECT_TYPE like '%proj%'
+     	]]>
+    </select>
+    
+    <!-- 更新借款人姓名 -->
+    <update id="updateBorrowerName" parameterClass="cashStream">
+		<![CDATA[
+			update RL_CASHSTREAM
+			set 
+				BORROWER_NAME = #borrowerName:VARCHAR#
+			where
+				CREDITAPPLICATION_ID = #creditapplicationId:INTEGER#
+		]]>
+	</update>
+	
+	<!-- 根据申请单id删除数据 -->
+	<delete id="deleteByCreditId" parameterClass="int">
+    	<![CDATA[
+    		DELETE FROM RL_CASHSTREAM WHERE CREDITAPPLICATION_ID=#creditapplicationId:INTEGER#
+    	]]>
+    </delete>
+    
+    <!-- 根据申请单id查询最大借款额度 -->
+    <select id="selectMaxLoanSumByCreditId" parameterClass="int" resultMap="CashStreamMap">
+     	<![CDATA[
+     		SELECT 
+     			* 
+     		FROM 
+     			RL_CASHSTREAM 
+     		where 
+     			CREDITAPPLICATION_ID = #creditapplicationId:INTEGER# 
+     		AND 
+     			PROJECT_TYPE = 'maxLoanSum' 
+     		ORDER BY CASHSTREAM_ID
+     	]]>
+    </select>
+    
+    
+ 	<update id="updateBorrowName" parameterClass="long">
+ 	
+ 		update rl_cashstream t 
+            set t.borrower_name=(select bs.name from rl_borrower_service_app bs where bs.creditapplication_id=#creditapplicationId# and bs.leader='1' and bs.valid_state='1')
+             where t.creditapplication_id = #creditapplicationId#
+ 		
+ 	</update>
+
+    
+</sqlMap>

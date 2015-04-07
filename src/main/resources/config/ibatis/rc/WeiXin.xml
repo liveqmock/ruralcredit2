@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="WEIXIN">
+	<typeAlias alias="" type="" />
+
+	<select id="selectByParentId" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.domain.NationalStandardCode">
+        <![CDATA[
+					SELECT 	T4.CITY_NAME AS cityName,
+							T4.CITY_CODE AS cityCode
+					FROM 	RL_NATIONAL_STANDARD_CODE T4
+					WHERE 	T4.CITY_CODE IN
+							(SELECT T1.PROVINCEHOME AS CITYCODE
+							 FROM 	RL_WEBSITE T1
+					UNION ALL
+					SELECT 	T2.CITYHOME AS CITYCODE FROM RL_WEBSITE T2
+					UNION ALL
+					SELECT 	T3.COUNTYHOME AS CITYCODE FROM RL_WEBSITE T3)
+        ]]>
+		<dynamic>
+			<isEqual property="filter" compareValue="p">
+				AND T4.PARENT_ID IS NULL
+            </isEqual>
+			<isEqual property="filter" compareValue="ca">
+				AND T4.PARENT_ID = #parentId#
+            </isEqual>
+		</dynamic>
+	</select>
+	<select id="checkWeiXinVIP" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.domain.CustomerBasicInfo">
+		select cbi.customer_basic_id as customerBasicId ,cbi.mobilephone as
+		mobilephone
+		from rl_customer_basic_info cbi where
+		cbi.name like
+		'%$name$%' and substr(cbi.credentials_number, 15, 18) = #identityCardSub#
+    </select>
+	<select id="checkAnswered" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+		select u.wx_user_id
+		from rl_wx_user u
+		where u.user_code = #userCode#
+		and trunc(u.answer_date, 'dd') = trunc(sysdate, 'dd')
+    </select>
+	<select id="queryScore" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.QyScoreResponseParam">
+		select distinct ssl.name as name,
+    decode(ssl.currentScore, '', 0,
+    ssl.currentScore) as currentScore,
+    decode(ssl.currentRank, '', 0, ssl.currentRank) as currentRank,
+    decode(ssl.tComplete, '', 0, ssl.tComplete) as
+    tComplete,
+    decode(ssl.tRight, '', 0, ssl.tRight) as tRight,
+    decode(ssl.tWrong, '', 0, ssl.tWrong) as tWrong,
+    decode(ssl.tVIPScore, '', 0,
+    ssl.tVIPScore) as tVIPScore,
+    decode(ssl.aComplete, '', 0, ssl.aComplete) as aComplete,
+    decode(ssl.aRight, '', 0, ssl.aRight) as aRight,
+    decode(ssl.aWrong, '', 0, ssl.aWrong) as aWrong,
+    decode(ssl.aVIPScore, '', 0, ssl.aVIPScore) as aVIPScore
+    from (
+    select wu.name as name,
+    wu.score as
+    currentScore,
+    rankSQL.rank as
+    currentRank,
+    (select count(1) as tComplete
+    from rl_wx_answers_record war
+    where
+    war.wx_user_id = wu.wx_user_id
+    and
+    trunc(war.answer_date, 'dd') =
+    trunc(to_date(#answerDate#, 'yyyy-MM-dd'))) as tComplete,
+    (select count(1)
+    from rl_wx_answers_record
+    war
+    where war.wx_user_id =
+    wu.wx_user_id
+    and war.is_correct = '0'
+    and trunc(war.answer_date, 'dd') = trunc(to_date(#answerDate#, 'yyyy-MM-dd'))) as
+    tRight,
+    (select count(1)
+    from
+    rl_wx_answers_record war
+    where
+    war.wx_user_id =
+    wu.wx_user_id
+    and war.is_correct = '1'
+    and trunc(war.answer_date, 'dd') =
+    trunc(to_date(#answerDate#,
+    'yyyy-MM-dd'))) as tWrong,
+    (select sum(war.vip_score) as
+    vip_score
+    from rl_wx_answers_record war
+    where war.wx_user_id =
+    wu.wx_user_id
+    and
+    trunc(war.answer_date, 'dd') =
+    trunc(to_date(#answerDate#, 'yyyy-MM-dd'))
+    group by
+    war.wx_user_id) as tVIPScore,
+    (select count(1)
+    from
+    rl_wx_answers_record war
+    where war.wx_user_id =
+    wu.wx_user_id
+    and trunc(to_date(#answerDate#, 'yyyy-MM-dd')) >=
+    trunc(war.answer_date, 'dd')) as
+    aComplete,
+    (select count(1)
+    from
+    rl_wx_answers_record
+    war
+    where war.wx_user_id = wu.wx_user_id
+    and war.is_correct = '0'
+    and trunc(to_date(#answerDate#,
+    'yyyy-MM-dd')) >= trunc(war.answer_date, 'dd')) as
+    aRight,
+    (select count(1)
+    from rl_wx_answers_record war
+    where
+    war.wx_user_id =
+    wu.wx_user_id
+    and
+    war.is_correct = '1'
+    and trunc(to_date(#answerDate#,
+    'yyyy-MM-dd')) >= trunc(war.answer_date, 'dd')) as aWrong,
+    (select sum(war.vip_score) as
+    vip_score
+    from rl_wx_answers_record war
+    where
+    war.wx_user_id =
+    wu.wx_user_id
+    and trunc(to_date(#answerDate#, 'yyyy-MM-dd')) >= trunc(war.answer_date, 'dd')
+    group
+    by
+    war.wx_user_id) as aVIPScore
+    from rl_wx_user wu
+    left join ( select aggregate_score as aggregateScore, rank as rank
+    from (select aggregate_score as
+    aggregate_score, rank as rank
+    from (select
+               wu.AGGREGATE_SCORE as aggregate_score,
+               (rank() over(order by AGGREGATE_SCORE desc)) as rank
+          from rl_wx_user wu order
+    by wu.aggregate_score desc))) rankSQL
+    on rankSQL.aggregateScore = wu.aggregate_score
+    where wu.user_code
+    = #userCode#
+    and
+    trunc(to_date(#answerDate#,
+    'yyyy-MM-dd')) >=
+    trunc(wu.answer_date, 'dd') )ssl
+		
+	</select>
+	<select id="queryHistoryQuestionsWrong" parameterClass="java.lang.String" resultClass="com.creditease.rc.vo.QandA">
+		select distinct wq.question as question, wa.answer as
+		answer
+		from rl_wx_user wu
+		left join rl_wx_answers_record war
+		on wu.wx_user_id = war.wx_user_id
+		and war.is_correct = '1'
+		left join rl_wx_question wq
+		on
+		wq.wx_question_id = war.wx_question_id
+		left join rl_wx_answer wa
+		on wa.wx_question_id = wq.wx_question_id
+		and wa.true_flag = '0'
+		where wu.user_code =
+		#userCode#
+		and wq.question is not null
+	</select>
+	<select id="qyCanGetPrizeList" parameterClass="java.lang.String" resultClass="com.creditease.rc.vo.PrizeHasFlag">
+	select WX_PRIZE_ID as wxPrizeId,
+	PRIZE_TYPE as prizeType,
+	PRIZE_NAME as
+	prizeName,
+	PRIZE_SCORE as prizeScore,
+	PICTURE_ADDRESS as pictureAddress,
+	CONDITION as condition,
+	case
+	when (k.userscore >= k.prize_score or
+	k.special = '1') and
+	k.VALID_FLAG = '0' then
+	'1'
+	else
+	'0'
+	end as convertFlag
+	from (select wp.*,
+	(select wu.score
+	from rl_wx_user wu
+	where wu.user_code
+	= #userCode#) as userscore
+	from rl_wx_prize wp) k
+	</select>
+	
+	<!-- 罗红杰  添加一等奖能兑换的sql -->
+	<select id="qyCanGetFirstPrizeList" parameterClass="java.lang.String" resultClass="com.creditease.rc.vo.PrizeHasFlag">
+	<![CDATA[
+	select WX_PRIZE_ID as wxPrizeId,
+       PRIZE_TYPE as prizeType,
+       PRIZE_NAME as prizeName,
+       PRIZE_SCORE as prizeScore,
+       PICTURE_ADDRESS as pictureAddress,
+       CONDITION as condition,
+       case
+       when #userCode# in (select userC.user_code from (select gg.num, gg.wx_user_id,gg.AGGREGATE_SCORE, gg.User_Code
+  	   from (select ll.*, Rownum
+          from (select wxU.wx_user_id,
+                       wxU.AGGREGATE_SCORE,
+                       wxU.User_Code,
+                       (rank() over(order by AGGREGATE_SCORE desc)) as num
+                  from rl_wx_user wxU) ll
+         where rownum <= 20) gg
+     group by gg.num,gg.User_Code,gg.wx_user_id,gg.AGGREGATE_SCORE
+     order by gg.num asc, gg.wx_user_id asc) userC)
+          and k.SPECIAL = '1' and k.VALID_FLAG = '0' then
+          '1'
+         else
+          '0'
+       end as firstFlag
+     from (select wp.*,
+               (select wu.aggregate_score
+                  from rl_wx_user wu
+                 where wu.user_code = #userCode#) as AGGREGASCORE
+          from rl_wx_prize wp) k order by PRIZE_TYPE desc
+    ]]>
+	</select>
+	<!-- *************************************** -->
+	<select id="queryConvertPrizeHistoryList" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.ConvertPrizeHistory">
+		select wur.upri_record_code as upriRecordCode,
+		to_char(wur.recpri_date,'yyyy-MM-dd') as recpriDate,
+		decode((nsc0.city_name || '-' || nsc1.city_name ||
+		'-' ||
+		nsc2.city_name || '-'
+		||
+		wur.branchoffice_name),'---','',(nsc0.city_name || '-' || nsc1.city_name || '-' ||
+		nsc2.city_name || '-'
+		||
+		wur.branchoffice_name)) as location,
+		wp.picture_address as pictureAddress,
+		wur.is_receive as status
+		from rl_wx_upri_record wur
+		left join rl_wx_prize wp
+		on wur.wx_prize_id = wp.wx_prize_id
+		left join rl_wx_user wu
+		on wu.wx_user_id = wur.wx_user_id
+		left join
+		rl_national_standard_code nsc0
+		on
+		wur.provincehome = nsc0.city_code
+		left join rl_national_standard_code nsc1
+		on wur.cityhome = nsc1.city_code
+		left join
+		rl_national_standard_code nsc2
+		on
+		wur.countyhome = nsc2.city_code
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="wxUpriRecordId">
+				wur.wx_upri_record_id = #wxUpriRecordId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userCode">
+				wu.user_code = #userCode#
+			</isNotEmpty>
+		</dynamic>
+		order by wur.recpri_date desc
+	</select>
+	<select id="queryPrizeList" parameterClass="java.util.HashMap" resultClass="com.creditease.rc.vo.Prize">
+		select wp.wx_prize_id as wxPrizeId,
+		wp.prize_type as prizeType,
+		wp.prize_name as prizeName,
+		wp.prize_score as prizeScore,
+		wp.prize_total_count as
+		prizeTotalCount,
+		wp.picture_address as pictureAddress,
+		wp.condition as condition,
+		wp.prize_content as prizeContent
+		from rl_wx_prize wp
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="wxPrizeId">
+				WX_PRIZE_ID = $wxPrizeId$
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="validFlag">
+				VALID_FLAG = #validFlag#
+			</isNotEmpty>
+		</dynamic>
+		order by to_number(wp.prize_type) asc
+	</select>
+</sqlMap>

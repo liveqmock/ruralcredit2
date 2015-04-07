@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="borrowersurvey">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination"></typeAlias>
+	<typeAlias alias="borrowersurvey" type="com.creditease.rc.domain.Borrowersurvey" />
+	<resultMap class="com.creditease.rc.domain.Borrowersurvey" id="borrowersurveyMap">
+		<result column="BORROWERSURVEY_ID" jdbcType="INTEGER" property="borrowerSurveyId" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="FAMILY_WAGEINCOME" jdbcType="DOUBLE" property="familyWageincome" />
+		<result column="OTHER_INCOME" jdbcType="DOUBLE" property="otherIncome" />
+		<result column="LIABILITIES" jdbcType="DOUBLE" property="liabilities" />
+		<result column="CLAIMS" jdbcType="DOUBLE" property="claims" />
+		<result column="BORROWERREPAYMENT_ABILITY" jdbcType="CHAR" property="borrowerrepaymentAbility" />
+		<result column="REPAYMENT_WILL" jdbcType="CHAR" property="repaymentWill" />
+		<result column="BADRECORDS_AND_HOBBIES" jdbcType="CHAR" property="badrecordsAndHobbies" />
+		<result column="OTHER_SUPPLEMENTARY" jdbcType="VARCHAR" property="otherSupplementary" />
+		<result column="BANK_SAVE" jdbcType="DOUBLE" property="bankSave" />
+		<result column="FAMILY_EXPENDITURE" jdbcType="DOUBLE" property="familyExpenditure" />
+		<result column="BANK_LIABILITIES" jdbcType="DOUBLE" property="bankLiabilitites" />
+		<result column="TOTAL_MONEY" jdbcType="DOUBLE" property="totalMoney" />
+	</resultMap>
+	<sql id="byborrowerSurveyIdCondition">
+        <![CDATA[
+           BORROWERSURVEY_ID = #borrowerSurveyId#
+        ]]>
+	</sql>
+	<update id="updateborrowersurveyByPrimaryKey" parameterClass="borrowersurvey">
+		<![CDATA[
+			update RL_BORROWER_SURVEY set
+			FAMILY_WAGEINCOME = #familyWageincome:DOUBLE#,
+			OTHER_INCOME = #otherIncome:DOUBLE#,
+			LIABILITIES = #liabilities:DOUBLE#,
+			CLAIMS = #claims:DOUBLE#,
+			BORROWERREPAYMENT_ABILITY = #borrowerrepaymentAbility:CHAR#,
+			REPAYMENT_WILL = #repaymentWill:CHAR#,
+			BADRECORDS_AND_HOBBIES = #badrecordsAndHobbies:CHAR#,
+			OTHER_SUPPLEMENTARY = #otherSupplementary:VARCHAR#,
+			BANK_SAVE = #bankSave:DOUBLE#,
+			FAMILY_EXPENDITURE = #familyExpenditure:DOUBLE#,
+			BANK_LIABILITIES = #bankLiabilitites:DOUBLE#,
+			TOTAL_MONEY = #totalMoney:DOUBLE#
+			where
+			BORROWERSURVEY_ID = #borrowerSurveyId:INTEGER#
+		]]>
+	</update>
+	<select id="selectborrowersurveyByBorrowerServiceAppId" parameterClass="int" resultMap="borrowersurveyMap">
+		<![CDATA[
+			select * 
+			from RL_BORROWER_SURVEY
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<select id="selectBorrowerSurveyIdByAppId" parameterClass="int" resultClass="int">
+		<![CDATA[
+			select BORROWERSURVEY_ID as borrowerSurveyId 
+			from RL_BORROWER_SURVEY
+			where
+			BORROWER_SERVICE_APP_ID = #borrowerServiceAppId:INTEGER#
+		]]>
+	</select>
+	<insert id="insertborrowersurvey" parameterClass="borrowersurvey">
+		<selectKey keyProperty="borrowerSurveyId" resultClass="java.lang.Integer" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+
+        </selectKey>
+		<![CDATA[
+			insert into RL_BORROWER_SURVEY 
+				(FAMILY_WAGEINCOME,
+				OTHER_INCOME,
+				LIABILITIES,
+				CLAIMS,
+				BORROWERREPAYMENT_ABILITY ,
+				REPAYMENT_WILL ,
+				BADRECORDS_AND_HOBBIES,
+				OTHER_SUPPLEMENTARY,
+				BANK_SAVE,
+				FAMILY_EXPENDITURE,
+				BANK_LIABILITIES,
+				TOTAL_MONEY,
+				BORROWERSURVEY_ID,
+				BORROWER_SERVICE_APP_ID
+				)
+			values(
+				#familyWageincome:DOUBLE#,
+				#otherIncome:DOUBLE#,
+				#liabilities:DOUBLE#,
+				#claims:DOUBLE#,
+				#borrowerrepaymentAbility:VARCHAR#,
+				#repaymentWill:VARCHAR#,
+				#badrecordsAndHobbies:VARCHAR#,
+				#otherSupplementary:VARCHAR#,
+				#bankSave:DOUBLE#,
+				#familyExpenditure:DOUBLE#,
+				#bankLiabilitites:DOUBLE#,
+				#totalMoney:DOUBLE#,
+				#borrowerSurveyId:INTEGER#,
+				#borrowerServiceAppId:INTEGER#
+			)
+		]]>
+	</insert>
+	<delete id="deleteborrowersurveyByPrimaryKey" parameterClass="int">
+		<![CDATA[
+			delete from RL_BORROWER_SURVEY
+			where
+			BORROWERSURVEY_ID = #borrowerSurveyId:INTEGER#
+		]]>
+	</delete>
+</sqlMap>

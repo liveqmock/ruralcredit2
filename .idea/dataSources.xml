@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="3346471720">
+    <data-source source="LOCAL" name="Oracle - @二期测试库" uuid="b38f63b8-3352-40ac-9894-282567f6caee">
+      <driver-ref>oracle</driver-ref>
+      <auto-commit>false</auto-commit>
+      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+      <jdbc-url>jdbc:oracle:thin:@//192.168.101.120:1521/cedb</jdbc-url>
+      <libraries>
+        <library>
+          <url>file://$PROJECT_DIR$/WebContent/WEB-INF/lib/ojdbc6.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Oracle - @一期测试库" uuid="8e6af0cf-c470-4580-b8e9-3b4088672a75">
+      <driver-ref>oracle</driver-ref>
+      <auto-commit>false</auto-commit>
+      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+      <jdbc-url>jdbc:oracle:thin:@//192.168.101.120:1521/cedb</jdbc-url>
+      <libraries>
+        <library>
+          <url>file://$PROJECT_DIR$/WebContent/WEB-INF/lib/ojdbc6.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+  </component>
+</project>

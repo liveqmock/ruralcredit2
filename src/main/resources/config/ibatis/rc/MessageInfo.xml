@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="messageInfo">
+	<typeAlias alias="messageInfoVo" type="com.creditease.rc.vo.MessageInfoVo" />
+	<typeAlias alias="creditMessage" type="com.creditease.rc.domain.CreditMessage" />
+    <typeAlias alias="creditMessageHis" type="com.creditease.rc.domain.CreditMessageHis" />
+	<!--出现需要前三天发送短信的申请信息列表-->
+	<select id="queryNeedSendMsgListThreeDaysBeforeReturn"   resultClass="messageInfoVo">
+		  select ca.creditapplication_id creditapplicationId,
+                  ai.account account,
+                  rpp.repayment_date repayment_date ,
+                  rpp.repayment_dateStr repaymentDateStr,
+                  rpp.curr_account_total currAccountTotal,
+                  rpp.year year,
+                  rpp.month month,
+                  rpp.day day,
+                  coalesce(bi.mobilephone,ba.mobilephone) mobilephone
+            from rl_credit_application ca
+           join rl_borrower_service_app ba on ca.creditapplication_id = ba.creditapplication_id   and ba.leader = 1
+           join rl_account_info ai on ca.account_info_id  = ai.account_info_id
+           left join rl_customer_basic_info bi on bi.customer_basic_id = ba.customer_basic_id
+           join(
+                 select rp.creditapplication_id ,
+                   min(rp.repayment_date) repayment_date,
+                   min(to_char(rp.repayment_date,'yyyy')||'年' || to_char(rp.repayment_date,'MM')||'月' ||to_char(rp.repayment_date,'dd')||'日') repayment_dateStr,
+                   min(to_char(rp.repayment_date,'yyyy')) year,
+                   min(to_char(rp.repayment_date,'MM')) month,
+                   min(to_char(rp.repayment_date,'dd')) day,
+                   min(rp.curr_account_total)  curr_account_total
+                   from rl_return_plan rp
+                      where rp.repayment_date = (trunc(sysdate+3, 'DD'))
+                        and rp.curr_account_total > 0
+                      group by (rp.creditapplication_id)) rpp
+           on rpp.creditapplication_id = ca.creditapplication_id
+           where coalesce(bi.mobilephone,ba.mobilephone)  is not null and ca.audit_status = 15
+	</select>
+
+	<!--根据信贷申请ID查询需要发送关于逾期的信息-->
+	<select id="queryOverDueInfoForSendMsgByCreditId" parameterClass="java.lang.Integer"  resultClass="messageInfoVo">
+		  <![CDATA[  select distinct ca.creditapplication_id creditapplicationId ,
+                  ca.business_number businessNumber,
+                  ai.account account,
+                  rpp.repayment_date repayment_date,
+                  rpp.repayment_dateStr repaymentDateStr,
+                  rpp.curr_account_total currAccountTotal,
+                  rpp.year year,
+                  rpp.month month,
+                  rpp.day  day,
+                  nvl(os.overdue_daycount,0) overdueDayCount,
+                  nvl(cm.remind_overdue_count，0) remindOverdueCount,
+                  coalesce(ctv.mobilephone,bi.mobilephone,ba.mobilephone) mobilephone,
+                  coalesce(to_char(cm.update_date,'yyyy-MM-dd'),'1900-01-01' ) updateDate ,
+                  to_char(sysdate,'yyyy-MM-dd') todayDate,
+                  case  when coalesce(to_char(cm.update_date,'yyyy-MM-dd'),'1900-01-01') <> to_char(sysdate,'yyyy-MM-dd') then
+                    'T'else 'F' end newDay
+
+             from rl_credit_application ca
+             join rl_borrower_service_app ba on ca.creditapplication_id = ba.creditapplication_id   and ba.leader = 1
+           join rl_account_info ai on ca.account_info_id  = ai.account_info_id
+           left join rl_customer_basic_info bi on bi.customer_basic_id = ba.customer_basic_id
+           left join(
+                 select rp.creditapplication_id ,
+                   min(rp.repayment_date) repayment_date,
+                   min(to_char(rp.repayment_date,'yyyy')||'年' || to_char(rp.repayment_date,'MM')||'月' ||to_char(rp.repayment_date,'dd')||'日') repayment_dateStr,
+                   min(to_char(rp.repayment_date,'yyyy')) year,
+                   min(to_char(rp.repayment_date,'MM')) month,
+                  min(to_char(rp.repayment_date,'dd')) day,
+                   min(rp.curr_account_total)  curr_account_total
+                   from rl_return_plan rp
+                      where
+                      to_char(rp.repayment_date,'MM') = to_char(sysdate,'MM')
+                      and to_char(rp.repayment_date,'yyyy') = to_char(sysdate,'yyyy')
+                      and rp.curr_account_total > 0
+                      group by (rp.creditapplication_id)) rpp
+           on rpp.creditapplication_id = ca.creditapplication_id
+           left join (select t.creditapplication_id,t.change_borrower_phone mobilephone from (
+                      select crv.creditapplication_id, crv.change_borrower_phone,
+                        row_number() over(partition by crv.creditapplication_id order by crv.customer_return_visit_id desc nulls last) rno
+                      from rl_customer_return_visit crv
+                      where crv.change_borrower_phone is not null ) t where rno = 1) ctv
+           on ctv.creditapplication_id = ca.creditapplication_id
+           join rl_overdue_summary os on os.creditapplication_id = ca.creditapplication_id
+           left join rl_credit_message cm on cm.creditapplication_id =  ca.creditapplication_id
+          where ca.creditapplication_id = #creditapplicationId#
+
+           ]]>
+	</select>
+	<insert id="insertMessageInfo" parameterClass="creditMessage" >
+		<![CDATA[
+      insert into rl_credit_message
+         (creditapplication_id,
+          remind_return_count,
+          remind_birthday_count,
+          remind_overdue_count,
+          remind_loanclosed_count,
+          create_date,
+          create_user,
+          update_date,
+          update_user)
+       values
+         (#creditapplicationId#,
+          #remindeturnRCount#,
+          #remindBirthdayCount#,
+          #remindOverdueCount#,
+          #remindLoanclosedCount#,
+          #createDate#,
+          #createUser#,
+          #updateDate#,
+          #updateUser#)
+          ]]>
+	</insert>
+	<update id="inCreaseOverDueCount" parameterClass="creditMessage" >
+		update rl_credit_message cm
+         set cm.remind_overdue_count = #remindOverdueCount#+1,
+             cm.update_date = #updateDate#,
+             cm.update_user = #updateUser#
+        where cm.creditapplication_id = #creditapplicationId#
+	</update>
+    <!--根据信贷申请ID查询需要发送关于结清短信的信息-->
+    <select id="queryLoanCloseMsgByCreidtId" parameterClass="java.lang.Integer"  resultClass="messageInfoVo">
+        select ca.creditapplication_id creditapplicationId,ba.mobilephone
+         from rl_credit_application ca
+         join rl_borrower_service_app ba on ca.creditapplication_id  = ba.creditapplication_id
+          and ba.leader = 1
+       where ca.creditapplication_id = #creditapplicationId#
+    </select>
+    <!--根据信贷申请IDList查询需要发送关于结清短信的信息-->
+    <select id="queryLoanCloseMsgInfoList"   resultClass="messageInfoVo">
+       <![CDATA[
+            select ca.creditapplication_id creditapplicationId,ca.sys_guid sysUUID ,COALESCE(bi.MOBILEPHONE,ba.mobilephone) mobilephone
+            from rl_credit_application ca
+            join rl_borrower_service_app ba on ca.creditapplication_id  = ba.creditapplication_id
+            left join rl_customer_basic_info bi on bi.customer_basic_id = ba.customer_basic_id
+            and ba.leader = 1
+            join rl_credit_message_his mh on mh.sys_guid = ca.sys_guid
+            where COALESCE(bi.MOBILEPHONE,ba.mobilephone) is not null
+            and nvl(mh.issuccess,'F') <> 'T' and nvl(mh.sendcount,0) < 4
+        	]]>
+    </select>
+    <!--删除正常发送结清短信的记录-->
+    <delete id="deleteSuccessedLoanCloseList" parameterClass="creditMessageHis">
+        delete  rl_credit_message_his mh where mh.issuccess  = 'T'
+    </delete>
+    <!--查询需要插入的结清信息-->
+    <select id="queryNeedInsertLoanCloseList" parameterClass="java.util.List"  resultClass="java.lang.String">
+        (select ca.sys_guid from rl_credit_application ca where ca.sys_guid in
+        <iterate open="(" close=")" conjunction=",">
+            #sysIdList[]#
+        </iterate>)
+        minus
+        (select mh.sys_guid from rl_credit_message_his mh )
+    </select>
+    <insert id="insertCreditMessageHis" parameterClass="creditMessageHis">
+        <![CDATA[
+			insert into rl_credit_message_his (SYS_GUID,isSuccess,sendCount,create_time,create_user,update_time,update_user,mobilephone)
+            values(#sysUUID#,#isSuccess#,#sendCount#,#creditTime#,#createUser#,#updateTime#,#updateUser#,#mobilephone#)
+		]]>
+    </insert>
+    <select id="getMobilePhoneBySysId" parameterClass="java.lang.String" resultClass="java.lang.String">
+         select coalesce(bi.mobilephone,ba.mobilephone) mobilephone
+        from rl_credit_application ca
+        join rl_borrower_service_app ba on ca.creditapplication_id  = ba.creditapplication_id
+        and ba.leader = 1
+        left join rl_customer_basic_info bi on bi.customer_basic_id = ba.customer_basic_id
+        where ca.sys_guid = #sysId#
+    </select>
+    <update id="updateCreditMessageHisStatusByMobilePhoneList" parameterClass="java.util.List">
+        update rl_credit_message_his mh
+        set mh.issuccess = 'F'
+        where mh.mobilephone in
+        <iterate open="(" close=")" conjunction=",">
+            #mobilePhoneList[]#
+        </iterate>
+    </update>
+    <update id="updateCreditMessageHisStatus" parameterClass="messageInfoVo">
+        update rl_credit_message_his mh
+        set mh.issuccess = 'T',mh.sendcount = nvl(mh.sendcount,0)+1
+        where mh.sys_guid = #sysUUID#
+    </update>
+</sqlMap>

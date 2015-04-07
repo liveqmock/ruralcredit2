@@ -1,0 +1,1201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="compliance_check">
+    <typeAlias alias="check" type="com.creditease.rc.domain.ComplianceCheck"/>
+    <typeAlias alias="checkVo" type="com.creditease.rc.vo.ComplianceCheckVo"/>
+
+    <sql id="sql_searchComplianceCheck">
+        SELECT T1.BUSINESS_NUMBER,
+        T2.NAME AS BORROWER_NAME,
+        T2.APPLY_LIMIT,
+        TO_CHAR(T1.SIGNAGREEMENT_DATE, 'YYYY-MM-DD') AS SIGNAGREEMENT_DATE,
+        T1.LOAN_OFFICER_NAME,
+        T10.OPERATOR_NAME,
+        T1.COMPANY_NAME,
+        (SELECT T4.CODE_VALUE
+        FROM RL_CODETABLE T4
+        WHERE T4.SECTION = 'auditStatus'
+        AND T4.CODE_KEY = T1.AUDIT_STATUS) AS AUDIT_STATUS,
+        (SELECT T5.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T5
+        WHERE T5.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T5.COMPLIANCE_CHECK_SCORE_TYPE = 0) AS SCORE_SELF,
+        (SELECT T6.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T6
+        WHERE T6.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T6.COMPLIANCE_CHECK_SCORE_TYPE = 1) AS SCORE_CUSTOMER,
+        (SELECT T7.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T7
+        WHERE T7.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T7.COMPLIANCE_CHECK_SCORE_TYPE = 2) AS SCORE_OTHER,
+        T8.CREDIT_INVESTIGATIO_ID,
+        T1.CREDITAPPLICATION_ID,
+        T9.COMPLIANCE_CHECK_ID,
+        T1.CREATE_LOAN_OFFICER_NAME
+        FROM RL_CREDIT_APPLICATION T1
+        INNER JOIN (SELECT *
+        FROM RL_BORROWER_SERVICE_APP B
+        WHERE B.VALID_STATE = '1'
+        AND B.LEADER = '1') T2
+        ON T2.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID
+        LEFT JOIN (SELECT MAX(T3.COMPLIANCE_CHECK_ITEM_ID),
+        T3.CREDIT_APPLICATION_ID,
+        T3.OPERATOR_NAME
+        FROM RL_COMPLIANCE_CHECK_ITEM T3
+        WHERE COMPLIANCE_CHECK_TYPE = $checkType$
+        GROUP BY T3.CREDIT_APPLICATION_ID, T3.OPERATOR_NAME) T10
+        ON T10.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        LEFT JOIN RL_CREDIT_INVESTIGATIO T8
+        ON T8.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID
+        LEFT JOIN (SELECT *
+        FROM RL_COMPLIANCE_CHECK RCC
+        WHERE RCC.COMPLIANCE_CHECK_ID IN
+        (SELECT MAX(RCC1.COMPLIANCE_CHECK_ID)
+        FROM RL_COMPLIANCE_CHECK RCC1
+        WHERE RCC1.COMPLIANCE_CHECK_TYPE = '0'
+        GROUP BY RCC1.CREDIT_APPLICATION_ID
+        UNION ALL
+        SELECT MAX(RCC1.COMPLIANCE_CHECK_ID)
+        FROM RL_COMPLIANCE_CHECK RCC1
+        WHERE RCC1.COMPLIANCE_CHECK_TYPE = '1'
+        GROUP BY RCC1.CREDIT_APPLICATION_ID
+        UNION ALL
+        SELECT RCC2.COMPLIANCE_CHECK_ID
+        FROM RL_COMPLIANCE_CHECK RCC2
+        WHERE RCC2.COMPLIANCE_CHECK_TYPE = '2')) T9
+        ON (T9.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T9.COMPLIANCE_CHECK_TYPE = $checkType$)
+        INNER JOIN (SELECT DISTINCT OBJECT_ID_IDENTITY
+        FROM sid_view
+        WHERE class = 'com.creditease.rc.domain.CreditApplication' AND
+        ace_sid IN ($authList$)) v
+        ON (v.object_id_identity = T1.CREDITAPPLICATION_ID
+        )
+        WHERE T1.AUDIT_STATUS IN ($businessStatus$)
+        <isNotEmpty property="fuzzyValue" prepend="AND">
+            (T1.BUSINESS_NUMBER LIKE '%$fuzzyValue$%' OR
+            T2.NAME LIKE '%$fuzzyValue$%' OR
+            T1.LOAN_OFFICER_NAME LIKE '%$fuzzyValue$%' OR
+            T1.COMPANY_NAME LIKE '%$fuzzyValue$%')
+        </isNotEmpty>
+        <isNotEmpty property="branchName" prepend="AND">
+            T1.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            T1.BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            T1.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="borrowerMan" prepend="AND">
+            T2.NAME = #borrowerMan#
+        </isNotEmpty>
+        <isNotEmpty property="accountManager" prepend="AND">
+            T1.LOAN_OFFICER_NAME = #accountManager#
+        </isNotEmpty>
+        <isNotEmpty prepend="ORDER BY" property="order">
+            <isEqual property="sort" compareValue="signagreementDate">
+                T1.SIGNAGREEMENT_DATE $order$ NULLS LAST
+            </isEqual>
+            <isEqual property="sort" compareValue="businessNumber">
+                T1.BUSINESS_NUMBER $order$
+            </isEqual>
+        </isNotEmpty>
+    </sql>
+    <!--
+        检查列表：
+                1.限制状态：15-还款中 29-不良贷款 30-法律诉讼）
+                2.{0}检查类型
+     -->
+    <select id="searchComplianceCheck" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_searchComplianceCheck"/>
+    </select>
+    <select id="searchComplianceCheckCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+        <include refid="sql_searchComplianceCheck"/>
+        )
+    </select>
+
+    <!--保存检查、检查项-->
+    <insert id="saveComplianceCheck" parameterClass="checkVo">
+        <selectKey keyProperty="complianceCheckId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        insert into rl_compliance_check
+        (COMPLIANCE_CHECK_ID,
+        CREDIT_APPLICATION_ID,
+        COMPLIANCE_CHECK_ADVICE,
+        COMPLIANCE_CHECK_TYPE,
+        ISNEW,
+        OPERATOR_ID,
+        OPERATOR_NAME,
+        OPERATE_DATE)
+        values
+        (#complianceCheckId#,
+        #creditApplicationId#,
+        #checkRemark#,
+        #checkType#,
+        #isNew#,
+        #operatorId#,
+        #operatorName#,
+        #operateDate#)
+    </insert>
+    <insert id="saveComplianceCheckItem" parameterClass="checkVo">
+        <selectKey keyProperty="complianceCheckItemId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        insert into rl_compliance_check_item
+        (COMPLIANCE_CHECK_ITEM_ID,
+        CREDIT_APPLICATION_ID,
+        COMPLIANCE_CHECK_POINT,
+        ERROR_FILE,
+        COMPLIANCE_OBJECT,
+        SYSTEM_MATERIAL,
+        COMPLIANCE_CHECK_TYPE,
+        OPERATOR_ID,
+        OPERATOR_NAME,
+        OPERATE_DATE,
+        ISNEW
+        <isNotEmpty prepend="," property="complianceCheckId">
+            COMPLIANCE_CHECK_ID
+        </isNotEmpty>
+        )
+        values
+        (#complianceCheckItemId#,
+        #creditApplicationId#,
+        #checkPoint#,
+        #errorFile#,
+        #complianceObject#,
+        #systemMaterial#,
+        #checkType#,
+        #operatorId#,
+        #operatorName#,
+        #operateDate#,
+        #isNew#
+        <isNotEmpty prepend="," property="complianceCheckId">
+            #complianceCheckId#
+        </isNotEmpty>
+        )
+    </insert>
+
+    <!--合规检查-查询检查记录（根据不同的检查类型查询营业部自查、合规检查、客服检查记录）-->
+    <select id="searchComplianceCheckRecord" parameterClass="checkVo" resultClass="checkVo">
+            SELECT T1.COMPLIANCE_CHECK_ITEM_ID AS complianceCheckItemId,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'object_compliance'
+            AND T3.CODE_KEY = T1.COMPLIANCE_OBJECT) AS complianceObject,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'systemMaterial_compliance' ELSE 'systemMaterial_compliance_v1' END)
+            AND T3.CODE_KEY = T1.SYSTEM_MATERIAL) AS systemMaterial,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'checkpoint_compliance' ELSE 'checkpoint_compliance_v1' END)
+            AND T3.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPoint,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'errorFile_compliance'
+            AND T3.CODE_KEY = T1.ERROR_FILE) AS errorFile,
+            (SELECT T3.CODE_VALUE
+            FROM RL_CODETABLE T3
+            WHERE T3.SECTION = 'checkpoint_loan'
+            AND T3.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPointLoan,
+            T1.OPERATOR_NAME AS operatorName,
+            TO_CHAR(T1.OPERATE_DATE, 'YYYY-MM-DD HH24:MI:SS') AS operateDate
+            FROM RL_COMPLIANCE_CHECK_ITEM T1
+            WHERE T1.COMPLIANCE_CHECK_TYPE = $checkType$
+            AND T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+            ORDER BY T1.COMPLIANCE_CHECK_ITEM_ID ASC
+    </select>
+
+    <!--删除检查记录-->
+    <statement id="deleteComplianceCheck" parameterClass="java.util.List">
+        delete from RL_COMPLIANCE_CHECK_ITEM
+        <iterate prepend="where" open="(" close=")" conjunction="OR">
+            COMPLIANCE_CHECK_ITEM_ID = #list[]#
+        </iterate>
+    </statement>
+
+    <select id="searchComplianceCheckById" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_ID AS complianceCheckId,
+        T1.CREDIT_APPLICATION_ID AS creditApplicationId,
+        T1.COMPLIANCE_CHECK_ADVICE AS checkRemark,
+        T1.COMPLIANCE_CHECK_TYPE AS checkType
+        FROM RL_COMPLIANCE_CHECK T1
+        WHERE T1.COMPLIANCE_CHECK_ID = #complianceCheckId#
+    </select>
+
+    <!--根据信贷申请ID查询检查-->
+    <select id="searchComplianceCheckByCreditApplicationId" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_ID AS complianceCheckId,
+        T1.CREDIT_APPLICATION_ID AS creditApplicationId,
+        T1.COMPLIANCE_CHECK_ADVICE AS checkRemark,
+        T1.COMPLIANCE_CHECK_TYPE AS checkType
+        FROM RL_COMPLIANCE_CHECK T1
+        WHERE T1.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+        ORDER BY T1.COMPLIANCE_CHECK_ID ASC
+    </select>
+
+    <update id="updateComplianceCheckRemarkById" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_CHECK SET COMPLIANCE_CHECK_ADVICE = #checkRemark#,OPERATOR_ID = #operatorId#,OPERATOR_NAME = #operatorName#,OPERATE_DATE = #operateDate# WHERE COMPLIANCE_CHECK_ID = #complianceCheckId#
+    </update>
+
+    <!--查询合规检查记录-->
+    <sql id="sql_selectComplianceCheckRecord">
+        SELECT T1.BUSINESS_NUMBER,
+        T2.NAME AS BORROWER_NAME,
+        T2.APPLY_LIMIT,
+        TO_CHAR(T1.SIGNAGREEMENT_DATE, 'YYYY-MM-DD') AS SIGNAGREEMENT_DATE,
+        T1.LOAN_OFFICER_NAME,
+        T1.CREATE_LOAN_OFFICER_NAME,
+        T1.COMPANY_NAME,
+        (SELECT T4.CODE_VALUE
+        FROM RL_CODETABLE T4
+        WHERE T4.SECTION = 'auditStatus'
+        AND T4.CODE_KEY = T1.AUDIT_STATUS) AS AUDIT_STATUS,
+        (SELECT T5.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T5
+        WHERE T5.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T5.COMPLIANCE_CHECK_SCORE_TYPE = '0') AS SCORE_SELF,
+        (SELECT T6.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T6
+        WHERE T6.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T6.COMPLIANCE_CHECK_SCORE_TYPE = '1') AS SCORE_CUSTOMER,
+        (SELECT T7.COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE T7
+        WHERE T7.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        AND T7.COMPLIANCE_CHECK_SCORE_TYPE = '2') AS SCORE_OTHER,
+        T8.CREDIT_INVESTIGATIO_ID,
+        T1.CREDITAPPLICATION_ID,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE CODE_KEY = T9.COMPLAINT_STATUS AND SECTION='compliance_complaint_status') AS COMPLAINT_STATUS,
+        T9.COMPLAINT_ID,
+        T9.COMPLAINT_CONTENT,
+        T10.APPROVE_CONTENT,
+        (SELECT 1
+        FROM RL_COMPLIANCE_CHECK T
+        WHERE T.COMPLIANCE_CHECK_TYPE IN ('1', '2')
+        AND T.COMPLIANCE_CHECK_ADVICE IS NOT NULL
+        AND T.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        UNION
+        SELECT 1
+        FROM RL_COMPLIANCE_CHECK_ITEM T
+        WHERE T.COMPLIANCE_CHECK_TYPE IN ('1', '2')
+        AND T.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS CUSTOMER_COMMISSIONER
+        FROM RL_CREDIT_APPLICATION T1
+        INNER JOIN (SELECT *
+        FROM RL_BORROWER_SERVICE_APP B
+        WHERE B.VALID_STATE = '1'
+        AND B.LEADER = '1') T2
+        ON T2.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID
+        INNER JOIN (SELECT TX1.CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK TX1
+        UNION
+        SELECT TX2.CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM TX2) T4
+        ON T4.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID
+        LEFT JOIN RL_CREDIT_INVESTIGATIO T8
+        ON T8.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID
+        INNER JOIN sid_view v
+        ON (T1.CREDITAPPLICATION_ID = v.object_id_identity
+        AND v.class='com.creditease.rc.domain.CreditApplication'
+        AND v.ace_sid IN ($authList$))
+        LEFT JOIN RL_COMPLIANCE_COMPLAINT T9
+        ON (T9.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID AND T9.ISNEW = 'Y' )
+        LEFT JOIN RL_COMPLIANCE_APPROVE  T10
+        ON (T10.CREDITAPPLICATION_ID = T1.CREDITAPPLICATION_ID AND T10.ISNEW = 'Y' )
+        WHERE 1=1
+        <isNotEmpty property="fuzzyValue" prepend="AND">
+            (T1.BUSINESS_NUMBER LIKE '%$fuzzyValue$%' OR
+            T2.NAME LIKE '%$fuzzyValue$%' OR
+            T1.LOAN_OFFICER_NAME LIKE '%$fuzzyValue$%' OR
+            T1.COMPANY_NAME LIKE '%$fuzzyValue$%')
+        </isNotEmpty>
+        <isNotEmpty property="branchName" prepend="AND">
+            T1.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            T1.BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            T1.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="complaintStatus" prepend="AND">
+            <isEqual property="complaintStatus" compareValue="0">
+                T1.CREDITAPPLICATION_ID NOT IN (SELECT T9.CREDITAPPLICATION_ID
+                FROM RL_COMPLIANCE_COMPLAINT T9
+                UNION ALL
+                SELECT T1.CREDIT_APPLICATION_ID
+                FROM RL_COMPLIANCE_CHECK T1
+                WHERE T1.COMPLIANCE_CHECK_TYPE = '0'
+                UNION ALL
+                SELECT T2.CREDIT_APPLICATION_ID
+                FROM RL_COMPLIANCE_CHECK_ITEM T2
+                WHERE T2.COMPLIANCE_CHECK_TYPE = '0')
+            </isEqual>
+            <isNotEqual property="complaintStatus" compareValue="0">
+                T9.COMPLAINT_STATUS = #complaintStatus#
+            </isNotEqual>
+        </isNotEmpty>
+        <isNotEmpty prepend="ORDER BY" property="order">
+            <isEqual property="sort" compareValue="signagreementDate">
+                T1.SIGNAGREEMENT_DATE $order$ NULLS LAST
+            </isEqual>
+            <isEqual property="sort" compareValue="businessNumber">
+                T1.BUSINESS_NUMBER $order$
+            </isEqual>
+        </isNotEmpty>
+    </sql>
+    <select id="selectComplianceCheckRecord" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_selectComplianceCheckRecord"/>
+    </select>
+    <select id="selectComplianceCheckRecordCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+        <include refid="sql_selectComplianceCheckRecord"/>
+        )
+    </select>
+
+    <!--查询检查点分数配置-->
+    <select id="selectComplianceCheckPointConfigByType" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_CONFIG_ID AS complianceCheckPointConfigId,
+        (SELECT T2.CODE_VALUE
+        FROM RL_CODETABLE T2
+        WHERE T2.SECTION = #section#
+        AND T2.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPoint,
+        T1.COMPLIANCE_CHECK_POINT AS checkPointKey,
+        T1.COMPLIANCE_CHECK_POINT_SCORE AS complianceCheckPointScore,
+        T1.COMPLIANCE_CHECK_POINT_TYPE AS complianceCheckPointType
+        FROM RL_COMPLIANCE_CHECK_CONFIG T1
+        WHERE 1 = 1
+        <isNotEmpty property="complianceCheckPointType" prepend="AND">
+            T1.COMPLIANCE_CHECK_POINT_TYPE = #complianceCheckPointType#
+        </isNotEmpty>
+        <isNotEmpty property="checkPoint" prepend="AND">
+            T1.COMPLIANCE_CHECK_POINT = $checkPoint$
+        </isNotEmpty>
+        AND T1.CHECKVERSION = '1'
+        ORDER BY TO_NUMBER(T1.COMPLIANCE_CHECK_POINT) ASC
+    </select>
+
+    <!--保存检查点分数配置-->
+    <insert id="saveComplianceCheckPointConfigByType" parameterClass="checkVo">
+        <selectKey keyProperty="complianceCheckPointConfigId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        INSERT INTO RL_COMPLIANCE_CHECK_CONFIG
+        (COMPLIANCE_CHECK_CONFIG_ID,
+        COMPLIANCE_CHECK_POINT,
+        COMPLIANCE_CHECK_POINT_SCORE,
+        COMPLIANCE_CHECK_POINT_TYPE)
+        VALUES
+        (#complianceCheckPointConfigId#,
+        #checkPoint#,
+        #complianceCheckPointScore#,
+        #complianceCheckPointType#)
+    </insert>
+
+    <!--更新检查点分数配置信息-->
+    <update id="updateComplianceCheckConfig" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_CHECK_CONFIG
+        SET COMPLIANCE_CHECK_POINT = #checkPoint#, COMPLIANCE_CHECK_POINT_SCORE = #complianceCheckPointScore#
+        WHERE COMPLIANCE_CHECK_POINT_TYPE = #complianceCheckPointType#
+        AND COMPLIANCE_CHECK_CONFIG_ID = #complianceCheckPointConfigId#
+    </update>
+
+    <!--根据数据字典键值，查询检查点分数配置-->
+    <select id="selectComplianceConfigByPointAndType" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_CONFIG_ID AS complianceCheckPointConfigId,
+        (SELECT T2.CODE_VALUE
+        FROM RL_CODETABLE T2
+        WHERE T2.SECTION = #section#
+        AND T2.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPoint,
+        T1.COMPLIANCE_CHECK_POINT AS checkPointKey,
+        T1.COMPLIANCE_CHECK_POINT_SCORE AS complianceCheckPointScore,
+        T1.COMPLIANCE_CHECK_POINT_TYPE AS complianceCheckPointType
+        FROM RL_COMPLIANCE_CHECK_CONFIG T1
+        WHERE 1 = 1
+        <isNotEmpty property="complianceCheckPointType" prepend="AND">
+            T1.COMPLIANCE_CHECK_POINT_TYPE = #complianceCheckPointType#
+        </isNotEmpty>
+        <isNotEmpty property="checkPoint" prepend="AND">
+            T1.COMPLIANCE_CHECK_POINT = $checkPoint$
+        </isNotEmpty>
+        AND T1.CHECKVERSION = '1'
+        ORDER BY TO_NUMBER(T1.COMPLIANCE_CHECK_POINT) ASC
+    </select>
+
+    <!--删除检查点分数配置信息-->
+    <delete id="deleteComplianceCheckConfigById" parameterClass="checkVo">
+        DELETE RL_COMPLIANCE_CHECK_CONFIG WHERE COMPLIANCE_CHECK_CONFIG_ID = #complianceCheckPointConfigId#
+    </delete>
+
+    <!--检查已添加检查项信息-->
+    <select id="selectExistenceOfComplianceCheckItem" parameterClass="checkVo" resultClass="java.lang.Integer">
+        select 1
+        from rl_compliance_check_item t
+        where t.credit_application_id=#creditApplicationId#
+        and t.compliance_check_type = #checkType#
+        and t.compliance_object = #complianceObject#
+        and t.system_material = #systemMaterial#
+        and t.compliance_check_point = #checkPoint#
+        <isNotEmpty property="errorFile" prepend="and">
+            t.error_file = #errorFile#
+        </isNotEmpty>
+    </select>
+
+    <!--查询某检查类型得分 0-自查扣分 1-客服扣分 2-合规扣分-->
+    <select id="selectComplianceCheckScoreByIdAndType" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_SCORE_ID AS complianceCheckScoreId,
+        T1.CREDIT_APPLICATION_ID AS creditApplicationId,
+        T1.COMPLIANCE_CHECK_SCORE AS complianceCheckPointScore,
+        T1.COMPLIANCE_CHECK_SCORE_TYPE AS complianceCheckScoreType
+        FROM RL_COMPLIANCE_CHECK_SCORE T1
+        WHERE T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND T1.COMPLIANCE_CHECK_SCORE_TYPE = #complianceCheckScoreType#
+    </select>
+
+    <!--保存某检查类型得分-->
+    <insert id="saveComplianceCheckScore" parameterClass="checkVo">
+        <selectKey keyProperty="complianceCheckScoreId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        INSERT INTO RL_COMPLIANCE_CHECK_SCORE
+        (COMPLIANCE_CHECK_SCORE_ID,
+        CREDIT_APPLICATION_ID,
+        COMPLIANCE_CHECK_SCORE,
+        COMPLIANCE_CHECK_SCORE_TYPE)
+        VALUES
+        (#complianceCheckScoreId#,
+        #creditApplicationId#,
+        #complianceCheckPointScore#,
+        #complianceCheckScoreType#)
+    </insert>
+
+    <!--更新某检查类型得分-->
+    <update id="updateComplianceCheckScoreByIdAndType" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_CHECK_SCORE
+        SET COMPLIANCE_CHECK_SCORE = #complianceCheckPointScore#
+        WHERE CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND COMPLIANCE_CHECK_SCORE_TYPE = #complianceCheckScoreType#
+    </update>
+
+    <!--计算某信贷申请某类型检查扣分-->
+    <select id="selectComplianceCheckScoreByCheckPoint" parameterClass="checkVo" resultClass="java.lang.Double">
+        SELECT SUM(T1.COMPLIANCE_CHECK_POINT_SCORE)
+        FROM RL_COMPLIANCE_CHECK_CONFIG T1,RL_COMPLIANCE_CHECK_ITEM T2
+        WHERE T1.COMPLIANCE_CHECK_POINT = T2.COMPLIANCE_CHECK_POINT
+        AND T1.COMPLIANCE_CHECK_POINT_TYPE = #complianceCheckPointType#
+        AND T2.CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND T2.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T1.CHECKVERSION = '1'
+    </select>
+
+    <!--导出统计数据-->
+    <sql id="sql_exportStatistics_v1">
+        SELECT RET_OUTER.*,
+        (100 - (CASE
+        WHEN RET_OUTER.SCORE_OTHER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_OTHER
+        END) - (CASE
+        WHEN RET_OUTER.SCORE_CUSTOMER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_CUSTOMER
+        END)) AS TOTAL_SCORE
+        FROM (SELECT RET.CREATE_LOAN_OFFICER_NAME,
+        SUM(RET.CHECK_COUNT1 + RET.CHECK_COUNT2) AS CHECK_COUNT,
+        SUM(RET.SCORE_OTHER) AS SCORE_OTHER,
+        SUM(RET.SCORE_CUSTOMER) AS SCORE_CUSTOMER
+        FROM (
+        SELECT T1.CREATE_LOAN_OFFICER_NAME AS CREATE_LOAN_OFFICER_NAME,
+        T1.CREDITAPPLICATION_ID,
+        (SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK_ITEM
+        WHERE CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS CHECK_COUNT1,
+        (SELECT CHECK_COUNT2
+        FROM (SELECT COUNT(1) AS CHECK_COUNT2,
+        CREDIT_APPLICATION_ID
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        WHERE EXISTS
+        (SELECT 1
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        MINUS
+        SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM) SUB_QUERY
+        WHERE SUB_QUERY.CREDIT_APPLICATION_ID =
+        CREDIT_APPLICATION_ID))
+        GROUP BY CREDIT_APPLICATION_ID) NEST_QUERY
+        WHERE NEST_QUERY.CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID) AS CHECK_COUNT2,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '2'
+        AND CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS SCORE_OTHER,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '1'
+        AND CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS SCORE_CUSTOMER,
+        T1.COMPANY_ID,
+        T1.BUSINESS_NUMBER,
+        T1.SIGNAGREEMENT_DATE
+        FROM RL_CREDIT_APPLICATION T1, sid_view v
+        WHERE EXISTS
+        (SELECT 1
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        UNION ALL
+        SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM) SUB_QUERY
+        WHERE SUB_QUERY.CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)
+        AND (T1.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+
+        <!--<isNotEmpty property="branchName" prepend="AND">
+            T1.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            T1.BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            T1.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>-->
+
+        ) RET
+        GROUP BY RET.CREATE_LOAN_OFFICER_NAME
+        ORDER BY RET.CREATE_LOAN_OFFICER_NAME DESC) RET_OUTER
+    </sql>
+    <sql id="sql_exportStatistics_v2">
+        SELECT RET.BUSINESS_NUMBER,
+        RET.NAME,
+        RET.CREATE_LOAN_OFFICER_NAME,
+        RET.COMPANY_NAME,
+        (CASE
+        WHEN RET.SCORE_OTHER IS NULL THEN
+        100
+        ELSE
+        100 - RET.SCORE_OTHER
+        END) AS SCORE_OTHER,
+        (CASE
+        WHEN RET.SCORE_CUSTOMER IS NULL THEN
+        100
+        ELSE
+        100 - RET.SCORE_CUSTOMER
+        END) AS SCORE_CUSTOMER
+        FROM (SELECT T1.BUSINESS_NUMBER,
+        T2.NAME,
+        T1.CREATE_LOAN_OFFICER_NAME,
+        T1.COMPANY_NAME,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '2'
+        AND CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS SCORE_OTHER,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '1'
+        AND CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID) AS SCORE_CUSTOMER,
+        COMPANY_ID,
+        SIGNAGREEMENT_DATE
+        FROM RL_CREDIT_APPLICATION T1
+        LEFT JOIN RL_BORROWER_SERVICE_APP T2
+        ON (T1.CREDITAPPLICATION_ID = T2.CREDITAPPLICATION_ID AND
+        T2.LEADER = '1' AND T2.VALID_STATE = '1')
+        INNER JOIN SID_VIEW V
+        ON (T1.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+        WHERE EXISTS (SELECT 1
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        UNION ALL
+        SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM) SUB_QUERY
+        WHERE SUB_QUERY.CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)) RET
+        WHERE 1 = 1
+        <isNotEmpty property="branchName" prepend="AND">
+            RET.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            RET.BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            RET.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ RET.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ RET.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        ORDER BY RET.BUSINESS_NUMBER ASC
+    </sql>
+    <sql id="sql_exportStatistics_v3">
+        SELECT
+        RET_OUTER.*,
+        CASE WHEN CHECK_COUNT_COMMISSIONER LIKE '0' THEN NULL
+        ELSE CHECK_COUNT_COMMISSIONER END AS CHECK_COUNT_COM_MODIFY,
+        CASE WHEN CHECK_COUNT_CUSTOMER LIKE '0' THEN NULL
+        ELSE CHECK_COUNT_CUSTOMER END     AS CHECK_COUNT_CUS_MODIFY,
+        ROUND(100 - (CASE
+        WHEN RET_OUTER.SCORE_OTHER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_OTHER / RET_OUTER.CHECK_COUNT_COMMISSIONER
+        END) - (CASE
+        WHEN RET_OUTER.SCORE_CUSTOMER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_CUSTOMER / CHECK_COUNT_CUSTOMER
+        END), 2) AS TOTAL_SCORE
+        FROM (SELECT
+        RET.COMPANY_NAME,
+        RET.CREATE_LOAN_OFFICER_NAME,
+        SUM(RET.CHECK_COUNT1 + RET.CHECK_COUNT2) AS CHECK_COUNT_COMMISSIONER,
+        /*SUM(RET.CHECK_COUNT3 + RET.CHECK_COUNT4) AS CHECK_COUNT_CUSTOMER,*/
+        SUM(RET.CHECK_COUNT3) AS CHECK_COUNT_CUSTOMER,
+        SUM(RET.SCORE_OTHER)                     AS SCORE_OTHER,
+        SUM(RET.SCORE_CUSTOMER)                  AS SCORE_CUSTOMER
+        FROM (
+        SELECT
+        T1.COMPANY_NAME,
+        T1.CREATE_LOAN_OFFICER_NAME                                          AS CREATE_LOAN_OFFICER_NAME,
+        T1.CREDITAPPLICATION_ID,
+
+
+        (SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK_ITEM RCCI
+        WHERE RCCI.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID AND RCCI.COMPLIANCE_CHECK_TYPE =
+        '1') AS CHECK_COUNT1,
+
+        (SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK RCC
+        WHERE RCC.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID AND RCC.COMPLIANCE_CHECK_TYPE =
+        '1')  AS CHECK_COUNT2,
+
+        (SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK_ITEM RCCI
+        WHERE RCCI.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID AND RCCI.COMPLIANCE_CHECK_TYPE =
+        '2') AS CHECK_COUNT3,
+
+        /*(SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK RCC
+        WHERE RCC.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID AND RCC.COMPLIANCE_CHECK_TYPE =
+        '2')  AS CHECK_COUNT4,*/
+
+
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '2'
+        AND CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)                                  AS SCORE_OTHER,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '1'
+        AND CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)                                  AS SCORE_CUSTOMER,
+        T1.COMPANY_ID,
+        T1.BUSINESS_NUMBER,
+        T1.SIGNAGREEMENT_DATE
+        FROM RL_CREDIT_APPLICATION T1, sid_view v
+        WHERE EXISTS
+        (SELECT 1
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        UNION ALL
+        SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM) SUB_QUERY
+        WHERE SUB_QUERY.CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)
+        AND (T1.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+        <isNotEmpty property="branchName" prepend="AND">
+            T1.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            T1.BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            T1.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        ) RET
+        GROUP BY RET.COMPANY_NAME, RET.CREATE_LOAN_OFFICER_NAME
+        ORDER BY NLSSORT(RET.COMPANY_NAME ,'NLS_SORT = SCHINESE_PINYIN_M') ASC, RET.CREATE_LOAN_OFFICER_NAME ASC) RET_OUTER
+    </sql>
+    <sql id="sql_exportStatistics_v4">
+        SELECT
+        RET_OUTER.COMPANY_NAME,
+        RET_OUTER.CREATE_LOAN_OFFICER_NAME,
+        CASE WHEN CHECK_COUNT_COMMISSIONER LIKE '0' THEN NULL
+        ELSE CHECK_COUNT_COMMISSIONER END AS CHECK_COUNT_COM_MODIFY,
+        RET_OUTER.SCORE_OTHER,
+        CASE WHEN CHECK_COUNT_CUSTOMER LIKE '0' THEN NULL
+        ELSE CHECK_COUNT_CUSTOMER END     AS CHECK_COUNT_CUS_MODIFY,
+        RET_OUTER.SCORE_CUSTOMER,
+        ROUND(100 - (CASE
+        WHEN RET_OUTER.SCORE_OTHER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_OTHER / RET_OUTER.CHECK_COUNT_COMMISSIONER
+        END) - (CASE
+        WHEN RET_OUTER.SCORE_CUSTOMER IS NULL THEN
+        0
+        ELSE
+        RET_OUTER.SCORE_CUSTOMER / CHECK_COUNT_CUSTOMER
+        END), 2)     AS TOTAL_SCORE
+        FROM (SELECT
+        RET.COMPANY_NAME,
+        RET.CREATE_LOAN_OFFICER_ID,
+        RET.CREATE_LOAN_OFFICER_NAME,
+        (SELECT t3_outer.final_cus_count
+        FROM (SELECT
+        t3.CREATE_LOAN_OFFICER_ID,
+        t3.CREATE_LOAN_OFFICER_NAME,
+        count(1) AS final_cus_count
+        FROM RL_CREDIT_APPLICATION t3
+        WHERE exists(SELECT 1
+        FROM (SELECT t1.CREDITAPPLICATION_ID
+        FROM RL_CREDIT_APPLICATION t1
+        WHERE t1.AUDIT_STATUS IN ('15')
+        AND t1.VALID_STATE = '1'
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ t1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ t1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        INTERSECT
+        SELECT t2.CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK t2
+        WHERE t2.COMPLIANCE_CHECK_TYPE = '1') t4
+        WHERE t3.CREDITAPPLICATION_ID = t4.CREDITAPPLICATION_ID)
+        GROUP BY t3.CREATE_LOAN_OFFICER_ID,
+        t3.CREATE_LOAN_OFFICER_NAME) t3_outer
+        WHERE t3_outer.CREATE_LOAN_OFFICER_ID = RET.CREATE_LOAN_OFFICER_ID)
+        AS CHECK_COUNT_COMMISSIONER,
+
+        (SELECT t3_outer.final_com_count
+        FROM (SELECT
+        t3.CREATE_LOAN_OFFICER_ID,
+        t3.CREATE_LOAN_OFFICER_NAME,
+        count(1) AS final_com_count
+        FROM RL_CREDIT_APPLICATION t3
+        WHERE t3.AUDIT_STATUS IN ('15')
+        AND t3.VALID_STATE = '1'
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ t3.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ t3.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        GROUP BY t3.CREATE_LOAN_OFFICER_ID, t3.CREATE_LOAN_OFFICER_NAME) t3_outer
+        WHERE t3_outer.CREATE_LOAN_OFFICER_ID = RET.CREATE_LOAN_OFFICER_ID)
+        AS CHECK_COUNT_CUSTOMER,
+
+        SUM(RET.SCORE_OTHER)    AS SCORE_OTHER,
+        SUM(RET.SCORE_CUSTOMER) AS SCORE_CUSTOMER
+        FROM (
+        SELECT
+        T1.COMPANY_NAME,
+        T1.CREATE_LOAN_OFFICER_ID,
+        T1.CREATE_LOAN_OFFICER_NAME                                          AS CREATE_LOAN_OFFICER_NAME,
+        T1.CREDITAPPLICATION_ID,
+
+
+        (SELECT COUNT(1)
+        FROM RL_COMPLIANCE_CHECK_ITEM RCCI
+        WHERE RCCI.CREDIT_APPLICATION_ID = T1.CREDITAPPLICATION_ID AND RCCI.COMPLIANCE_CHECK_TYPE =
+        '2') AS CHECK_COUNT3,
+
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '2'
+        AND CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)                                  AS SCORE_OTHER,
+        (SELECT COMPLIANCE_CHECK_SCORE
+        FROM RL_COMPLIANCE_CHECK_SCORE
+        WHERE COMPLIANCE_CHECK_SCORE_TYPE = '1'
+        AND CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)                                  AS SCORE_CUSTOMER,
+        T1.COMPANY_ID,
+        T1.BUSINESS_NUMBER,
+        T1.SIGNAGREEMENT_DATE
+        FROM RL_CREDIT_APPLICATION T1
+        WHERE EXISTS
+        (SELECT 1
+        FROM (SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK
+        UNION ALL
+        SELECT CREDIT_APPLICATION_ID
+        FROM RL_COMPLIANCE_CHECK_ITEM) SUB_QUERY
+        WHERE SUB_QUERY.CREDIT_APPLICATION_ID =
+        T1.CREDITAPPLICATION_ID)
+        <isNotEmpty property="branchName" prepend="AND">
+            T1.COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            T1.CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ T1.SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        ) RET
+        GROUP BY RET.COMPANY_NAME, RET.CREATE_LOAN_OFFICER_ID, RET.CREATE_LOAN_OFFICER_NAME
+        ORDER BY NLSSORT(RET.COMPANY_NAME, 'NLS_SORT = SCHINESE_PINYIN_M') ASC,
+        RET.CREATE_LOAN_OFFICER_NAME ASC) RET_OUTER
+    </sql>
+    <select id="exportStatistics" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_exportStatistics_v4"/>
+    </select>
+    <select id="exportStatisticsCount" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+        <include refid="sql_exportStatistics_v4"/>
+        )
+    </select>
+
+    <!--导出检查明细数据-->
+        <!--检查点数据-->
+        <!--SELECT DBMS_LOB.SUBSTR(T.COMPLIANCE_CHECK_ADVICE, 32000, 1)
+        FROM (SELECT T.CREDIT_APPLICATION_ID,
+        wm_concat(T.COMPLIANCE_CHECK_ADVICE) AS COMPLIANCE_CHECK_ADVICE
+        FROM RL_COMPLIANCE_CHECK T WHERE T.COMPLIANCE_CHECK_TYPE = #checkType#
+        GROUP BY T.CREDIT_APPLICATION_ID) T
+        WHERE T.CREDIT_APPLICATION_ID = T1.CREDIT_APPLICATION_ID-->
+    <sql id="sql_exportCheckDetail_customer">
+        SELECT T1.CREDIT_APPLICATION_ID,
+        T2.BUSINESS_NUMBER,
+        T2.LOAN_OFFICER_NAME,
+        T2.CREATE_LOAN_OFFICER_NAME,
+        T2.SIGNAGREEMENT_DATE,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'object_compliance'
+        AND CODE_KEY = T1.COMPLIANCE_OBJECT) AS COMPLIANCE_OBJECT,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'systemMaterial_compliance' ELSE 'systemMaterial_compliance_v1' END)
+        AND CODE_KEY = T1.SYSTEM_MATERIAL) AS SYSTEM_MATERIAL,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'errorFile_compliance'
+        AND CODE_KEY = T1.ERROR_FILE) AS ERROR_FILE,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'checkpoint_compliance' ELSE 'checkpoint_compliance_v1' END)
+        AND CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS COMPLIANCE_CHECK_POINT,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'checkpoint_loan'
+        AND CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS COMPLIANCE_CP_LOAN,
+        (SELECT T4.COMPLIANCE_CHECK_POINT_SCORE
+        FROM RL_COMPLIANCE_CHECK_CONFIG T4
+        WHERE T4.COMPLIANCE_CHECK_POINT_TYPE = #configType#
+        AND T4.COMPLIANCE_CHECK_POINT = T1.COMPLIANCE_CHECK_POINT AND T4.CHECKVERSION = '1') AS COMPLIANCE_CHECK_SCORE,
+        T1.OPERATOR_NAME,
+        TO_CHAR(T1.OPERATE_DATE,'YYYY-MM-DD HH24:MI:SS') AS OPERATE_DATE,
+        (SELECT T.COMPLIANCE_CHECK_ADVICE
+         FROM RL_COMPLIANCE_CHECK T
+         WHERE T.COMPLIANCE_CHECK_ID = T1.COMPLIANCE_CHECK_ID) AS COMPLIANCE_CHECK_ADVICE,
+        T2.COMPANY_ID,
+        T2.COMPANY_NAME
+        FROM RL_COMPLIANCE_CHECK_ITEM T1, RL_CREDIT_APPLICATION T2, sid_view v
+        WHERE 1 =1
+        AND T1.CREDIT_APPLICATION_ID = T2.CREDITAPPLICATION_ID
+        AND (T2.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+    </sql>
+    <sql id="sql_exportCheckDetail_customer_modify">
+        SELECT T1.CREDIT_APPLICATION_ID,
+        T2.BUSINESS_NUMBER,
+        T2.LOAN_OFFICER_NAME,
+        T2.CREATE_LOAN_OFFICER_NAME,
+        T2.SIGNAGREEMENT_DATE,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'object_compliance'
+        AND CODE_KEY = T1.COMPLIANCE_OBJECT) AS COMPLIANCE_OBJECT,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'systemMaterial_compliance' ELSE 'systemMaterial_compliance_v1' END)
+        AND CODE_KEY = T1.SYSTEM_MATERIAL) AS SYSTEM_MATERIAL,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'errorFile_compliance'
+        AND CODE_KEY = T1.ERROR_FILE) AS ERROR_FILE,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'checkpoint_compliance' ELSE 'checkpoint_compliance_v1' END)
+        AND CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS COMPLIANCE_CHECK_POINT,
+        (SELECT CODE_VALUE
+        FROM RL_CODETABLE
+        WHERE SECTION = 'checkpoint_loan'
+        AND CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS COMPLIANCE_CP_LOAN,
+        (SELECT T4.COMPLIANCE_CHECK_POINT_SCORE
+        FROM RL_COMPLIANCE_CHECK_CONFIG T4
+        WHERE T4.COMPLIANCE_CHECK_POINT_TYPE = #configType#
+        AND T4.COMPLIANCE_CHECK_POINT = T1.COMPLIANCE_CHECK_POINT AND T4.CHECKVERSION = '1') AS COMPLIANCE_CHECK_SCORE,
+        T1.OPERATOR_NAME,
+        TO_CHAR(T1.OPERATE_DATE,'YYYY-MM-DD HH24:MI:SS') AS OPERATE_DATE,
+        (SELECT T.COMPLIANCE_CHECK_ADVICE
+         FROM RL_COMPLIANCE_CHECK T
+         WHERE T.CREDIT_APPLICATION_ID = T1.CREDIT_APPLICATION_ID
+         AND T.COMPLIANCE_CHECK_TYPE= #checkType#) AS COMPLIANCE_CHECK_ADVICE,
+        T2.COMPANY_ID,
+        T2.COMPANY_NAME
+        FROM RL_COMPLIANCE_CHECK_ITEM T1, RL_CREDIT_APPLICATION T2, sid_view v
+        WHERE 1 =1
+        AND T1.CREDIT_APPLICATION_ID = T2.CREDITAPPLICATION_ID
+        AND (T2.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+    </sql>
+        <!--导出时搜索条件-->
+    <sql id="sql_exportCheckDetail_condition">
+        <isNotEmpty property="branchName" prepend="AND">
+            COMPANY_ID IN ($branchName$)
+        </isNotEmpty>
+        <isNotEmpty property="businessNumber" prepend="AND">
+            BUSINESS_NUMBER IN (#businessNumber#)
+        </isNotEmpty>
+        <isNotEmpty property="materialMan" prepend="AND">
+            CREATE_LOAN_OFFICER_NAME = #materialMan#
+        </isNotEmpty>
+        <isNotEmpty property="loanBegin" prepend="AND">
+            <![CDATA[ SIGNAGREEMENT_DATE >= TO_DATE(#loanBegin#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+        <isNotEmpty property="loanEnd" prepend="AND">
+            <![CDATA[ SIGNAGREEMENT_DATE <= TO_DATE(#loanEnd#,'YYYY-MM-DD') ]]>
+        </isNotEmpty>
+    </sql>
+        <!--备注数据-->
+    <sql id="sql_exportCheckDetail_commissioner">
+        SELECT T1.CREDIT_APPLICATION_ID,
+        T2.BUSINESS_NUMBER,
+        T2.LOAN_OFFICER_NAME,
+        T2.CREATE_LOAN_OFFICER_NAME,
+        T2.SIGNAGREEMENT_DATE,
+        '',
+        '',
+        '',
+        '',
+        '',
+        TO_NUMBER(''),
+        T1.OPERATOR_NAME,
+        TO_CHAR(T1.OPERATE_DATE,'YYYY-MM-DD HH24:MI:SS') AS OPERATE_DATE,
+        T1.COMPLIANCE_CHECK_ADVICE,
+        T2.COMPANY_ID,
+        T2.COMPANY_NAME
+        FROM RL_COMPLIANCE_CHECK T1, RL_CREDIT_APPLICATION T2, sid_view v
+        WHERE T1.CREDIT_APPLICATION_ID = T2.CREDITAPPLICATION_ID
+        AND (T2.CREDITAPPLICATION_ID = v.object_id_identity AND
+        v.class = 'com.creditease.rc.domain.CreditApplication' AND
+        v.ace_sid IN ($authList$))
+        AND T1.CREDIT_APPLICATION_ID NOT IN
+        (SELECT T.CREDIT_APPLICATION_ID FROM RL_COMPLIANCE_CHECK_ITEM T)
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+    </sql>
+        <!--客服明细数据-->
+    <select id="exportCheckDetail_customer" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_exportCheckDetail_customer"/>
+        <include refid="sql_exportCheckDetail_condition"/>
+        ORDER BY NLSSORT(T2.COMPANY_NAME,'NLS_SORT = SCHINESE_PINYIN_M') ASC, T1.OPERATE_DATE DESC NULLS LAST
+    </select>
+    <select id="exportCheckDetailCount_customer" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+        <include refid="sql_exportCheckDetail_customer"/>
+        <include refid="sql_exportCheckDetail_condition"/>
+        )
+    </select>
+        <!--合规明细数据-->
+    <select id="exportCheckDetail_commissioner" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT T2.* FROM (
+        <include refid="sql_exportCheckDetail_customer_modify"/>
+        UNION ALL
+        <include refid="sql_exportCheckDetail_commissioner"/>
+        ) T2 WHERE 1 = 1
+        <include refid="sql_exportCheckDetail_condition"/>
+        ORDER BY NLSSORT(T2.COMPANY_NAME,'NLS_SORT = SCHINESE_PINYIN_M') ASC, T2.OPERATE_DATE DESC NULLS LAST
+    </select>
+    <select id="exportCheckDetailCount_commissioner" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        SELECT COUNT(*) FROM (
+        SELECT T2.* FROM (
+        <include refid="sql_exportCheckDetail_customer_modify"/>
+        UNION ALL
+        <include refid="sql_exportCheckDetail_commissioner"/>
+        ) T2 WHERE 1 = 1
+        <include refid="sql_exportCheckDetail_condition"/>
+        )
+    </select>
+
+    <!--根据信贷申请ID和检查类型TYPE，查询检查项记录-->
+    <select id="selectComplianceCheckItemByIdAndType" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_ITEM_ID AS complianceCheckItemId,
+        T1.COMPLIANCE_OBJECT AS complianceObject,
+        T1.SYSTEM_MATERIAL AS systemMaterial,
+        T1.ERROR_FILE AS errorFile,
+        T1.COMPLIANCE_CHECK_POINT AS checkPoint
+        FROM RL_COMPLIANCE_CHECK_ITEM T1
+        WHERE T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+    </select>
+
+    <select id="selectComplianceCheckByIdAndTypeAndFlag" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_ID AS complianceCheckId,
+        T1.CREDIT_APPLICATION_ID AS creditApplicationId,
+        T1.COMPLIANCE_CHECK_ADVICE AS checkRemark,
+        T1.COMPLIANCE_CHECK_TYPE AS checkType
+        FROM RL_COMPLIANCE_CHECK T1
+        WHERE T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T1.ISNEW = #isNew#
+    </select>
+
+    <!--更新检查项表新旧数据标识-->
+    <update id="updateComplianceCheckItemFlag" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_CHECK_ITEM T SET T.ISNEW = #isNew# WHERE T.CREDIT_APPLICATION_ID = #creditApplicationId# AND T.COMPLIANCE_CHECK_TYPE = #checkType#
+    </update>
+
+    <!--更新检查表新旧数据标识-->
+    <update id="updateComplianceCheckFlag" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_CHECK T SET T.ISNEW = #isNew# WHERE T.CREDIT_APPLICATION_ID = #creditApplicationId# AND T.COMPLIANCE_CHECK_TYPE = #checkType#
+    </update>
+
+    <select id="searchComplianceCheckItemByFlag" parameterClass="checkVo" resultClass="checkVo">
+        SELECT T1.COMPLIANCE_CHECK_ITEM_ID AS complianceCheckItemId,
+        (SELECT T3.CODE_VALUE
+        FROM RL_CODETABLE T3
+        WHERE T3.SECTION = 'object_compliance'
+        AND T3.CODE_KEY = T1.COMPLIANCE_OBJECT) AS complianceObject,
+        (SELECT T3.CODE_VALUE
+        FROM RL_CODETABLE T3
+        WHERE T3.SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'systemMaterial_compliance' ELSE 'systemMaterial_compliance_v1' END)
+        AND T3.CODE_KEY = T1.SYSTEM_MATERIAL) AS systemMaterial,
+        (SELECT T3.CODE_VALUE
+        FROM RL_CODETABLE T3
+        WHERE T3.SECTION = (CASE WHEN T1.CHECKVERSION = '0' THEN 'checkpoint_compliance' ELSE 'checkpoint_compliance_v1' END)
+        AND T3.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPoint,
+        (SELECT T3.CODE_VALUE
+        FROM RL_CODETABLE T3
+        WHERE T3.SECTION = 'errorFile_compliance'
+        AND T3.CODE_KEY = T1.ERROR_FILE) AS errorFile,
+        (SELECT T3.CODE_VALUE
+        FROM RL_CODETABLE T3
+        WHERE T3.SECTION = 'checkpoint_loan'
+        AND T3.CODE_KEY = T1.COMPLIANCE_CHECK_POINT) AS checkPointLoan,
+        T1.OPERATOR_NAME AS operatorName,
+        T1.OPERATE_DATE AS operateDate
+        FROM RL_COMPLIANCE_CHECK_ITEM T1
+        WHERE T1.CREDIT_APPLICATION_ID = #creditApplicationId#
+        AND T1.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T1.ISNEW = #isNew#
+        ORDER BY T1.COMPLIANCE_CHECK_ITEM_ID ASC
+    </select>
+
+    <!--检查此笔申请单是否做过合规自查、合规检查、客服检查，其中 0表示自查，1表示检查，2表示客服检查-->
+    <select id="checkIfCheckByType" parameterClass="checkVo" resultClass="java.lang.Integer">
+        SELECT 1
+        FROM RL_COMPLIANCE_CHECK T
+        WHERE T.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T.COMPLIANCE_CHECK_ADVICE IS NOT NULL
+        AND T.CREDIT_APPLICATION_ID = #creditApplicationId#
+        UNION
+        SELECT 1
+        FROM RL_COMPLIANCE_CHECK_ITEM T
+        WHERE T.COMPLIANCE_CHECK_TYPE = #checkType#
+        AND T.CREDIT_APPLICATION_ID = #creditApplicationId#
+    </select>
+
+    <!--保存申诉-->
+    <insert id="saveComplianceComplaint" parameterClass="checkVo">
+        <selectKey keyProperty="complaintId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        INSERT INTO RL_COMPLIANCE_COMPLAINT
+        (COMPLAINT_ID,
+        CREDITAPPLICATION_ID,
+        COMPLAINT_STATUS,
+        COMPLAINT_CONTENT,
+        ISNEW,
+        COMPLAINANT_ID,
+        COMPLAINANT_NAME,
+        COMPLAINT_DATE)
+        VALUES
+        (#complaintId#,
+        #creditApplicationId#,
+        #complaintStatus#,
+        #complaintContent#,
+        #isNew#,
+        #operatorId#,
+        #operatorName#,
+        #operateDate#)
+    </insert>
+
+    <!--修改申诉状态-->
+    <update id="updateComplianceComplaint" parameterClass="checkVo">
+        UPDATE RL_COMPLIANCE_COMPLAINT T SET T.COMPLAINT_STATUS=#complaintStatus# WHERE T.COMPLAINT_ID=#complaintId#
+    </update>
+
+    <!--保存申诉审批-->
+    <insert id="saveComplianceApprove" parameterClass="checkVo">
+        <selectKey keyProperty="complaintApproveId" resultClass="java.lang.Long" type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL as value from dual
+        </selectKey>
+        INSERT INTO RL_COMPLIANCE_APPROVE
+        (APPROVE_ID,
+        CREDITAPPLICATION_ID,
+        APPROVE_RESULT,
+        APPROVE_CONTENT,
+        APPROVER_ID,
+        APPROVER_NAME,
+        APPROVE_DATE,
+        ISNEW)
+        VALUES
+        (#complaintApproveId#,
+        #creditApplicationId#,
+        #approveResult#,
+        #approveContent#,
+        #operatorId#,
+        #operatorName#,
+        #operateDate#,
+        #isNew#)
+    </insert>
+</sqlMap>

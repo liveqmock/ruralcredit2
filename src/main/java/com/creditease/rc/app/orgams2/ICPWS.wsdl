@@ -1,0 +1,1164 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="ICPWebServiceService" targetNamespace="http://service.icp.ws.component.creditease.com/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://service.icp.ws.component.creditease.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema targetNamespace="http://service.server.ws.icp.creditease.com/" version="1.0" xmlns:ns1="http://service.icp.ws.component.creditease.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:import namespace="http://service.icp.ws.component.creditease.com/"/>
+<xs:element name="creditClosingNotice" type="ns1:CreditClosingNotice"/>
+<xs:element name="creditClosingNoticeResponse" type="ns1:CreditClosingNoticeResponse"/>
+<xs:element name="creditCustomerInfoReq" type="ns1:CreditCustomerInfoReq"/>
+<xs:element name="creditCustomerInfoReqResponse" type="ns1:CreditCustomerInfoReqResponse"/>
+<xs:element name="creditPaymentResultNotice" type="ns1:CreditPaymentResultNotice"/>
+<xs:element name="creditPaymentResultNoticeResponse" type="ns1:CreditPaymentResultNoticeResponse"/>
+<xs:element name="orgAMSContractConfirmNotice" type="ns1:OrgAMSContractConfirmNotice"/>
+<xs:element name="orgAMSContractConfirmNoticeResponse" type="ns1:OrgAMSContractConfirmNoticeResponse"/>
+<xs:element name="organMatchingReq" type="ns1:OrganMatchingReq"/>
+<xs:element name="organMatchingReqResponse" type="ns1:OrganMatchingReqResponse"/>
+<xs:element name="originalStatusNotice" type="ns1:OriginalStatusNotice"/>
+<xs:element name="originalStatusNoticeResponse" type="ns1:OriginalStatusNoticeResponse"/>
+<xs:element name="planMatchingReq" type="ns1:PlanMatchingReq"/>
+<xs:element name="planMatchingReqResponse" type="ns1:PlanMatchingReqResponse"/>
+<xs:element name="productMatchingReq" type="ns1:ProductMatchingReq"/>
+<xs:element name="productMatchingReqResponse" type="ns1:ProductMatchingReqResponse"/>
+</xs:schema>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://service.icp.ws.component.creditease.com/" version="1.0" xmlns:tns="http://service.icp.ws.component.creditease.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="synBatchBorrowContract" type="tns:synBatchBorrowContract"/>
+<xs:element name="synBatchBorrowContractResponse" type="tns:synBatchBorrowContractResponse"/>
+<xs:element name="synBorrowContract" type="tns:synBorrowContract"/>
+<xs:element name="synBorrowContractResponse" type="tns:synBorrowContractResponse"/>
+<xs:element name="synBorrowContractState" type="tns:synBorrowContractState"/>
+<xs:element name="synBorrowContractStateResponse" type="tns:synBorrowContractStateResponse"/>
+<xs:complexType name="synBatchBorrowContract">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="requestList" type="tns:borrowContractReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="borrowContractReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="amortisation" type="xs:long"/>
+<xs:element minOccurs="0" name="applyId" type="xs:string"/>
+<xs:element minOccurs="0" name="bankAccount" type="xs:string"/>
+<xs:element minOccurs="0" name="bankBook" type="xs:string"/>
+<xs:element minOccurs="0" name="bankName" type="xs:string"/>
+<xs:element minOccurs="0" name="bankNumber" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="borrowId" type="xs:long"/>
+<xs:element minOccurs="0" name="borrowPurpose1" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowPurpose2" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowType" type="xs:string"/>
+<xs:element minOccurs="0" name="bsApplyId" type="xs:long"/>
+<xs:element minOccurs="0" name="bsClientId" type="xs:string"/>
+<xs:element minOccurs="0" name="bussTableName" type="xs:string"/>
+<xs:element minOccurs="0" name="checkOffOper" type="xs:string"/>
+<xs:element minOccurs="0" name="checkOffTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="city" type="xs:string"/>
+<xs:element minOccurs="0" name="clientId" type="xs:string"/>
+<xs:element minOccurs="0" name="clientName" type="xs:string"/>
+<xs:element minOccurs="0" name="clientType" type="xs:string"/>
+<xs:element minOccurs="0" name="cmIp" type="xs:string"/>
+<xs:element minOccurs="0" name="contractId" type="xs:long"/>
+<xs:element minOccurs="0" name="contractRemark" type="xs:string"/>
+<xs:element minOccurs="0" name="contractState" type="xs:string"/>
+<xs:element minOccurs="0" name="contractTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="contractVersion" type="xs:string"/>
+<xs:element minOccurs="0" name="discountRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="discountReason" type="xs:string"/>
+<xs:element minOccurs="0" name="downLoadUrl" type="xs:string"/>
+<xs:element minOccurs="0" name="electricSignUrl" type="xs:string"/>
+<xs:element minOccurs="0" name="fileType" type="xs:string"/>
+<xs:element minOccurs="0" name="interest" type="xs:decimal"/>
+<xs:element minOccurs="0" name="isExpedited" type="xs:string"/>
+<xs:element minOccurs="0" name="loanAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="manageFee" type="xs:decimal"/>
+<xs:element minOccurs="0" name="mobile" type="xs:string"/>
+<xs:element minOccurs="0" name="planId" type="xs:long"/>
+<xs:element minOccurs="0" name="planName" type="xs:string"/>
+<xs:element minOccurs="0" name="productType" type="xs:string"/>
+<xs:element minOccurs="0" name="purposeCaption" type="xs:string"/>
+<xs:element minOccurs="0" name="rate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="repayAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="returnEndDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="returnStartDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="returnType" type="xs:string"/>
+<xs:element minOccurs="0" name="submitTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="systemId" type="xs:string"/>
+<xs:element minOccurs="0" name="systemSign" type="xs:string"/>
+<xs:element minOccurs="0" name="viewUrl" type="xs:string"/>
+<xs:element minOccurs="0" name="yearIrr" type="xs:decimal"/>
+<xs:element minOccurs="0" name="rCharge" type="xs:decimal"/>
+<xs:element minOccurs="0" name="rTime" type="xs:dateTime"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="synBatchBorrowContractResponse">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:borrowContractRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="borrowContractRes">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyId" type="xs:string"/>
+<xs:element minOccurs="0" name="reason" type="xs:string"/>
+<xs:element name="success" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="synBorrowContract">
+<xs:sequence>
+<xs:element minOccurs="0" name="request" type="tns:borrowContractReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="synBorrowContractResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:borrowContractRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="synBorrowContractState">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="request" type="tns:contractStateReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="contractStateReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyId" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowState" type="xs:string"/>
+<xs:element minOccurs="0" name="matchId" type="xs:string"/>
+<xs:element minOccurs="0" name="operationId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="synBorrowContractStateResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:contractStateRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="contractStateRes">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyId" type="xs:string"/>
+<xs:element minOccurs="0" name="reason" type="xs:string"/>
+<xs:element name="success" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="trustOrgan">
+<xs:sequence>
+<xs:element minOccurs="0" name="attachmentId" type="xs:string"/>
+<xs:element minOccurs="0" name="city" type="xs:string"/>
+<xs:element minOccurs="0" name="contactPerson1" type="xs:string"/>
+<xs:element minOccurs="0" name="contactPerson2" type="xs:string"/>
+<xs:element minOccurs="0" name="contactPerson3" type="xs:string"/>
+<xs:element minOccurs="0" name="contactPerson4" type="xs:string"/>
+<xs:element minOccurs="0" name="contactPerson5" type="xs:string"/>
+<xs:element minOccurs="0" name="contactTel3" type="xs:string"/>
+<xs:element minOccurs="0" name="contactTel1" type="xs:string"/>
+<xs:element minOccurs="0" name="contactTel2" type="xs:string"/>
+<xs:element minOccurs="0" name="contactTel4" type="xs:string"/>
+<xs:element minOccurs="0" name="contactTel5" type="xs:string"/>
+<xs:element minOccurs="0" name="createTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="creator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="displayName" type="xs:string"/>
+<xs:element minOccurs="0" name="iconClass" type="xs:string"/>
+<xs:element minOccurs="0" name="modifyTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="operator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organCode" type="xs:string"/>
+<xs:element minOccurs="0" name="organId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organName" type="xs:string"/>
+<xs:element minOccurs="0" name="organType" type="xs:string"/>
+<xs:element minOccurs="0" name="postCode" type="xs:int"/>
+<xs:element minOccurs="0" name="province" type="xs:string"/>
+<xs:element minOccurs="0" name="remark" type="xs:string"/>
+<xs:element minOccurs="0" name="state" type="xs:string"/>
+<xs:element minOccurs="0" name="street" type="xs:string"/>
+<xs:element minOccurs="0" name="sysStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="version" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CreditClosingNoticeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:creditClosingNoticeRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="creditClosingNoticeRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="baseResponseHead">
+<xs:sequence>
+<xs:element name="transactionCode" type="xs:string"/>
+<xs:element name="transactionCompleteTime" type="xs:dateTime"/>
+<xs:element name="transactionMsg" type="xs:string"/>
+<xs:element name="transactionReceiveTime" type="xs:dateTime"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="contractConfirmNoticeRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="paymentResultNoticeRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="trustPlanRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="customerInfoRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="originalStatusNoticeRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="trustOrganRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="productSeriesRes">
+<xs:complexContent>
+<xs:extension base="tns:baseResponseHead">
+<xs:sequence/>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="CreditCustomerInfoReqResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:customerInfoRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OriginalStatusNoticeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:originalStatusNoticeRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrganMatchingReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:trustOrganReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="trustOrganReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="trustOrganList" nillable="true" type="tns:trustOrgan"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="baseRequestHead">
+<xs:sequence>
+<xs:element name="operateTime" type="xs:dateTime"/>
+<xs:element name="operator" type="xs:string"/>
+<xs:element name="signInfo" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="contractConfirmNoticeReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" name="contractConfirmNoticeDTOList" type="tns:contractConfirmNoticeDTO"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="contractConfirmNoticeDTO">
+<xs:sequence>
+<xs:element name="confirmDate" type="xs:dateTime"/>
+<xs:element name="isPass" type="xs:boolean"/>
+<xs:element name="retInfo" type="xs:string"/>
+<xs:element name="transportId" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="trustPlanReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="trustPlanList" nillable="true" type="tns:trustPlan"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="trustPlan">
+<xs:sequence>
+<xs:element minOccurs="0" name="accountName" type="xs:string"/>
+<xs:element minOccurs="0" name="accountNo" type="xs:decimal"/>
+<xs:element minOccurs="0" name="attachmentId" type="xs:string"/>
+<xs:element minOccurs="0" name="createTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="creator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="displayName" type="xs:string"/>
+<xs:element minOccurs="0" name="exchangeCycle" type="xs:int"/>
+<xs:element minOccurs="0" name="exchangeTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="fullAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="iconClass" type="xs:string"/>
+<xs:element minOccurs="0" name="impelRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="initAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="initMatchId" type="xs:string"/>
+<xs:element minOccurs="0" name="interest" type="xs:decimal"/>
+<xs:element minOccurs="0" name="interestDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="investEndDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="investStartDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="irr" type="xs:decimal"/>
+<xs:element minOccurs="0" name="isAdd" type="xs:string"/>
+<xs:element minOccurs="0" name="isReturn" type="xs:string"/>
+<xs:element minOccurs="0" name="isRound" type="xs:string"/>
+<xs:element minOccurs="0" name="keepFee" type="xs:decimal"/>
+<xs:element minOccurs="0" name="keepRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="lawyerFee" type="xs:decimal"/>
+<xs:element minOccurs="0" name="minLastAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="modifyTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="operator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organBankName" type="xs:string"/>
+<xs:element minOccurs="0" name="organId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organName" type="xs:string"/>
+<xs:element minOccurs="0" name="payRule" type="xs:string"/>
+<xs:element minOccurs="0" name="planCode" type="xs:string"/>
+<xs:element minOccurs="0" name="planCreateTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="planId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="planName" type="xs:string"/>
+<xs:element minOccurs="0" name="planTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="priorityScopeAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="productId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="productName" type="xs:string"/>
+<xs:element minOccurs="0" name="reAddScope" type="xs:decimal"/>
+<xs:element minOccurs="0" name="reAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="remark" type="xs:string"/>
+<xs:element minOccurs="0" name="returnMatchId" type="xs:string"/>
+<xs:element minOccurs="0" name="returnRule" type="xs:string"/>
+<xs:element minOccurs="0" name="scopeAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="secondScopeAmt" type="xs:decimal"/>
+<xs:element minOccurs="0" name="sort" type="xs:decimal"/>
+<xs:element minOccurs="0" name="state" type="xs:string"/>
+<xs:element minOccurs="0" name="subAccountName" type="xs:string"/>
+<xs:element minOccurs="0" name="sysStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="thirdNo" type="xs:string"/>
+<xs:element minOccurs="0" name="verifyOper" type="xs:long"/>
+<xs:element minOccurs="0" name="verifyTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="version" type="xs:long"/>
+<xs:element minOccurs="0" name="yield" type="xs:decimal"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="paymentResultNoticeReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" name="paymentResultNoticeDTOList" type="tns:paymentResultNoticeDTO"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="paymentResultNoticeDTO">
+<xs:sequence>
+<xs:element name="bizId" type="xs:string"/>
+<xs:element name="completeTime" type="xs:dateTime"/>
+<xs:element name="receiveTime" type="xs:dateTime"/>
+<xs:element name="retInfo" type="xs:string"/>
+<xs:element name="state" type="xs:string"/>
+<xs:element name="tradeTime" type="xs:dateTime"/>
+<xs:element name="transportId" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="customerInfoReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element minOccurs="0" name="creditCustomerInfoVO" type="tns:creditCustomerInfoVO"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="creditCustomerInfoVO">
+<xs:sequence>
+<xs:element minOccurs="0" name="bsTransport" type="tns:bsTransport"/>
+<xs:element minOccurs="0" name="intoPieces" type="tns:intoPieces"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgageRepaymentList" nillable="true" type="tns:mortgageRepayment"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorVOList" nillable="true" type="tns:mortgagorVO"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="bsTransport">
+<xs:sequence>
+<xs:element minOccurs="0" name="acceptMothRepay" type="xs:decimal"/>
+<xs:element minOccurs="0" name="applyMaxAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="applyMinAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="assignFlag" type="xs:string"/>
+<xs:element minOccurs="0" name="brandModel" type="xs:string"/>
+<xs:element minOccurs="0" name="bsApplyId" type="xs:long"/>
+<xs:element minOccurs="0" name="bsTransportId" type="xs:long"/>
+<xs:element minOccurs="0" name="contractTime" type="xs:string"/>
+<xs:element minOccurs="0" name="courseTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="destineTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="inspectionResult" type="xs:string"/>
+<xs:element minOccurs="0" name="intoPiecesId" type="xs:long"/>
+<xs:element minOccurs="0" name="isChuding" type="xs:string"/>
+<xs:element minOccurs="0" name="isRepeatApply" type="xs:string"/>
+<xs:element minOccurs="0" name="isYizhi" type="xs:string"/>
+<xs:element minOccurs="0" name="lenssonStartDate" type="xs:string"/>
+<xs:element minOccurs="0" name="loanCount" type="xs:int"/>
+<xs:element minOccurs="0" name="loanPlans" type="xs:int"/>
+<xs:element minOccurs="0" name="loanType" type="xs:string"/>
+<xs:element minOccurs="0" name="longRepaymentTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="moneySource" type="xs:string"/>
+<xs:element minOccurs="0" name="otherMoneySource" type="xs:string"/>
+<xs:element minOccurs="0" name="outletCode" type="xs:string"/>
+<xs:element minOccurs="0" name="outletId" type="xs:long"/>
+<xs:element minOccurs="0" name="outletName" type="xs:string"/>
+<xs:element minOccurs="0" name="overTime" type="xs:string"/>
+<xs:element minOccurs="0" name="overTimeStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="paidAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="passCondition" type="xs:string"/>
+<xs:element minOccurs="0" name="processNode" type="xs:string"/>
+<xs:element minOccurs="0" name="shortRepaymentTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="subject" type="xs:string"/>
+<xs:element minOccurs="0" name="sumTuitionFee" type="xs:decimal"/>
+<xs:element minOccurs="0" name="teamLeaderId" type="xs:long"/>
+<xs:element minOccurs="0" name="teamLeaderName" type="xs:string"/>
+<xs:element minOccurs="0" name="trainCampus" type="xs:string"/>
+<xs:element minOccurs="0" name="trainCode" type="xs:string"/>
+<xs:element minOccurs="0" name="trainId" type="xs:long"/>
+<xs:element minOccurs="0" name="trainName" type="xs:string"/>
+<xs:element minOccurs="0" name="trainTeacher" type="xs:string"/>
+<xs:element minOccurs="0" name="trainTeacherPhone" type="xs:string"/>
+<xs:element minOccurs="0" name="urgentLeve" type="xs:short"/>
+<xs:element minOccurs="0" name="verifyPageVesion" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="intoPieces">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyInstalments" type="xs:int"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="intoPiecesId" type="xs:long"/>
+<xs:element minOccurs="0" name="isExpress" type="xs:string"/>
+<xs:element minOccurs="0" name="isInterest" type="xs:string"/>
+<xs:element minOccurs="0" name="knownCeMethod" type="xs:string"/>
+<xs:element minOccurs="0" name="loanCategory" type="xs:short"/>
+<xs:element minOccurs="0" name="loanPurposeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="loanPurposeOne" type="xs:string"/>
+<xs:element minOccurs="0" name="loanPurposeTwo" type="xs:string"/>
+<xs:element minOccurs="0" name="loanType" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="overAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="productType" type="xs:string"/>
+<xs:element minOccurs="0" name="repaymentMode" type="xs:string"/>
+<xs:element minOccurs="0" name="sellUserId" type="xs:long"/>
+<xs:element minOccurs="0" name="sellUserName" type="xs:string"/>
+<xs:element minOccurs="0" name="serviceUserId" type="xs:long"/>
+<xs:element minOccurs="0" name="serviceUserName" type="xs:string"/>
+<xs:element minOccurs="0" name="submitDeptNo" type="xs:long"/>
+<xs:element minOccurs="0" name="systemSourceName" type="xs:string"/>
+<xs:element minOccurs="0" name="transportDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="transportId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgageRepayment">
+<xs:sequence>
+<xs:element minOccurs="0" name="borrowSort" type="xs:string"/>
+<xs:element minOccurs="0" name="bsTransportId" type="xs:long"/>
+<xs:element minOccurs="0" name="contractId" type="xs:long"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="decesionId" type="xs:long"/>
+<xs:element minOccurs="0" name="isPrepayment" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="prepaymentAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="prepaymentCost" type="xs:decimal"/>
+<xs:element minOccurs="0" name="repaymentDate" type="xs:string"/>
+<xs:element minOccurs="0" name="repaymentId" type="xs:long"/>
+<xs:element minOccurs="0" name="restPrincipal" type="xs:decimal"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorVO">
+<xs:sequence>
+<xs:element minOccurs="0" name="borrowerInfo" type="tns:borrowerInfo"/>
+<xs:element minOccurs="0" name="mortgagor" type="tns:mortgagor"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorApplyCorpList" nillable="true" type="tns:mortgagorApplyCorp"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorApplyHouseList" nillable="true" type="tns:mortgagorApplyHouse"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorBankList" nillable="true" type="tns:mortgagorBank"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorContactList" nillable="true" type="tns:mortgagorContact"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorCorporationList" nillable="true" type="tns:mortgagorCorporation"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorFixedAssetList" nillable="true" type="tns:mortgagorFixedAssets"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorInfoExtList" nillable="true" type="tns:mortgagorInfoExt"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorPersonaltyList" nillable="true" type="tns:mortgagorPersonalty"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorRelativesList" nillable="true" type="tns:mortgagorRelatives"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="mortgagorSalaryList" nillable="true" type="tns:mortgagorSalary"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="borrowerInfo">
+<xs:sequence>
+<xs:element minOccurs="0" name="birthday" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowerInfoId" type="xs:long"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="customerId" type="xs:long"/>
+<xs:element minOccurs="0" name="domicileAddr" type="xs:string"/>
+<xs:element minOccurs="0" name="domicileCity" type="xs:string"/>
+<xs:element minOccurs="0" name="domicileDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="domicileProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="email" type="xs:string"/>
+<xs:element minOccurs="0" name="formerName" type="xs:string"/>
+<xs:element minOccurs="0" name="gender" type="xs:string"/>
+<xs:element minOccurs="0" name="historyFlag" type="xs:short"/>
+<xs:element minOccurs="0" name="idNumber" type="xs:string"/>
+<xs:element minOccurs="0" name="idType" type="xs:string"/>
+<xs:element minOccurs="0" name="idValidityDate" type="xs:string"/>
+<xs:element minOccurs="0" name="imAccount" type="xs:string"/>
+<xs:element minOccurs="0" name="intoPiecesId" type="xs:long"/>
+<xs:element minOccurs="0" name="marriage" type="xs:string"/>
+<xs:element minOccurs="0" name="maxDiploma" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mobile" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorName" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorType" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="postCd1" type="xs:string"/>
+<xs:element minOccurs="0" name="postCd2" type="xs:string"/>
+<xs:element minOccurs="0" name="residentAddr" type="xs:string"/>
+<xs:element minOccurs="0" name="residentCity" type="xs:string"/>
+<xs:element minOccurs="0" name="residentDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="residentProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="residentTelAreacode" type="xs:string"/>
+<xs:element minOccurs="0" name="residentTelNumber" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagor">
+<xs:sequence>
+<xs:element minOccurs="0" name="annualIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="borrowerInfoId" type="xs:long"/>
+<xs:element minOccurs="0" name="borrowerType" type="xs:string"/>
+<xs:element minOccurs="0" name="businessRegNo" type="xs:string"/>
+<xs:element minOccurs="0" name="businessScope" type="xs:string"/>
+<xs:element minOccurs="0" name="companyAnnualProfit" type="xs:decimal"/>
+<xs:element minOccurs="0" name="companyHouseType" type="xs:string"/>
+<xs:element minOccurs="0" name="companyStartDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="creditCardLimit" type="xs:decimal"/>
+<xs:element minOccurs="0" name="creditCardSum" type="xs:decimal"/>
+<xs:element minOccurs="0" name="department" type="xs:string"/>
+<xs:element minOccurs="0" name="departmentTel" type="xs:string"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="domicileZipcode" type="xs:string"/>
+<xs:element minOccurs="0" name="grade" type="xs:string"/>
+<xs:element minOccurs="0" name="graduateDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="hasCar" type="xs:string"/>
+<xs:element minOccurs="0" name="hasChildren" type="xs:string"/>
+<xs:element minOccurs="0" name="hasSocialInsurance" type="xs:string"/>
+<xs:element minOccurs="0" name="house" type="xs:string"/>
+<xs:element minOccurs="0" name="houseCondition" type="xs:string"/>
+<xs:element minOccurs="0" name="houseConditionDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="inCityYears" type="xs:short"/>
+<xs:element minOccurs="0" name="incomeType" type="xs:string"/>
+<xs:element minOccurs="0" name="isReplaceReport" type="xs:string"/>
+<xs:element minOccurs="0" name="isReported" type="xs:string"/>
+<xs:element minOccurs="0" name="jobPosition" type="xs:string"/>
+<xs:element minOccurs="0" name="loanRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="loanTitle" type="xs:string"/>
+<xs:element minOccurs="0" name="major" type="xs:string"/>
+<xs:element minOccurs="0" name="marriageDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="mobile2" type="xs:string"/>
+<xs:element minOccurs="0" name="monthIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="monthOtherIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="monthOtherIncomeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="monthPay" type="xs:decimal"/>
+<xs:element minOccurs="0" name="monthlyOutlay" type="xs:decimal"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="orgAddress" type="xs:string"/>
+<xs:element minOccurs="0" name="orgCity" type="xs:string"/>
+<xs:element minOccurs="0" name="orgDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="orgName" type="xs:string"/>
+<xs:element minOccurs="0" name="orgProvice" type="xs:string"/>
+<xs:element minOccurs="0" name="orgTelArea" type="xs:string"/>
+<xs:element minOccurs="0" name="orgType" type="xs:string"/>
+<xs:element minOccurs="0" name="otherIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="provideForCount" type="xs:short"/>
+<xs:element minOccurs="0" name="querySeqId" type="xs:long"/>
+<xs:element minOccurs="0" name="recruitmentDate" type="xs:string"/>
+<xs:element minOccurs="0" name="rentalFee" type="xs:decimal"/>
+<xs:element minOccurs="0" name="roomCharge" type="xs:string"/>
+<xs:element minOccurs="0" name="salary" type="xs:decimal"/>
+<xs:element minOccurs="0" name="studentCardid" type="xs:string"/>
+<xs:element minOccurs="0" name="taxNo" type="xs:string"/>
+<xs:element minOccurs="0" name="title" type="xs:string"/>
+<xs:element minOccurs="0" name="userNickname" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorApplyCorp">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyCorpId" type="xs:long"/>
+<xs:element minOccurs="0" name="corpNature" type="xs:string"/>
+<xs:element minOccurs="0" name="corpNatureDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="corpRegistCapital" type="xs:decimal"/>
+<xs:element minOccurs="0" name="corpRegistDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="createDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="customerIdentType" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="shareProportion" type="xs:decimal"/>
+<xs:element minOccurs="0" name="transportId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorApplyHouse">
+<xs:sequence>
+<xs:element minOccurs="0" name="applyHouseId" type="xs:long"/>
+<xs:element minOccurs="0" name="buyHouseDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="createDate" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="houseAddr" type="xs:string"/>
+<xs:element minOccurs="0" name="houseCity" type="xs:string"/>
+<xs:element minOccurs="0" name="houseDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="houseOwnerType" type="xs:string"/>
+<xs:element minOccurs="0" name="houseOwnerTypeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="houseProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="houseType" type="xs:string"/>
+<xs:element minOccurs="0" name="houseTypeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="houseZipcode" type="xs:string"/>
+<xs:element minOccurs="0" name="isSameWithApplay" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="transportId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorBank">
+<xs:sequence>
+<xs:element minOccurs="0" name="accountBankCity" type="xs:string"/>
+<xs:element minOccurs="0" name="accountBankName" type="xs:string"/>
+<xs:element minOccurs="0" name="accountBankProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="bankCardNum" type="xs:string"/>
+<xs:element minOccurs="0" name="bankId" type="xs:string"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="mortgagorBankId" type="xs:long"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorContact">
+<xs:sequence>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="age" type="xs:int"/>
+<xs:element minOccurs="0" name="contactId" type="xs:long"/>
+<xs:element minOccurs="0" name="contentSourceType" type="xs:string"/>
+<xs:element minOccurs="0" name="contentType" type="xs:string"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="gender" type="xs:string"/>
+<xs:element minOccurs="0" name="investigationRepId" type="xs:long"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mobile" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="nm" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="organization" type="xs:string"/>
+<xs:element minOccurs="0" name="relationship" type="xs:string"/>
+<xs:element minOccurs="0" name="remark" type="xs:string"/>
+<xs:element minOccurs="0" name="seqNo" type="xs:int"/>
+<xs:element minOccurs="0" name="summaryDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="telAreaCode1" type="xs:string"/>
+<xs:element minOccurs="0" name="telDistNum2" type="xs:string"/>
+<xs:element minOccurs="0" name="telLoc" type="xs:string"/>
+<xs:element minOccurs="0" name="telNum1" type="xs:string"/>
+<xs:element minOccurs="0" name="telNum2" type="xs:string"/>
+<xs:element minOccurs="0" name="telRemark" type="xs:string"/>
+<xs:element minOccurs="0" name="telSource" type="xs:string"/>
+<xs:element minOccurs="0" name="telSourceDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="telphoneType" type="xs:string"/>
+<xs:element minOccurs="0" name="title" type="xs:string"/>
+<xs:element minOccurs="0" name="workReference" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorCorporation">
+<xs:sequence>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="annualSurveied" type="xs:string"/>
+<xs:element minOccurs="0" name="billType" type="xs:string"/>
+<xs:element minOccurs="0" name="contentType" type="xs:string"/>
+<xs:element minOccurs="0" name="corporationId" type="xs:long"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="customerIdentType" type="xs:string"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="establishDate" type="xs:string"/>
+<xs:element minOccurs="0" name="issueDate" type="xs:string"/>
+<xs:element minOccurs="0" name="landlord" type="xs:string"/>
+<xs:element minOccurs="0" name="legalRepresentative" type="xs:string"/>
+<xs:element minOccurs="0" name="licenceType" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="obligee" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="orgNature" type="xs:string"/>
+<xs:element minOccurs="0" name="orgNatureDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="orgType" type="xs:string"/>
+<xs:element minOccurs="0" name="organizationNm" type="xs:string"/>
+<xs:element minOccurs="0" name="paidDate" type="xs:string"/>
+<xs:element minOccurs="0" name="portion" type="xs:decimal"/>
+<xs:element minOccurs="0" name="registeredCapital" type="xs:decimal"/>
+<xs:element minOccurs="0" name="relationship" type="xs:string"/>
+<xs:element minOccurs="0" name="rentTerm" type="xs:string"/>
+<xs:element minOccurs="0" name="rentTermEnd" type="xs:string"/>
+<xs:element minOccurs="0" name="rental" type="xs:decimal"/>
+<xs:element minOccurs="0" name="residentAddr" type="xs:string"/>
+<xs:element minOccurs="0" name="secondDocType" type="xs:string"/>
+<xs:element minOccurs="0" name="tenantry" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorFixedAssets">
+<xs:sequence>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="addressCity" type="xs:string"/>
+<xs:element minOccurs="0" name="addressDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="addressProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="addressZipcode" type="xs:string"/>
+<xs:element minOccurs="0" name="area" type="xs:string"/>
+<xs:element minOccurs="0" name="assestType" type="xs:string"/>
+<xs:element minOccurs="0" name="brand" type="xs:string"/>
+<xs:element minOccurs="0" name="chargeAgainstAssets" type="xs:decimal"/>
+<xs:element minOccurs="0" name="chargeAgainstLiabilities" type="xs:decimal"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="fixedAssetsId" type="xs:long"/>
+<xs:element minOccurs="0" name="house" type="xs:string"/>
+<xs:element minOccurs="0" name="houseOwnerTypeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="houseTypeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="isPledge" type="xs:string"/>
+<xs:element minOccurs="0" name="jointOwners" type="xs:int"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="propertyDate" type="xs:string"/>
+<xs:element minOccurs="0" name="proportion" type="xs:decimal"/>
+<xs:element minOccurs="0" name="relatedLoan" type="xs:string"/>
+<xs:element minOccurs="0" name="relationship" type="xs:string"/>
+<xs:element minOccurs="0" name="relationshipTwo" type="xs:string"/>
+<xs:element minOccurs="0" name="rootCharacter" type="xs:string"/>
+<xs:element minOccurs="0" name="rootType" type="xs:string"/>
+<xs:element minOccurs="0" name="secondPrice" type="xs:decimal"/>
+<xs:element minOccurs="0" name="seqNo" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorInfoExt">
+<xs:sequence>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="addressDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="annualIncome" type="xs:string"/>
+<xs:element minOccurs="0" name="applyAddressIsIdentity" type="xs:string"/>
+<xs:element minOccurs="0" name="birthDate" type="xs:string"/>
+<xs:element minOccurs="0" name="borrowSort" type="xs:string"/>
+<xs:element minOccurs="0" name="career" type="xs:string"/>
+<xs:element minOccurs="0" name="childrenStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="city" type="xs:string"/>
+<xs:element minOccurs="0" name="cohabitRela" type="xs:string"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="creditCardLimit" type="xs:string"/>
+<xs:element minOccurs="0" name="desc16a1" type="xs:string"/>
+<xs:element minOccurs="0" name="descRemark" type="xs:string"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="description1016" type="xs:string"/>
+<xs:element minOccurs="0" name="distNum" type="xs:string"/>
+<xs:element minOccurs="0" name="district" type="xs:string"/>
+<xs:element minOccurs="0" name="gender" type="xs:string"/>
+<xs:element minOccurs="0" name="hasHousingLoan" type="xs:string"/>
+<xs:element minOccurs="0" name="homeAddress" type="xs:string"/>
+<xs:element minOccurs="0" name="homeCity" type="xs:string"/>
+<xs:element minOccurs="0" name="homeDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="homePhoneConnected" type="xs:string"/>
+<xs:element minOccurs="0" name="homeProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="houseStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="industryCode" type="xs:string"/>
+<xs:element minOccurs="0" name="industryCode1" type="xs:string"/>
+<xs:element minOccurs="0" name="industryCode2" type="xs:string"/>
+<xs:element minOccurs="0" name="industryCode3" type="xs:string"/>
+<xs:element minOccurs="0" name="infoExtId" type="xs:long"/>
+<xs:element minOccurs="0" name="isCeMortgagor" type="xs:string"/>
+<xs:element minOccurs="0" name="isCompliance" type="xs:string"/>
+<xs:element minOccurs="0" name="isMortAnswer" type="xs:string"/>
+<xs:element minOccurs="0" name="isNative" type="xs:string"/>
+<xs:element minOccurs="0" name="job" type="xs:string"/>
+<xs:element minOccurs="0" name="livingStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="loanAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="loanAmountMax" type="xs:decimal"/>
+<xs:element minOccurs="0" name="mainBusiness" type="xs:string"/>
+<xs:element minOccurs="0" name="marriageStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="mateHasHouse" type="xs:string"/>
+<xs:element minOccurs="0" name="maxDiploma" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mobile" type="xs:string"/>
+<xs:element minOccurs="0" name="monthExpend" type="xs:decimal"/>
+<xs:element minOccurs="0" name="monthRent" type="xs:decimal"/>
+<xs:element minOccurs="0" name="monthRepayment" type="xs:decimal"/>
+<xs:element minOccurs="0" name="mortDept" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="nowAddressIsIdentity" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="orgName" type="xs:string"/>
+<xs:element minOccurs="0" name="orgTel" type="xs:string"/>
+<xs:element minOccurs="0" name="orgTelArea" type="xs:string"/>
+<xs:element minOccurs="0" name="ownerName" type="xs:string"/>
+<xs:element minOccurs="0" name="ownerRelationship" type="xs:string"/>
+<xs:element minOccurs="0" name="periodization" type="xs:string"/>
+<xs:element minOccurs="0" name="phone" type="xs:string"/>
+<xs:element minOccurs="0" name="privAddress" type="xs:string"/>
+<xs:element minOccurs="0" name="privCity" type="xs:string"/>
+<xs:element minOccurs="0" name="privDistrict" type="xs:string"/>
+<xs:element minOccurs="0" name="privOrg" type="xs:string"/>
+<xs:element minOccurs="0" name="privProvince" type="xs:string"/>
+<xs:element minOccurs="0" name="privSalary" type="xs:decimal"/>
+<xs:element minOccurs="0" name="privWorkYears" type="xs:int"/>
+<xs:element minOccurs="0" name="professionalTitle" type="xs:string"/>
+<xs:element minOccurs="0" name="province" type="xs:string"/>
+<xs:element minOccurs="0" name="recordFiles" type="xs:string"/>
+<xs:element minOccurs="0" name="relationship" type="xs:string"/>
+<xs:element minOccurs="0" name="rentBeginDate" type="xs:string"/>
+<xs:element minOccurs="0" name="rentEndDate" type="xs:string"/>
+<xs:element minOccurs="0" name="rentMethod" type="xs:string"/>
+<xs:element minOccurs="0" name="rootType" type="xs:string"/>
+<xs:element minOccurs="0" name="scale" type="xs:string"/>
+<xs:element minOccurs="0" name="telDistNum" type="xs:string"/>
+<xs:element minOccurs="0" name="telNum" type="xs:string"/>
+<xs:element minOccurs="0" name="totalHouse" type="xs:int"/>
+<xs:element minOccurs="0" name="vocationCode" type="xs:string"/>
+<xs:element minOccurs="0" name="whenAnswer" type="xs:string"/>
+<xs:element minOccurs="0" name="workYear" type="xs:string"/>
+<xs:element minOccurs="0" name="yrdApplyResource1" type="xs:string"/>
+<xs:element minOccurs="0" name="yrdApplyResource2" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdAcceptCheck" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdAcceptCheckDescription" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdFamilySupport" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdGraduationData" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdPeopleType" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdPlanCheck" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdPlanCheckDescription" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdSchoolName" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdWorkingExperience" type="xs:string"/>
+<xs:element minOccurs="0" name="yxdWorkingExperienceDesc" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorPersonalty">
+<xs:sequence>
+<xs:element minOccurs="0" name="assest" type="xs:decimal"/>
+<xs:element minOccurs="0" name="assestCate" type="xs:string"/>
+<xs:element minOccurs="0" name="assestType" type="xs:string"/>
+<xs:element minOccurs="0" name="chargeAgainstAssets" type="xs:decimal"/>
+<xs:element minOccurs="0" name="conversionRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="isPledge" type="xs:string"/>
+<xs:element minOccurs="0" name="isVerification" type="xs:string"/>
+<xs:element minOccurs="0" name="maturityDate" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="personaltyId" type="xs:long"/>
+<xs:element minOccurs="0" name="pledgeAmount" type="xs:decimal"/>
+<xs:element minOccurs="0" name="pledgeExpireDate" type="xs:string"/>
+<xs:element minOccurs="0" name="providedContent" type="xs:string"/>
+<xs:element minOccurs="0" name="seqNo" type="xs:int"/>
+<xs:element minOccurs="0" name="totalAmount" type="xs:decimal"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorRelatives">
+<xs:sequence>
+<xs:element minOccurs="0" name="age" type="xs:int"/>
+<xs:element minOccurs="0" name="alimony" type="xs:decimal"/>
+<xs:element minOccurs="0" name="amount" type="xs:int"/>
+<xs:element minOccurs="0" name="contentType" type="xs:string"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="generalDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="hasHouseProperty" type="xs:string"/>
+<xs:element minOccurs="0" name="hasHousingLoan" type="xs:string"/>
+<xs:element minOccurs="0" name="housePropertyCount" type="xs:string"/>
+<xs:element minOccurs="0" name="housingLoanType" type="xs:string"/>
+<xs:element minOccurs="0" name="income" type="xs:decimal"/>
+<xs:element minOccurs="0" name="isAware" type="xs:string"/>
+<xs:element minOccurs="0" name="isHealth" type="xs:string"/>
+<xs:element minOccurs="0" name="isPayAlimony" type="xs:string"/>
+<xs:element minOccurs="0" name="isPresent" type="xs:string"/>
+<xs:element minOccurs="0" name="isSameCity" type="xs:string"/>
+<xs:element minOccurs="0" name="jobStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="jobType" type="xs:string"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="mortgagorRelativesId" type="xs:long"/>
+<xs:element minOccurs="0" name="nm" type="xs:string"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="operator" type="xs:long"/>
+<xs:element minOccurs="0" name="organization" type="xs:string"/>
+<xs:element minOccurs="0" name="organizationTel" type="xs:string"/>
+<xs:element minOccurs="0" name="relativeDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="repayment" type="xs:decimal"/>
+<xs:element minOccurs="0" name="telNum" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="mortgagorSalary">
+<xs:sequence>
+<xs:element minOccurs="0" name="bigGapReasn" type="xs:string"/>
+<xs:element minOccurs="0" name="cashFlowTerm" type="xs:int"/>
+<xs:element minOccurs="0" name="cashFlowType" type="xs:string"/>
+<xs:element minOccurs="0" name="consumptionHabits" type="xs:string"/>
+<xs:element minOccurs="0" name="conversionRate" type="xs:decimal"/>
+<xs:element minOccurs="0" name="createDate" type="xs:string"/>
+<xs:element minOccurs="0" name="creator" type="xs:long"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="endBalance" type="xs:decimal"/>
+<xs:element minOccurs="0" name="isavglastestmonth" type="xs:string"/>
+<xs:element minOccurs="0" name="isavgn1" type="xs:string"/>
+<xs:element minOccurs="0" name="isavgn2" type="xs:string"/>
+<xs:element minOccurs="0" name="isavgn3" type="xs:string"/>
+<xs:element minOccurs="0" name="isavgn4" type="xs:string"/>
+<xs:element minOccurs="0" name="isavgn5" type="xs:string"/>
+<xs:element minOccurs="0" name="issuedBranch" type="xs:string"/>
+<xs:element minOccurs="0" name="issuedDate" type="xs:string"/>
+<xs:element minOccurs="0" name="latestMonthIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="memo" type="xs:string"/>
+<xs:element minOccurs="0" name="monthIncome" type="xs:decimal"/>
+<xs:element minOccurs="0" name="mortgagorId" type="xs:long"/>
+<xs:element minOccurs="0" name="mortgagorSalaryId" type="xs:long"/>
+<xs:element minOccurs="0" name="n1" type="xs:decimal"/>
+<xs:element minOccurs="0" name="n2" type="xs:decimal"/>
+<xs:element minOccurs="0" name="n3" type="xs:decimal"/>
+<xs:element minOccurs="0" name="n4" type="xs:decimal"/>
+<xs:element minOccurs="0" name="n5" type="xs:decimal"/>
+<xs:element minOccurs="0" name="operDate" type="xs:string"/>
+<xs:element minOccurs="0" name="payrollForm" type="xs:string"/>
+<xs:element minOccurs="0" name="payrollFormDesc" type="xs:string"/>
+<xs:element minOccurs="0" name="seqNo" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="creditClosingNoticeReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" name="creditClosingNoticeDTOList" type="tns:creditClosingNoticeDTO"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="creditClosingNoticeDTO">
+<xs:sequence>
+<xs:element name="closingDate" type="xs:dateTime"/>
+<xs:element name="isPrepayment" type="xs:boolean"/>
+<xs:element name="transportId" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="originalStatusNoticeReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element minOccurs="0" name="auditOriginalInfo" type="tns:auditOriginalInfo"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="auditOriginalInfo">
+<xs:sequence>
+<xs:element minOccurs="0" name="confirmDate" type="xs:dateTime"/>
+<xs:element name="pass" type="xs:boolean"/>
+<xs:element minOccurs="0" name="retInfo" type="xs:string"/>
+<xs:element minOccurs="0" name="transportId" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="productSeriesReq">
+<xs:complexContent>
+<xs:extension base="tns:baseRequestHead">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="productSeriesList" nillable="true" type="tns:productSeries"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="productSeries">
+<xs:sequence>
+<xs:element minOccurs="0" name="createTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="creator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="displayName" type="xs:string"/>
+<xs:element minOccurs="0" name="exchangeCycle" type="xs:long"/>
+<xs:element minOccurs="0" name="exchangeTerm" type="xs:long"/>
+<xs:element minOccurs="0" name="iconClass" type="xs:string"/>
+<xs:element minOccurs="0" name="isCircle" type="xs:string"/>
+<xs:element minOccurs="0" name="isReturn" type="xs:string"/>
+<xs:element minOccurs="0" name="modifyTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="operator" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="organName" type="xs:string"/>
+<xs:element minOccurs="0" name="payRule" type="xs:string"/>
+<xs:element minOccurs="0" name="productId" type="xs:decimal"/>
+<xs:element minOccurs="0" name="productName" type="xs:string"/>
+<xs:element minOccurs="0" name="productTerm" type="xs:long"/>
+<xs:element minOccurs="0" name="remark" type="xs:string"/>
+<xs:element minOccurs="0" name="returnRule" type="xs:string"/>
+<xs:element minOccurs="0" name="sort" type="xs:long"/>
+<xs:element minOccurs="0" name="state" type="xs:string"/>
+<xs:element minOccurs="0" name="sysStatus" type="xs:string"/>
+<xs:element minOccurs="0" name="verifyOper" type="xs:long"/>
+<xs:element minOccurs="0" name="verifyRemark" type="xs:string"/>
+<xs:element minOccurs="0" name="verifyTime" type="xs:dateTime"/>
+<xs:element minOccurs="0" name="version" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrgAMSContractConfirmNoticeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:contractConfirmNoticeRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CreditClosingNotice">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:creditClosingNoticeReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="PlanMatchingReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:trustPlanReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrganMatchingReqResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:trustOrganRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="PlanMatchingReqResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:trustPlanRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CreditPaymentResultNotice">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:paymentResultNoticeReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ProductMatchingReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:productSeriesReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CreditCustomerInfoReq">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:customerInfoReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrgAMSContractConfirmNotice">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:contractConfirmNoticeReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OriginalStatusNotice">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:originalStatusNoticeReq"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CreditPaymentResultNoticeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:paymentResultNoticeRes"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ProductMatchingReqResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:productSeriesRes"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="synBorrowContract">
+    <wsdl:part element="tns:synBorrowContract" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="synBatchBorrowContractResponse">
+    <wsdl:part element="tns:synBatchBorrowContractResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="synBatchBorrowContract">
+    <wsdl:part element="tns:synBatchBorrowContract" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="synBorrowContractState">
+    <wsdl:part element="tns:synBorrowContractState" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="synBorrowContractStateResponse">
+    <wsdl:part element="tns:synBorrowContractStateResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="synBorrowContractResponse">
+    <wsdl:part element="tns:synBorrowContractResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ICPWebService">
+    <wsdl:operation name="synBatchBorrowContract">
+      <wsdl:input message="tns:synBatchBorrowContract" name="synBatchBorrowContract">
+    </wsdl:input>
+      <wsdl:output message="tns:synBatchBorrowContractResponse" name="synBatchBorrowContractResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="synBorrowContract">
+      <wsdl:input message="tns:synBorrowContract" name="synBorrowContract">
+    </wsdl:input>
+      <wsdl:output message="tns:synBorrowContractResponse" name="synBorrowContractResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="synBorrowContractState">
+      <wsdl:input message="tns:synBorrowContractState" name="synBorrowContractState">
+    </wsdl:input>
+      <wsdl:output message="tns:synBorrowContractStateResponse" name="synBorrowContractStateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ICPWebServiceServiceSoapBinding" type="tns:ICPWebService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="synBatchBorrowContract">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="synBatchBorrowContract">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="synBatchBorrowContractResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="synBorrowContract">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="synBorrowContract">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="synBorrowContractResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="synBorrowContractState">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="synBorrowContractState">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="synBorrowContractStateResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ICPWebServiceService">
+    <wsdl:port binding="tns:ICPWebServiceServiceSoapBinding" name="ICPWebServicePort">
+      <soap:address location="http://10.100.132.215:8080/orgams/ws//ICPWS"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

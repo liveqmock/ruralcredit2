@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="creditCoBOrrower">
+    <typeAlias alias="creditCoBOrrowerDomain" type="com.creditease.rc.domain.CreditCoBorrower" />
+    
+    <!-- 根据借款服务申请ID查询共借人信息 -->
+    <select id="queryCoBOrrowerInfo" parameterClass="int" resultClass="creditCoBOrrowerDomain">
+    	select t.coborrower_id as coBorrowerId,
+       t.borrower_service_app_id as borrowerServiceAppId,
+       t.age as age,
+       t.name as name,
+       t.telphone as telphone,
+       t.borrowerre_rationship as borrowerreRationship,
+       t.work_unit as workUnit,
+       t.year_income as yearIncome,
+        t.education as education,
+        t.gender as gender,
+        t.profession as profession,
+        (select c.code_value from rl_codetable c where c.section='profession' and t.profession=c.code_key ) as professionView ,
+        t.idnumber as idNumber from Rl_Credit_Coborrower t where t.borrower_service_app_id=#borrowerServiceAppId#
+    </select>
+	<delete id="creditCoBOrrower_truncate" parameterClass="creditCoBOrrowerDomain">
+		     truncate table rl_overdue_summary
+    </delete>
+	<insert id="creditCoBOrrower_insert" parameterClass="creditCoBOrrowerDomain">
+		<selectKey resultClass="java.lang.Long" keyProperty="coBorrowerId">
+			select SEQ_BASIC_INFO.NEXTVAL from dual
+        </selectKey>
+        insert into rl_credit_coborrower
+        (coborrower_id,BORROWER_SERVICE_APP_ID,NAME,GENDER,AGE,TELPHONE,BORROWERRE_RATIONSHIP,WORK_UNIT,YEAR_INCOME,EDUCATION,
+        profession,PROFESSION_DETAIL,SEQ,IDNUMBER)
+        values (#coBorrowerId#, #borrowerServiceAppId#, #name#,#gender#, #age#,
+        #telphone#, #borrowerreRationship#,
+        #workUnit#, #yearIncome#, #education#,#profession#,#professionDetail#,#seq#,#idNumber#)
+    </insert>
+    <select id="queryCreditCoBorrowerInfoByBorrowerServiceAppId" parameterClass="java.lang.String"    resultClass="creditCoBOrrowerDomain">
+        select cc.coborrower_id as coBorrowerId,
+           cc.borrower_service_app_id as borrowerServiceAppId,
+           cc.age as age,
+           cc.telphone as telphone,
+           cc.borrowerre_rationship as borrowerreRationship,
+           cc.work_unit as workUnit,
+           cc.year_income as yearIncome,
+           cc.education as education,
+           cc.name as name,
+           cc.gender as gender,
+           cc.profession as profession,
+           cc.profession_detail as professionDetail,
+           cc.idnumber as idNumber,
+           cc.seq     as seq ,
+            ct.code_value  borrowerreRationshipView,
+           ct1.code_value professionView
+         from rl_credit_coborrower cc
+          left join rl_codetable ct
+                  on (ct.code_key = cc.borrowerre_rationship and
+                     ct.section = 'borrowerreRationship')
+                left join rl_codetable ct1
+                  on (ct1.code_key = cc.profession and ct1.section = 'profession')
+        where cc.borrower_service_app_id = #borrowerServiceAppId#
+    </select>
+    <update id="updateCreditCoBorrowerInfoByBorrowerServiceAppId" parameterClass="creditCoBOrrowerDomain"  >
+        update rl_credit_coborrower cc
+        <dynamic prepend="SET">
+            <isNotEmpty prepend="," property="age">
+                cc.age = #age#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="telphone">
+                cc.telphone = #telphone#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="borrowerreRationship">
+                cc.borrowerre_rationship = #borrowerreRationship#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="workUnit">
+                cc.work_unit =#workUnit#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="yearIncome">
+                cc.year_income = #yearIncome#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="education">
+                cc.education = #education#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="name">
+                cc.name = #name#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="gender">
+                cc.gender = #gender#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="profession">
+                cc.profession = #profession#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="professionDetail">
+                cc.profession_detail = #professionDetail#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="idNumber">
+                cc.idnumber = #idNumber#
+            </isNotEmpty>
+            <isNotEmpty prepend="," property="seq">
+                cc.seq      = #seq#
+            </isNotEmpty>
+        </dynamic>
+        WHERE
+        cc.borrower_service_app_id = #borrowerServiceAppId#
+    </update>
+</sqlMap>

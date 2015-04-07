@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ACCOUNTINFO">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="accountInfo" type="com.creditease.rc.domain.AccountInfo" />
+	<typeAlias alias="accountInfoVo" type="com.creditease.rc.vo.AccountInfoVo" />
+	<typeAlias alias="accountInfoVo2" type="com.creditease.rc.vo.AccountInfoVo2ICP" />
+	<resultMap class="com.creditease.rc.domain.AccountInfo" id="accountInfoMap">
+		<result property="accountInfoId" column="ACCOUNT_INFO_ID" jdbcType="NUMBER" />
+		<result property="branchName" column="BRANCH_NAME" jdbcType="VARCHAR" />
+		<result property="bankNum" column="BANK_NUM" jdbcType="VARCHAR" />
+		<result property="bankRank" column="BANK_RANK_NAME" jdbcType="VARCHAR" />
+		<result property="bankPrefectureNum" column="BANK_PREFECTURE_NUM" jdbcType="CHAR" />
+		<result property="bankName" column="BANK_NAME" jdbcType="VARCHAR" />
+		<result property="accountName" column="ACCOUNT_NAME" jdbcType="VARCHAR" />
+		<result property="account" column="ACCOUNT" jdbcType="VARCHAR" />
+		<result property="onUsed" column="ON_USED" jdbcType="CHAR" />
+		<result property="cardFlag" column="CARD_FLAG" jdbcType="VARCHAR" />
+		<result property="mobilephone" column="MOBILEPHONE" jdbcType="CHAR" />
+		<result property="useType" column="USE_TYPE" jdbcType="CHAR" />
+		<result property="payWay" column="PAY_WAY" jdbcType="VARCHAR" />
+		<result property="payBranchno" column="PAY_BRANCHNO" jdbcType="VARCHAR" />
+		<result property="credentialsNumber" column="CREDENTIALS_NUMBER" jdbcType="VARCHAR" />
+		<result property="provinceId" column="PROVINCE_ID" jdbcType="NUMBER" />
+		<result property="cityId" column="CITY_ID" jdbcType="NUMBER" />
+		<result property="districtId" column="DISTRICT_ID" jdbcType="NUMBER" />
+		<result property="accountType" column="ACCOUNT_TYPE" jdbcType="NUMBER" />
+		<result property="borrowerName" column="BORROWER_NAME" jdbcType="VARCHAR" />
+		<result property="borrowerCredentialsNumber" column="BORROWER_CREDENTIALS_NUMBER" jdbcType="VARCHAR" />
+
+		<result property="departmentId" column="DEPARTMENT_ID" jdbcType="VARCHAR" />
+
+		<result property="operaterName" column="OPERATER_NAME" jdbcType="VARCHAR" />
+
+		<result property="operaterId"  column="OPERATER_ID" jdbcType="VARCHAR" />
+
+		<result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP" />
+
+		<result property="updateTime" column="UPDATE_TIME" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="">
+
+	</sql>
+	<!-- 如果该条信息存在就更新，如果不存在就插入 -->
+	<update id="insertOrUpdate" parameterClass="accountInfoVo2">
+		merge into RL_ACCOUNT_INFO a
+		using (select count(x.account_info_id) cnt from rl_credit_application x where  x.creditapplication_id=#creditapplicationId#) b
+    on (b.cnt !=0)
+    when matched then
+      <![CDATA[
+			UPDATE 
+						
+			]]>
+		<dynamic prepend="SET">
+			<isNotEmpty prepend="," property="accountName">
+				a.ACCOUNT_NAME=#accountName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="bankNum">
+				a.BANK_NUM=#bankNum:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="bankRank">
+				a.BANK_RANK_NAME=#bankRank:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="bankPrefectureNum">
+				a.BANK_PREFECTURE_NUM=#bankPrefectureNum:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="bankName">
+				a.BANK_NAME=#bankName:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="branchName">
+				a.BRANCH_NAME=#branchName:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="account">
+				a.ACCOUNT=#account:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="onUsed">
+				a.ON_USED=#onUsed:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="cardFlag">
+				a.CARD_FLAG=#cardFlag:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="mobilephone">
+				a.MOBILEPHONE=#mobilephone:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="useType">
+				a.USE_TYPE=#useType:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="payWay">
+				a.PAY_WAY=#payWay:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="payBranchno">
+				a.PAY_BRANCHNO=#payBranchno:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="credentialsNumber">
+				a.CREDENTIALS_NUMBER=#credentialsNumber:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="provinceId">
+				a.PROVINCE_ID=#provinceId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="cityId">
+				a.CITY_ID=#cityId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="districtId">
+				a.DISTRICT_ID=#districtId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="accountType">
+				a.ACCOUNT_TYPE=#accountType:CHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentId">
+				a.DEPARTMENT_ID = #departmentId#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="operaterName">
+				a.OPERATER_NAME = #operaterName#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="operaterId">
+				a.OPERATER_ID = #operaterId#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="updateTime">
+				a.UPDATE_TIME = #updateTime:TIMESTAMP#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="borrowerName">
+				a.BORROWER_NAME = #borrowerName#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="borrowerCredentialsNumber">
+				a.BORROWER_CREDENTIALS_NUMBER = #borrowerCredentialsNumber#
+				</isNotEmpty>
+		</dynamic>
+			<![CDATA[
+							
+			WHERE a.ACCOUNT_INFO_ID=(select t.account_info_id from RL_CREDIT_APPLICATION t where t.creditapplication_id=#creditapplicationId#)
+		]]>when not matched then
+     
+       <![CDATA[insert (
+						ACCOUNT_INFO_ID,
+						BRANCH_NAME,
+						BANK_NUM,
+						BANK_RANK_NAME,
+						BANK_PREFECTURE_NUM,
+						BANK_NAME,
+						ACCOUNT_NAME,
+						ACCOUNT,
+						ON_USED,
+						CARD_FLAG,
+						MOBILEPHONE,
+						USE_TYPE,
+						PAY_WAY,
+						PAY_BRANCHNO,
+						CREDENTIALS_NUMBER,
+						PROVINCE_ID,
+						CITY_ID,
+						DISTRICT_ID,
+						ACCOUNT_TYPE,
+						DEPARTMENT_ID,
+						OPERATER_NAME,
+						OPERATER_ID,
+						CREATE_TIME,
+						BORROWER_NAME,
+						BORROWER_CREDENTIALS_NUMBER,
+						UPDATE_TIME
+					)
+					VALUES(
+					]]>
+						
+						SEQ_BASIC_INFO.NEXTVAL,
+						#branchName:VARCHAR#,
+						#bankNum:VARCHAR#,
+						#bankRank:VARCHAR#,
+						#bankPrefectureNum:VARCHAR#,
+						#bankName:VARCHAR#,
+						#accountName:VARCHAR#,
+						#account:VARCHAR#,
+						#onUsed:VARCHAR#,
+						#cardFlag:VARCHAR#,
+						#mobilephone:VARCHAR#,
+						#useType:VARCHAR#,
+						#payWay:VARCHAR#,
+						#payBranchno:VARCHAR#,
+						#credentialsNumber:VARCHAR#,
+						#provinceId:NUMBER#,
+						#cityId:NUMBER#,
+						#districtId:NUMBER#,
+						#accountType:CHAR#,
+						#departmentId#,
+						#operaterName#,
+						#operaterId#,
+						#createTime:TIMESTAMP#,
+						#borrowerName#,
+						#borrowerCredentialsNumber#,
+						#updateTime:TIMESTAMP#
+					)
+		
+	
+	
+		
+	
+	</update>
+	
+	<insert id="insert" parameterClass="accountInfo">
+		<selectKey type="pre" keyProperty="accountInfoId" resultClass="java.lang.Integer">
+			select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+		</selectKey>
+		<![CDATA[
+			INSERT INTO RL_ACCOUNT_INFO
+					(
+						ACCOUNT_INFO_ID,
+						BRANCH_NAME,
+						BANK_NUM,
+						BANK_RANK_NAME,
+						BANK_PREFECTURE_NUM,
+						BANK_NAME,
+						ACCOUNT_NAME,
+						ACCOUNT,
+						ON_USED,
+						CARD_FLAG,
+						MOBILEPHONE,
+						USE_TYPE,
+						PAY_WAY,
+						PAY_BRANCHNO,
+						CREDENTIALS_NUMBER,
+						PROVINCE_ID,
+						CITY_ID,
+						DISTRICT_ID,
+						ACCOUNT_TYPE,
+						DEPARTMENT_ID,
+						OPERATER_NAME,
+						OPERATER_ID,
+						CREATE_TIME,
+						BORROWER_NAME,
+						BORROWER_CREDENTIALS_NUMBER,
+						UPDATE_TIME
+					)
+	
+					VALUES(
+						#accountInfoId:NUMBER#,
+						#branchName:VARCHAR#,
+						#bankNum:VARCHAR#,
+						#bankRank:VARCHAR#,
+						#bankPrefectureNum:VARCHAR#,
+						#bankName:VARCHAR#,
+						#accountName:VARCHAR#,
+						#account:VARCHAR#,
+						#onUsed:VARCHAR#,
+						#cardFlag:VARCHAR#,
+						#mobilephone:VARCHAR#,
+						#useType:VARCHAR#,
+						#payWay:VARCHAR#,
+						#payBranchno:VARCHAR#,
+						#credentialsNumber:VARCHAR#,
+						#provinceId:NUMBER#,
+						#cityId:NUMBER#,
+						#districtId:NUMBER#,
+						#accountType:CHAR#,
+						#departmentId#,
+						#operaterName#,
+						#operaterId#,
+						#createTime:TIMESTAMP#,
+						#borrowerName#,
+						#borrowerCredentialsNumber#,
+						#updateTime:TIMESTAMP#
+					)
+		]]>
+	</insert>
+
+	<select id="selectByPage" parameterClass="accountInfo" resultClass="accountInfo">
+		<![CDATA[
+			SELECT 
+				ACCOUNT_INFO_ID			as		accountInfoId,
+				BRANCH_NAME			as		branchName,
+				BANK_NUM			as		bankNum,
+				(select c.code_value from  rl_codetable c where c.section='bankNum' and c.code_key = RL_ACCOUNT_INFO.BANK_NUM)		as		bankRank,
+				BANK_PREFECTURE_NUM			as		bankPrefectureNum,
+				BANK_NAME		as		bankName,
+				ACCOUNT_NAME			as		accountName,
+				ACCOUNT		as		account,
+				ON_USED			as		onUsed,
+				CARD_FLAG			as		cardFlag,
+				MOBILEPHONE			as		mobilephone,
+				USE_TYPE			as		useType,
+				PAY_WAY			as		payWay,
+				PAY_BRANCHNO			as		payBranchno,
+				CREDENTIALS_NUMBER			as		credentialsNumber,
+				PROVINCE_ID			as		provinceId,
+				CITY_ID			as		cityId,
+				DISTRICT_ID			as		districtId,
+				ACCOUNT_TYPE			as		accountType,
+				DEPARTMENT_ID			as		departmentId,
+				OPERATER_NAME			as		operaterName,
+				OPERATER_ID			as		operaterId,
+				CREATE_TIME			as		createTime,
+				BORROWER_NAME			as		borrowerName,
+				BORROWER_CREDENTIALS_NUMBER			as		borrowerCredentialsNumber,
+				UPDATE_TIME			as		updateTime
+
+				
+			 FROM RL_ACCOUNT_INFO
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="provinceId" prepend="AND">
+				PROVINCE_ID = #provinceId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="cityId" prepend="AND">
+				CITY_ID = #cityId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="districtId" prepend="AND">
+				DISTRICT_ID = #districtId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="branchName" prepend="AND">
+				BRANCH_NAME LIKE '%$branchName$%'
+			</isNotEmpty>
+            <isNotEmpty property="departmentId" prepend="AND">
+                DEPARTMENT_ID IN ($departmentId$)
+			</isNotEmpty>
+			<isNotNull property="accountType" prepend="AND">
+				ACCOUNT_TYPE = #accountType# 
+			</isNotNull>
+			<isNotEmpty prepend="AND" property="borrowerName">
+				BORROWER_NAME like '%$borrowerName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="borrowerCredentialsNumber">
+				upper(BORROWER_CREDENTIALS_NUMBER) like upper('%$borrowerCredentialsNumber$%')
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="accountName">
+				ACCOUNT_NAME like '%$accountName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="account">
+				ACCOUNT like '%$account$%'
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="credentialsNumber">
+				upper(CREDENTIALS_NUMBER) like upper('%$credentialsNumber$%')
+				</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			ORDER BY ACCOUNT_INFO_ID DESC
+		]]>
+	</select>
+	<select id="count" parameterClass="accountInfo" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM RL_ACCOUNT_INFO
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="provinceId" prepend="AND">
+				PROVINCE_ID = #provinceId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="cityId" prepend="AND">
+				CITY_ID = #cityId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="districtId" prepend="AND">
+				DISTRICT_ID = #districtId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="branchName" prepend="AND">
+				BRANCH_NAME LIKE '%$branchName$%'
+			</isNotEmpty>
+            <isNotEmpty property="departmentId" prepend="AND">
+                DEPARTMENT_ID IN ($departmentId$)
+            </isNotEmpty>
+			<isNotNull property="accountType" prepend="AND">
+				ACCOUNT_TYPE = #accountType# 
+		</isNotNull>
+			<isNotEmpty prepend="AND" property="borrowerName">
+				BORROWER_NAME like '%$borrowerName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="borrowerCredentialsNumber">
+				upper(BORROWER_CREDENTIALS_NUMBER) like upper('%$borrowerCredentialsNumber$%')
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="accountName">
+				ACCOUNT_NAME like '%$accountName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="account">
+				ACCOUNT like '%$account$%'
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="credentialsNumber">
+				upper(CREDENTIALS_NUMBER) like upper('%$credentialsNumber$%')
+				</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<update id="update" parameterClass="accountInfo">
+		<![CDATA[
+			UPDATE RL_ACCOUNT_INFO 
+						
+			]]>
+		<dynamic prepend="SET">
+			<isNotEmpty prepend="and" property="accountName">
+				ACCOUNT_NAME=#accountName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="bankNum">
+				BANK_NUM=#bankNum:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="bankRank">
+				BANK_RANK_NAME=#bankRank:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="bankPrefectureNum">
+				BANK_PREFECTURE_NUM=#bankPrefectureNum:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="bankName">
+				BANK_NAME=#bankName:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="branchName">
+				BRANCH_NAME=#branchName:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="account">
+				ACCOUNT=#account:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="onUsed">
+				ON_USED=#onUsed:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="cardFlag">
+				CARD_FLAG=#cardFlag:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="mobilephone">
+				MOBILEPHONE=#mobilephone:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="useType">
+				USE_TYPE=#useType:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="payWay">
+				PAY_WAY=#payWay:VARCHAR#
+				</isNotEmpty>
+
+			<isNotEmpty prepend="," property="payBranchno">
+				PAY_BRANCHNO=#payBranchno:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="credentialsNumber">
+				CREDENTIALS_NUMBER=#credentialsNumber:VARCHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="provinceId">
+				PROVINCE_ID=#provinceId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="cityId">
+				CITY_ID=#cityId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="districtId">
+				DISTRICT_ID=#districtId:NUMBER#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="accountType">
+				ACCOUNT_TYPE=#accountType:CHAR#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="departmentId">
+				DEPARTMENT_ID = #departmentId#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="operaterName">
+				OPERATER_NAME = #operaterName#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="operaterId">
+				OPERATER_ID = #operaterId#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="updateTime">
+				UPDATE_TIME = #updateTime:TIMESTAMP#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="borrowerName">
+				BORROWER_NAME = #borrowerName#
+				</isNotEmpty>
+			<isNotEmpty prepend="," property="borrowerCredentialsNumber">
+				BORROWER_CREDENTIALS_NUMBER = #borrowerCredentialsNumber#
+				</isNotEmpty>
+		</dynamic>
+			<![CDATA[
+							
+			WHERE 
+							ACCOUNT_INFO_ID=#accountInfoId:NUMBER#	
+		]]>
+	</update>
+	<select id="selectFuzzy" parameterClass="Map" resultClass="accountInfo">
+		<![CDATA[
+		SELECT 
+				ACCOUNT_INFO_ID			as		accountInfoId,
+				BRANCH_NAME			as		branchName,
+				BANK_NUM			as		bankNum,
+				(select c.code_value from  rl_codetable c where c.section='bankNum' and c.code_key = RL_ACCOUNT_INFO.BANK_NUM)		as		bankRank,
+				BANK_PREFECTURE_NUM			as		bankPrefectureNum,
+				BANK_NAME		as		bankName,
+				ACCOUNT_NAME			as		accountName,
+				ACCOUNT		as		account,
+				ON_USED			as		onUsed,
+				CARD_FLAG			as		cardFlag,
+				MOBILEPHONE			as		mobilephone,
+				USE_TYPE			as		useType,
+				PAY_WAY			as		payWay,
+				PAY_BRANCHNO			as		payBranchno,
+				CREDENTIALS_NUMBER			as		credentialsNumber,
+				PROVINCE_ID			as		provinceId,
+				CITY_ID			as		cityId,
+				DISTRICT_ID			as		districtId,
+				ACCOUNT_TYPE			as		accountType,
+				DEPARTMENT_ID			as		departmentId,
+				OPERATER_NAME			as		operaterName,
+				OPERATER_ID			as		operaterId,
+				CREATE_TIME			as		createTime,
+				BORROWER_NAME			as		borrowerName,
+				BORROWER_CREDENTIALS_NUMBER			as		borrowerCredentialsNumber,
+				UPDATE_TIME			as		updateTime
+			
+		 FROM RL_ACCOUNT_INFO
+		WHERE 	(BRANCH_NAME  LIKE '%$fuzzyValue$%'
+				or BORROWER_NAME like '%$fuzzyValue$%' 
+				or 	upper(BORROWER_CREDENTIALS_NUMBER) like upper('%$fuzzyValue$%')
+				or ACCOUNT_NAME like '%$fuzzyValue$%'
+				or ACCOUNT like '%$fuzzyValue$%'
+				or upper(CREDENTIALS_NUMBER)  like upper('%$fuzzyValue$%')
+				)
+			and	ACCOUNT_TYPE = #accountType#
+		ORDER BY ACCOUNT_INFO_ID DESC
+		]]>
+	</select>
+	<select id="selectByCondition" parameterClass="accountInfo" resultClass="accountInfo">
+		<![CDATA[
+		SELECT ACCOUNT_INFO_ID accountInfoId,
+	       ACCOUNT_NAME accountName,
+	       ACCOUNT account,
+	       DECODE(ACCOUNT_TYPE,'0',BRANCH_NAME,'1',ACCOUNT_NAME) branchName,
+	       DECODE(ACCOUNT_TYPE, '0', '分公司账号', '1', '个人账号') accountType
+	    FROM RL_ACCOUNT_INFO
+		WHERE ON_USED = '1'
+		]]>
+		<isNotNull property="accountInfoId" prepend="AND">
+			ACCOUNT_INFO_ID=#accountInfoId#
+		</isNotNull>
+		<isNotNull property="branchName" prepend="AND">
+			BRANCH_NAME=#branchName#
+		</isNotNull>
+		<isNotNull property="cardFlag" prepend="AND">
+			CARD_FLAG = #cardFlag#
+		</isNotNull>
+		<isNotNull property="useType" prepend="AND">
+			(USE_TYPE = #useType# OR USE_TYPE=2)
+		</isNotNull>
+		<isNotNull property="accountType" prepend="AND">
+			ACCOUNT_TYPE=#accountType#
+		</isNotNull>
+	</select>
+	<select id="countFuzzy" parameterClass="Map" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM RL_ACCOUNT_INFO
+			WHERE 		(BRANCH_NAME  LIKE '%$fuzzyValue$%'
+						or BORROWER_NAME like '%$fuzzyValue$%' 
+						or 	upper(BORROWER_CREDENTIALS_NUMBER) like upper('%$fuzzyValue$%')
+						or ACCOUNT_NAME like '%$fuzzyValue$%'
+						or ACCOUNT like '%$fuzzyValue$%'
+						or upper(CREDENTIALS_NUMBER)  like upper('%$fuzzyValue$%')
+						)
+			 and ACCOUNT_TYPE = #accountType#
+		]]>
+	</select>
+	<select id="selectById" parameterClass="int" resultMap="accountInfoMap">
+		<![CDATA[
+		SELECT * FROM RL_ACCOUNT_INFO
+		WHERE 	ACCOUNT_INFO_ID=#accountInfoId# 
+		]]>
+	</select>
+	<select id="selectByCrediApplicationId" parameterClass="long" resultMap="accountInfoMap">
+		<![CDATA[
+		SELECT a.* FROM RL_ACCOUNT_INFO a left join rl_credit_application c on c.account_info_id=a.account_info_id
+   		 WHERE   c.creditapplication_id=#value# 
+		]]>
+	</select>
+
+	<select id="selectReturnAccount" parameterClass="long" resultMap="accountInfoMap">
+		<![CDATA[
+		SELECT a.* FROM RL_ACCOUNT_INFO a left join rl_credit_application c on a.account_info_id=c.RETURN_ACCOUNT_INFO_ID
+   		 WHERE   c.creditapplication_id=#value# 
+		]]>
+	</select>
+	<delete id="delete" parameterClass="int">
+		DELETE FROM RL_ACCOUNT_INFO
+		WHERE ACCOUNT_INFO_ID=#accountInfoId# 
+	</delete>
+	<select id="selectByCreditApplicationId" resultMap="accountInfoMap" parameterClass="int">
+	<![CDATA[
+		select a.*
+		from rl_credit_application c, rl_account_info a
+		where ((a.account_type = 0 and a.department_id = c.company_id) or
+        (a.account_type = 1 and
+      	upper(a.borrower_credentials_number) =
+	         (select distinct upper(b.credentials_number)
+	        from rl_borrower_service_app b
+	        where b.leader = '1'
+	        and b.valid_state = '1'
+	        and b.creditapplication_id = c.creditapplication_id))
+	     )
+		and (a.use_type = 1 or a.use_type = 2)
+		and a.on_used = '1'
+		and c.creditapplication_id = #value#
+	]]>
+	</select>
+
+<!-- 分公司 可以付款账户 -->
+	<select id="selectCompanyAccounts" resultMap="accountInfoMap" parameterClass="int">
+		<![CDATA[
+			select a.*
+			from rl_credit_application c, rl_account_info a
+			where  a.department_id = c.company_id
+				   and a.account_type = '0'
+				   and (a.USE_TYPE = '0' or a.USE_TYPE = '2')
+				   and  c.creditapplication_id = #creditapplicationId#
+           		   and  a.on_used = '1'
+		]]>
+	</select>
+	
+	<!-- ******zhangman 按操作员 （信贷员 id 分组）******* -->
+	<select id="selectByoperaterId" resultClass="accountInfo">
+		<![CDATA[select c.OPERATER_ID receptionistId from rl_account_info c group by c.OPERATER_ID
+		]]>
+	</select>
+	<!-- ******zhangman 按操作员 （信贷员 id 修改）******* -->
+	<update id="updateByoperaterId" parameterClass="accountInfo">
+		<![CDATA[update rl_account_info 
+		]]>
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="departmentId">
+				DEPARTMENT_ID = #departmentId#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="branchName">
+				BRANCH_NAME = #branchName#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[where OPERATER_ID = #operaterId#
+		]]>
+	</update>
+	
+	<select id="selectAccountAddress" parameterClass="accountInfo" resultClass="accountInfoVo">
+		<![CDATA[
+			SELECT 
+				ACCOUNT_INFO_ID			as		accountInfoId,
+				BRANCH_NAME			as		branchName,
+				BANK_NUM			as		bankNum,
+				(select c.code_value from  rl_codetable c where c.section='bankNum' and c.code_key = RL_ACCOUNT_INFO.BANK_NUM)		as		bankRank,
+				BANK_PREFECTURE_NUM			as		bankPrefectureNum,
+				BANK_NAME		as		bankName,
+				ACCOUNT_NAME			as		accountName,
+				ACCOUNT		as		account,
+				ON_USED			as		onUsed,
+				CARD_FLAG			as		cardFlag,
+				MOBILEPHONE			as		mobilephone,
+				USE_TYPE			as		useType,
+				PAY_WAY			as		payWay,
+				PAY_BRANCHNO			as		payBranchno,
+				CREDENTIALS_NUMBER			as		credentialsNumber,
+				PROVINCE_ID			as		provinceId,
+				CITY_ID			as		cityId,
+				DISTRICT_ID			as		districtId,
+				ACCOUNT_TYPE			as		accountType,
+				DEPARTMENT_ID			as		departmentId,
+				OPERATER_NAME			as		operaterName,
+				OPERATER_ID			as		operaterId,
+				CREATE_TIME			as		createTime,
+				BORROWER_NAME			as		borrowerName,
+				BORROWER_CREDENTIALS_NUMBER			as		borrowerCredentialsNumber,
+				UPDATE_TIME			as		updateTime,
+				(select n.city_name from rl_national_standard_code n where n.city_code = RL_ACCOUNT_INFO.District_Id) as qu,
+				(select n.city_name from rl_national_standard_code n where n.city_code = RL_ACCOUNT_INFO.CITY_ID) as shi,
+				(select n.city_name from rl_national_standard_code n where n.city_code = RL_ACCOUNT_INFO.Province_Id) as sheng
+				
+			 FROM RL_ACCOUNT_INFO
+		]]>
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="accountInfoId" prepend="AND">
+				ACCOUNT_INFO_ID = #accountInfoId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="provinceId" prepend="AND">
+				PROVINCE_ID = #provinceId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="cityId" prepend="AND">
+				CITY_ID = #cityId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="districtId" prepend="AND">
+				DISTRICT_ID = #districtId:NUMBER#
+			</isNotEmpty>
+			<isNotEmpty property="branchName" prepend="AND">
+				BRANCH_NAME LIKE '%$branchName$%'
+			</isNotEmpty>
+			<isNotNull property="accountType" prepend="AND">
+				ACCOUNT_TYPE = #accountType# 
+			</isNotNull>
+			<isNotEmpty prepend="AND" property="borrowerName">
+				BORROWER_NAME like '%$borrowerName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="borrowerCredentialsNumber">
+				upper(BORROWER_CREDENTIALS_NUMBER) like upper('%$borrowerCredentialsNumber$%')
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="accountName">
+				ACCOUNT_NAME like '%$accountName$%'
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="account">
+				ACCOUNT like '%$account$%'
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="credentialsNumber">
+				upper(CREDENTIALS_NUMBER) like upper('%$credentialsNumber$%')
+				</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			ORDER BY ACCOUNT_INFO_ID DESC
+		]]>
+	</select>
+</sqlMap>

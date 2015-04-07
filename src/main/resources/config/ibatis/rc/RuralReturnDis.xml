@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RURALRETURNDIS">
+	<typeAlias alias="pagination" type="com.creditease.rc.framework.pager.Pagination" />
+	<typeAlias alias="ruralReturnDis" type="com.creditease.rc.domain.RuralReturnDis" />
+	<resultMap class="com.creditease.rc.domain.RuralReturnDis" id="ruralReturnDisMap">
+		<result column="DISTRIBUTION_ID" jdbcType="INTEGER" property="distributionId" />
+		<result column="RETURN_PLAN_ID" jdbcType="INTEGER" property="returnPlanId" />
+		<result column="CONTRACT_NO" jdbcType="VARCHAR" property="contractNo" />
+		<result column="BORROWER_SERVICE_APP_ID" jdbcType="INTEGER" property="borrowerServiceAppId" />
+		<result column="CURR_RECIEVE_PRINCIPAL" jdbcType="DOUBLE" property="currRecievePrincipal" />
+		<result column="CURR_RECIEVE_INTEREST" jdbcType="DOUBLE" property="currRecieveInterest" />
+		<result column="CURR_RECIEVE_MANAGE" jdbcType="DOUBLE" property="currRecieveManage" />
+		<result column="CURR_RECIEVE_LATEFREE" jdbcType="DOUBLE" property="currRecieveLatefree" />
+		<result column="CURR_RECIEVE_PENALTY" jdbcType="DOUBLE" property="currRecievePenalty" />
+		<result column="CURR_RECIEVE_TOTAL" jdbcType="DOUBLE" property="currRecieveTotal" />
+		<result column="ACT_PAIDIN_CAPITAL" jdbcType="DOUBLE" property="actPaidinCapital" />
+		<result column="ACT_PAID_INTEREST" jdbcType="DOUBLE" property="actPaidInterest" />
+		<result column="ACT_PAID_MANAGE_FREE" jdbcType="DOUBLE" property="actPaidManageFree" />
+		<result column="ACT_PAID_FINE" jdbcType="DOUBLE" property="actPaidFine" />
+		<result column="ACT_PAID_PANALTY" jdbcType="DOUBLE" property="actPaidPanalty" />
+		<result column="CURR_PAID_TOTAL" jdbcType="DOUBLE" property="currPaidTotal" />
+		<result column="ONE_TIME_REPAYMENT" jdbcType="CHAR" property="oneTimeRepayment" />
+		<result column="DATE_CHARGE" jdbcType="DATA" property="dateCharge" />
+		<result column="RESPECTIVE_MON_REPAY" jdbcType="VARCHAR" property="respectiveMonRepay" />
+		<result column="CONFIM_REPAY_TIME" jdbcType="DATA" property="confimRepayTime" />
+		<result column="BORROWER_NAME" jdbcType="VARCHAR" property="borrowerName" />
+		<result column="RETURN_COMPANY_FLAG" jdbcType="CHAR" property="returnCompanyFlag" />
+		<result column="CLEAR_BREACH_FLAG" jdbcType="CHAR" property="clearBreachFlag" />
+		<result column="BREACH_FLAG" jdbcType="CHAR" property="breachFlag" />
+		<result column="IMPUNITY_PAID_FINE" jdbcType="INTEGER" property="impunityPaidFine" />
+		<result column="IMPUNITY_PAID_PANALTY" jdbcType="INTEGER" property="impunityPaidPanalty" />
+		<result column="RECEIVED_RECORD_ID" jdbcType="INTEGER" property="receivedRecordId" />
+		<result column="CURR_REDUCE_PRINCIPAL" jdbcType="DOUBLE" property="currReducePrincipal" />
+		<result column="CURR_REDUCE_INTEREST" jdbcType="DOUBLE" property="currReduceInterest" />
+		<result column="CURR_REDUCE_MANAGE_FREE" jdbcType="DOUBLE" property="currReduceManageFree" />
+		<result column="CURR_REDUCE_PENALTY" jdbcType="DOUBLE" property="currReducePenalty" />
+		<result column="CURR_REDUCE_LATER_FREE" jdbcType="DOUBLE" property="currReduceLaterFree" />
+		<result column="CURR_REDUCE_TOTAL" jdbcType="DOUBLE" property="currReduceTotal" />
+		<result column="RECEIVED_RECORD_ID" jdbcType="INTEGER" property="receivedRecordId" />
+		<result column="RECE_EARLY_DAMAGES" jdbcType="DOUBLE" property="receEarlyDamages" />
+		<result column="PAID_EARLY_DAMAGES" jdbcType="DOUBLE" property="paidEarlyDamages" />
+		<result column="REPAYMENT_DATE" jdbcType="DATE" property="repaymentDate" />
+	</resultMap>
+	<select id="select" resultMap="ruralReturnDisMap">
+		select * from RL_RURAL_RETURN_DIS
+	</select>
+	<select id="selectRuralReturnDisByDistributionId" resultMap="ruralReturnDisMap">
+		select * from RL_RURAL_RETURN_DIS
+		where DISTRIBUTION_ID = #distributionId:INTEGER#
+	</select>
+	<select id="countRuralReturnDisByDistributionId" parameterClass="int" resultClass="int">
+        <![CDATA[
+            select count(*) from RL_RURAL_RETURN_DIS
+        ]]>
+	</select>
+	<insert id="insert" parameterClass="ruralReturnDis">
+		<selectKey keyProperty="distributionId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RURAL_RETURN_DIS
+			(DISTRIBUTION_ID,RETURN_PLAN_ID,CONTRACT_NO,
+			CURR_RECIEVE_PRINCIPAL,CURR_RECIEVE_INTEREST,CURR_RECIEVE_MANAGE,
+			CURR_RECIEVE_LATEFREE,CURR_RECIEVE_PENALTY,CURR_RECIEVE_TOTAL,
+			ACT_PAIDIN_CAPITAL,ACT_PAID_INTEREST,ACT_PAID_MANAGE_FREE,
+			ACT_PAID_FINE,ACT_PAID_PANALTY,CURR_PAID_TOTAL,
+			ONE_TIME_REPAYMENT,DATE_CHARGE,RESPECTIVE_MON_REPAY,
+			CONFIM_REPAY_TIME,BORROWER_NAME,RETURN_COMPANY_FLAG,
+			CLEAR_BREACH_FLAG,BREACH_FLAG,IMPUNITY_PAID_FINE,
+			IMPUNITY_PAID_PANALTY,
+			CURR_REDUCE_PRINCIPAL,CURR_REDUCE_INTEREST,CURR_REDUCE_MANAGE_FREE,
+			CURR_REDUCE_PENALTY,CURR_REDUCE_LATER_FREE,CURR_REDUCE_TOTAL,
+			RECEIVED_RECORD_ID,RECE_EARLY_DAMAGES,PAID_EARLY_DAMAGES,
+			REPAYMENT_DATE)
+			values 
+			(#distributionId:INTEGER#,#returnPlanId:INTEGER#,#contractNo:VARCHAR#,
+			#currRecievePrincipal:DOUBLE#,#currRecieveInterest:DOUBLE#,#currRecieveManage:DOUBLE#,
+			#currRecieveLatefree:DOUBLE#,#currRecievePenalty:DOUBLE#,#currRecieveTotal:DOUBLE#,
+			#actPaidinCapital:DOUBLE#,#actPaidInterest:DOUBLE#,#actPaidManageFree:DOUBLE#,
+			#actPaidFine:DOUBLE#,#actPaidPanalty:DOUBLE#,#currPaidTotal:DOUBLE#,
+			#oneTimeRepayment:CHAR#,#dateCharge:DATA#,#respectiveMonRepay:VARCHAR#,
+			#confimRepayTime:DATA#,#borrowerName:VARCHAR#,#returnCompanyFlag:CHAR#,
+			#clearBreachFlag:CHAR#,#breachFlag:CHAR#,#impunityPaidFine:INTEGER#,
+			#impunityPaidPanalty:INTEGER#,
+			#currReducePrincipal:DOUBLE#,#currReduceInterest:DOUBLE#,#currReduceManageFree:DOUBLE#,
+			#currReducePenalty:DOUBLE#,#currReduceLaterFree:DOUBLE#,#currReduceTotal:DOUBLE#,
+			#receivedRecordId:INTEGER#,#receEarlyDamages:DOUBLE#,#paidEarlyDamages:DOUBLE#,
+			#repaymentDate:DATE#)
+		]]>
+	</insert>
+	<insert id="dynamicInsert" parameterClass="ruralReturnDis">
+		<selectKey keyProperty="distributionId" resultClass="int" type="pre">
+			select SEQ_BASIC_INFO.NEXTVAL as value from dual
+		</selectKey>
+		<![CDATA[
+			insert into RL_RURAL_RETURN_DIS(
+			DISTRIBUTION_ID
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="returnPlanId">
+				,RETURN_PLAN_ID
+			</isNotEmpty>
+			<isNotEmpty property="contractNo">
+				,CONTRACT_NO
+			</isNotEmpty>
+			<isNotEmpty property="currRecievePrincipal">
+				,CURR_RECIEVE_PRINCIPAL
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveInterest">
+				,CURR_RECIEVE_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveManage">
+				,CURR_RECIEVE_MANAGE
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveLatefree">
+				,CURR_RECIEVE_LATEFREE
+			</isNotEmpty>
+			<isNotEmpty property="currRecievePenalty">
+				,CURR_RECIEVE_PENALTY
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveTotal">
+				,CURR_RECIEVE_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="actPaidinCapital">
+				,ACT_PAIDIN_CAPITAL
+			</isNotEmpty>
+			<isNotEmpty property="actPaidInterest">
+				,ACT_PAID_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="actPaidManageFree">
+				,ACT_PAID_MANAGE_FREE
+			</isNotEmpty>
+			<isNotEmpty property="actPaidFine">
+				,ACT_PAID_FINE
+			</isNotEmpty>
+			<isNotEmpty property="actPaidPanalty">
+				,ACT_PAID_PANALTY
+			</isNotEmpty>
+			<isNotEmpty property="currPaidTotal">
+				,CURR_PAID_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="oneTimeRepayment">
+				,ONE_TIME_REPAYMENT
+			</isNotEmpty>
+			<isNotEmpty property="dateCharge">
+				,DATE_CHARGE
+			</isNotEmpty>
+			<isNotEmpty property="respectiveMonRepay">
+				,RESPECTIVE_MON_REPAY
+			</isNotEmpty>
+			<isNotEmpty property="confimRepayTime">
+				,CONFIM_REPAY_TIME
+			</isNotEmpty>
+			<isNotEmpty property="borrowerName">
+				,BORROWER_NAME
+			</isNotEmpty>
+			<isNotEmpty property="returnCompanyFlag">
+				,RETURN_COMPANY_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="clearBreachFlag">
+				,CLEAR_BREACH_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="breachFlag">
+				,BREACH_FLAG
+			</isNotEmpty>
+			<isNotEmpty property="impunityPaidFine">
+				,IMPUNITY_PAID_FINE
+			</isNotEmpty>
+			<isNotEmpty property="impunityPaidPanalty">
+				,IMPUNITY_PAID_PANALTY
+			</isNotEmpty>
+			<isNotEmpty property="receivedRecordId">
+				,RECEIVED_RECORD_ID
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal">
+				,CURR_REDUCE_PRINCIPAL
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest">
+				,CURR_REDUCE_INTEREST
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree">
+				,CURR_REDUCE_MANAGE_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty">
+				,CURR_REDUCE_PENALTY
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree">
+				,CURR_REDUCE_LATER_FREE
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal">
+				,CURR_REDUCE_TOTAL
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages">
+				,RECE_EARLY_DAMAGES
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages">
+				,PAID_EARLY_DAMAGES
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate">
+				,REPAYMENT_DATE
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)values(
+			#distributionId:INTEGER#
+		]]>
+		<dynamic prepend=" ">
+			<isNotEmpty property="returnPlanId">
+				,#returnPlanId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="contractNo">
+				,#contractNo:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="currRecievePrincipal">
+				,#currRecievePrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveInterest">
+				,#currRecieveInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveManage">
+				,#currRecieveManage:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveLatefree">
+				,#currRecieveLatefree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currRecievePenalty">
+				,#currRecievePenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currRecieveTotal">
+				,#currRecieveTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="actPaidinCapital">
+				,#actPaidinCapital:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="actPaidInterest">
+				,#actPaidInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="actPaidManageFree">
+				,#actPaidManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="actPaidFine">
+				,#actPaidFine:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="actPaidPanalty">
+				,#actPaidPanalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currPaidTotal">
+				,#currPaidTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="oneTimeRepayment">
+				,#oneTimeRepayment:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="dateCharge">
+				,#dateCharge:DATA#
+			</isNotEmpty>
+			<isNotEmpty property="respectiveMonRepay">
+				,#respectiveMonRepay:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="confimRepayTime">
+				,#confimRepayTime:DATA#
+			</isNotEmpty>
+			<isNotEmpty property="borrowerName">
+				,#borrowerName:VARCHAR#
+			</isNotEmpty>
+			<isNotEmpty property="returnCompanyFlag">
+				,#returnCompanyFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="clearBreachFlag">
+				,#clearBreachFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="breachFlag">
+				,#breachFlag:CHAR#
+			</isNotEmpty>
+			<isNotEmpty property="impunityPaidFine">
+				,#impunityPaidFine:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="impunityPaidPanalty">
+				,#impunityPaidPanalty:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="receivedRecordId">
+				,#receivedRecordId:INTEGER#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePrincipal">
+				,#currReducePrincipal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceInterest">
+				,#currReduceInterest:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceManageFree">
+				,#currReduceManageFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReducePenalty">
+				,#currReducePenalty:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceLaterFree">
+				,#currReduceLaterFree:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="currReduceTotal">
+				,#currReduceTotal:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="receEarlyDamages">
+				,#receEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="paidEarlyDamages">
+				,#paidEarlyDamages:DOUBLE#
+			</isNotEmpty>
+			<isNotEmpty property="repaymentDate">
+				,#repaymentDate:DATE#
+			</isNotEmpty>
+		</dynamic>
+		<![CDATA[
+			)
+		]]>
+	</insert>
+	<update id="update" parameterClass="ruralReturnDis">
+		<![CDATA[
+			update RL_RURAL_RETURN_DIS
+			set
+			RETURN_PLAN_ID=#returnPlanId:INTEGER#,
+			CONTRACT_NO=#contractNo:VARCHAR#,
+			CURR_RECIEVE_PRINCIPAL=#currRecievePrincipal:DOUBLE#,
+			CURR_RECIEVE_INTEREST=#currRecieveInterest:DOUBLE#,
+			CURR_RECIEVE_MANAGE=#currRecieveManage:DOUBLE#,
+			CURR_RECIEVE_LATEFREE=#currRecieveLatefree:DOUBLE#,
+			CURR_RECIEVE_PENALTY=#currRecievePenalty:DOUBLE#,
+			CURR_RECIEVE_TOTAL=#currRecieveTotal:DOUBLE#,
+			ACT_PAIDIN_CAPITAL=#actPaidinCapital:DOUBLE#,
+			ACT_PAID_INTEREST=#actPaidInterest:DOUBLE#,
+			ACT_PAID_MANAGE_FREE=#actPaidManageFree:DOUBLE#,
+			ACT_PAID_FINE=#actPaidFine:DOUBLE#,
+			ACT_PAID_PANALTY=#actPaidPanalty:DOUBLE#,
+			CURR_PAID_TOTAL=#currPaidTotal:DOUBLE#,
+			ONE_TIME_REPAYMENT=#oneTimeRepayment:CHAR#,
+			DATE_CHARGE=#dateCharge:DATA#,
+			RESPECTIVE_MON_REPAY=#respectiveMonRepay:VARCHAR#,
+			CONFIM_REPAY_TIME=#confimRepayTime:DATA#,
+			BORROWER_NAME=#borrowerName:VARCHAR#,
+			RETURN_COMPANY_FLAG=#returnCompanyFlag:CHAR#,
+			CLEAR_BREACH_FLAG=#clearBreachFlag:CHAR#,
+			BREACH_FLAG=#breachFlag:CHAR#,
+			IMPUNITY_PAID_FINE=#impunityPaidFine:INTEGER#,
+			IMPUNITY_PAID_PANALTY=#impunityPaidPanalty:INTEGER#,
+			RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#,
+			CURR_REDUCE_PRINCIPAL = #currReducePrincipal:DOUBLE#,
+			CURR_REDUCE_INTEREST = #currReduceInterest:DOUBLE#,
+			CURR_REDUCE_MANAGE_FREE = #currReduceManageFree:DOUBLE#,
+			CURR_REDUCE_PENALTY = #currReducePenalty:DOUBLE#,
+			CURR_REDUCE_LATER_FREE = #currReduceLaterFree:DOUBLE#,
+			CURR_REDUCE_TOTAL = #currReduceTotal:DOUBLE#,
+			RECEIVED_RECORD_ID = #receivedRecordId:INTEGER#,
+			RECE_EARLY_DAMAGES = #receEarlyDamages:DOUBLE#,
+			PAID_EARLY_DAMAGES = #paidEarlyDamages:DOUBLE#,
+			REPAYMENT_DATE = #repaymentDate:DATE#
+			where
+			DISTRIBUTION_ID=#distributionId:INTEGER#
+		]]>
+	</update>
+	<delete id="deleteRuralReturnDisByReturnPlanId" parameterClass="int">
+		<![CDATA[
+			delete from RL_RURAL_RETURN_DIS
+			where
+			RETURN_PLAN_ID=#returnPlanId:INTEGER#
+		]]>
+	</delete>
+</sqlMap>

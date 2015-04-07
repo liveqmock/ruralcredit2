@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="BUSINESSSTATUSCHANGE">
+
+    <typeAlias alias="change" type="com.creditease.rc.domain.BusinessStatusChange"/>
+    <typeAlias alias="changeVo" type="com.creditease.rc.domain.BusinessStatusChangeVo"/>
+    <typeAlias alias="legalProceedingsVo" type="com.creditease.rc.vo.LegalProceedingsVo"/>
+    <typeAlias alias="legalProceedings" type="com.creditease.rc.domain.LegalProceedings"/>
+    <resultMap id="changeMap" class="change">
+        <result column="CHANGE_ID" property="changeId" jdbcType="DECIMAL"/>
+        <result column="CREDITAPPLICATION_ID" property="creditapplicationId" jdbcType="DECIMAL"/>
+        <result column="OPERATOR" property="operator" jdbcType="VARCHAR"/>
+        <result column="OPERATE_DATE" property="operateDate" jdbcType="TIMESTAMP"/>
+        <result column="CHANGE_REASON" property="changeReason" jdbcType="VARCHAR"/>
+        <result column="BEFORE_STATUS" property="beforeStatus" jdbcType="VARCHAR"/>
+        <result column="AFTER_STATUS" property="afterStatus" jdbcType="VARCHAR"/>
+        <result column="OPERATE_TYPE" property="operateType" jdbcType="VARCHAR"/>
+        <result column="HISTORY_FLAG" property="historyFlag" jdbcType="VARCHAR"/>
+        <result column="CHANGE_REMARK" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="changeVoMap" class="changeVo" extends="changeMap">
+        <result column="BUSINESS_NUMBER" property="groupNumber" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--保存变更 -->
+    <insert id="insertChange" parameterClass="com.creditease.rc.domain.BusinessStatusChange">
+        <selectKey keyProperty="changeId" resultClass="java.lang.Long"
+                   type="pre">
+            select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+        </selectKey>
+        INSERT INTO RL_BUSINESS_STATUS_CHANGE
+        (CHANGE_ID, CREDITAPPLICATION_ID, OPERATOR, OPERATE_DATE, CHANGE_REASON, BEFORE_STATUS, AFTER_STATUS, OPERATE_TYPE, HISTORY_FLAG,CHANGE_REMARK,ATTATCHMENT_ID)
+        VALUES
+        (#changeId#,#creditapplicationId#,#operator#,#operateDate#,#changeReason#,#beforeStatus#,#afterStatus#,#operateType#,#historyFlag#,#remark#,#attachmentId#)
+    </insert>
+
+    <!--查询变更记录-->
+    <sql id="sql_selectChangeLog">
+        SELECT T1.OPERATOR,
+        TO_CHAR(T1.OPERATE_DATE, 'YYYY-MM-DD') AS OPERATE_DATE,
+        (SELECT T.CODE_VALUE
+        FROM RL_CODETABLE T
+        WHERE T.SECTION = 'auditStatus'
+        AND T.CODE_KEY = T1.BEFORE_STATUS) BEFORE_STATUS,
+        (SELECT T.CODE_VALUE
+        FROM RL_CODETABLE T
+        WHERE T.SECTION = 'auditStatus'
+        AND T.CODE_KEY = T1.AFTER_STATUS) AFTER_STATUS,
+        T2.BUSINESS_NUMBER,
+        (SELECT T.CODE_VALUE
+        FROM RL_CODETABLE T
+        WHERE T.SECTION = 'changeReason'
+        AND T.CODE_KEY = T1.CHANGE_REASON) AS CHANGE_REASON,
+        T1.CHANGE_REMARK,
+        T1.ATTATCHMENT_ID
+        FROM RL_BUSINESS_STATUS_CHANGE T1
+        INNER JOIN RL_CREDIT_APPLICATION T2
+        ON T1.CREDITAPPLICATION_ID = T2.CREDITAPPLICATION_ID
+        WHERE 1 = 1
+    </sql>
+    <!--查询变更记录 显示最新变更记录过滤条件子句-->
+    <sql id="sql_selectChangeLog_and">
+        AND T1.CHANGE_ID IN (SELECT MAX(T3.CHANGE_ID)
+        FROM RL_BUSINESS_STATUS_CHANGE T3  WHERE 1 =1
+        <dynamic>
+            <isEqual prepend=" AND" property="type" compareValue="nonPerformingLoans">
+                T3.OPERATE_TYPE = '0'
+            </isEqual>
+            <isEqual prepend=" AND" property="type" compareValue="legalProceedings">
+                T3.OPERATE_TYPE = '1'
+            </isEqual>
+        </dynamic>
+        GROUP BY T3.CREDITAPPLICATION_ID)
+    </sql>
+    <!--查询变更记录 操作类型过滤条件子句-->
+    <sql id="sql_selectChangeLog_and_type">
+        <isNotEmpty prepend=" AND" property="groupNumber">
+            T2.BUSINESS_NUMBER = #groupNumber#
+        </isNotEmpty>
+        <isEqual prepend=" AND" property="type" compareValue="nonPerformingLoans">
+            T1.OPERATE_TYPE = '0'
+        </isEqual>
+        <isEqual prepend=" AND" property="type" compareValue="legalProceedings">
+            T1.OPERATE_TYPE = '1'
+        </isEqual>
+    </sql>
+    <select id="selectChangeLog" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_selectChangeLog"/>
+        <include refid="sql_selectChangeLog_and"/>
+        <include refid="sql_selectChangeLog_and_type"/>
+
+        ORDER BY T1.OPERATE_DATE DESC
+    </select>
+    <select id="countBySelectChangeLog" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        <![CDATA[
+	  		select count(*) FROM (
+	  		]]>
+        <include refid="sql_selectChangeLog"/>
+        <include refid="sql_selectChangeLog_and"/>
+        <include refid="sql_selectChangeLog_and_type"/>
+
+        <![CDATA[
+	  		)
+	  		]]>
+    </select>
+
+    <!--查询预变更信贷申请-->
+    <sql id="sql_selectPrepareCreditApplication">
+        SELECT
+        (CASE
+         WHEN T2.CHANGE_ID IS NULL THEN
+          0
+         ELSE
+          T2.CHANGE_ID
+       END) AS CHANGE_ID,
+       T1.CREDITAPPLICATION_ID,
+       T1.BUSINESS_NUMBER,
+       T2.OPERATOR,
+       TO_CHAR(T2.OPERATE_DATE,'YYYY-MM-DD') AS OPERATE_DATE,
+       (CASE
+         WHEN T2.AFTER_STATUS IS NOT NULL THEN
+          (SELECT T.CODE_VALUE
+             FROM RL_CODETABLE T
+            WHERE T.SECTION = 'auditStatus'
+              AND T.CODE_KEY = T2.AFTER_STATUS)
+         ELSE
+          (SELECT T.CODE_VALUE
+             FROM RL_CODETABLE T
+            WHERE T.SECTION = 'auditStatus'
+              AND T.CODE_KEY = T1.AUDIT_STATUS)
+       END) AS BUSINESS_STATUS,
+       (SELECT T.CODE_VALUE
+          FROM RL_CODETABLE T
+         WHERE T.SECTION = 'changeReason'
+           AND T.CODE_KEY = T2.CHANGE_REASON) AS CHANGE_REASON,
+       T2.ATTATCHMENT_ID
+       FROM RL_CREDIT_APPLICATION T1
+       LEFT JOIN RL_BUSINESS_STATUS_CHANGE T2
+       ON T1.CREDITAPPLICATION_ID = T2.CREDITAPPLICATION_ID
+       WHERE 1 = 1
+       AND T1.BUSINESS_NUMBER = #groupNumber#
+    </sql>
+    <select id="selectPrepareCreditApplication" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_selectPrepareCreditApplication"/>
+        MINUS
+        <include refid="sql_selectPrepareCreditApplication"/>
+        AND T2.HISTORY_FLAG = '0'
+    </select>
+    <select id="countByselectPrepareCreditApplication" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        <![CDATA[
+	  		select count(*) FROM (
+	  		]]>
+        <include refid="sql_selectPrepareCreditApplication" />
+        <![CDATA[
+	  		)
+	  		]]>
+    </select>
+
+    <!--以主键查询变更记录-->
+    <select id="selectChangeLogById" parameterClass="java.lang.Long" resultMap="changeMap">
+        SELECT T1.* FROM RL_BUSINESS_STATUS_CHANGE T1 WHERE T1.CHANGE_ID = #ID#
+    </select>
+
+    <!--变更历史标记：0 旧数据 1 新数据-->
+    <update id="updateChangeHistoryFlag" parameterClass="change">
+        UPDATE RL_BUSINESS_STATUS_CHANGE SET HISTORY_FLAG = #historyFlag# WHERE HISTORY_FLAG = '1'
+        <dynamic>
+            <isNotEmpty prepend=" AND" property="changeId">
+                CHANGE_ID = #changeId#
+            </isNotEmpty>
+            <isNotEmpty prepend=" AND" property="creditapplicationId">
+                CREDITAPPLICATION_ID = #creditapplicationId#
+            </isNotEmpty>
+        </dynamic>
+    </update>
+
+    <!--更新信贷申请状态-->
+    <update id="updateCreditApplicationStatus" parameterClass="java.util.HashMap">
+        UPDATE RL_CREDIT_APPLICATION SET AUDIT_STATUS = #auditStatus# WHERE CREDITAPPLICATION_ID = #creditApplicationId#
+    </update>
+
+    <!--根据信贷申请 ID 获取最新变更记录状态-->
+    <select id="seelctLatestStatusByCreditApplicationId" parameterClass="java.lang.Long" resultClass="change">
+        SELECT T1.BEFORE_STATUS AS beforeStatus
+        FROM RL_BUSINESS_STATUS_CHANGE T1
+        WHERE T1.HISTORY_FLAG = 1
+        AND T1.CREDITAPPLICATION_ID = #creditapplicationId#
+    </select>
+
+    <!--查询变更记录详情-->
+    <select id="selectChangeLogByNumber" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_selectChangeLog"/>
+        <include refid="sql_selectChangeLog_and_type"/>
+        ORDER BY T1.OPERATE_DATE DESC
+    </select>
+    <select id="countBySelectChangeLogByNumber" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        <![CDATA[
+	  		select count(*) FROM (
+	  		]]>
+        <include refid="sql_selectChangeLog"/>
+        <include refid="sql_selectChangeLog_and_type"/>
+        <![CDATA[
+	  		)
+	  		]]>
+    </select>
+
+    <!--查询定时任务变更记录-->
+    <select id="viewChangeLogByTimer" parameterClass="java.lang.Long" resultMap="changeMap">
+        SELECT T1.* FROM RL_BUSINESS_STATUS_CHANGE T1 WHERE T1.OPERATOR='定时任务' AND T1.CREDITAPPLICATION_ID = #creditApplicationId#
+    </select>
+
+    <!--查询诉讼-->
+    <sql id="sql_sql_viewLegalProceedings">
+        select distinct s.* from (
+        SELECT T2.CREDITAPPLICATION_ID,
+        T2.BUSINESS_NUMBER,
+        T3.NAME,
+        T2.COMPANY_NAME,
+        T2.COMPANY_ID,
+        T2.LOAN_OFFICER_NAME,
+        TO_CHAR(T2.SIGNAGREEMENT_DATE, 'YYYY-MM-DD') AS SIGNAGREEMENT_DATE,
+        T2.REPAYMENT_PLAN_NAME,
+        T4.AMOUNT,
+        T7.OPERATOR,
+        TO_CHAR(T7.OPERATE_DATE, 'YYYY-MM-DD') AS OPERATE_DATE,
+        T7.OPERATE_DATE AS OPERATE_DATE_SORT,
+        CI.CREDIT_INVESTIGATIO_ID
+        FROM RL_CREDIT_APPLICATION T2
+        LEFT JOIN RL_BORROWER_SERVICE_APP T3
+        ON T2.CREDITAPPLICATION_ID = T3.CREDITAPPLICATION_ID
+        LEFT JOIN RL_AMOUNT_CONFIRM T4
+        ON T2.CREDITAPPLICATION_ID = T4.CREDIT_APPLICATION_ID
+        LEFT JOIN (SELECT *
+        FROM RL_LEGAL_PROCEEDINGS T6
+        WHERE T6.FOLLOW_ID in
+        (SELECT MAX(FOLLOW_ID)
+        FROM RL_LEGAL_PROCEEDINGS
+        GROUP BY CREDITAPPLICATION_ID)) T7
+        ON T2.CREDITAPPLICATION_ID = T7.CREDITAPPLICATION_ID
+        LEFT JOIN RL_CREDIT_INVESTIGATIO CI
+        ON T2.CREDITAPPLICATION_ID = CI.CREDITAPPLICATION_ID
+        WHERE T3.VALID_STATE = '1'
+        AND T3.LEADER = '1'
+        AND (T4.HISTORY_FLAG = '0' OR T4.HISTORY_FLAG IS NULL)
+        AND T2.AUDIT_STATUS =
+        (SELECT T5.CODE_KEY
+        FROM RL_CODETABLE T5
+        WHERE T5.SECTION = 'auditStatus'
+        AND T5.CODE_VALUE = '法律诉讼')
+        )s,sid_view v where 1 = 1
+        <isNotEmpty prepend="AND" property="authList">
+            CREDITAPPLICATION_ID =
+            v.object_id_identity
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="authList">
+            v.class='com.creditease.rc.domain.CreditApplication'
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="authList">
+            v.ace_sid IN
+            ($authList$)
+        </isNotEmpty>
+        <dynamic>
+            <isNotEmpty prepend=" AND" property="businessNumber">
+                s.BUSINESS_NUMBER = #businessNumber#
+            </isNotEmpty>
+            <isNotEmpty prepend=" AND" property="borrowerName">
+                s.NAME = #borrowerName#
+            </isNotEmpty>
+            <isNotEmpty prepend=" AND" property="branchName">
+                s.COMPANY_ID IN ($branchName$)
+            </isNotEmpty>
+        </dynamic>
+    </sql>
+    <sql id="sql_viewLegalProceedings">
+        SELECT *
+        FROM (<include refid="sql_sql_viewLegalProceedings"/>
+        AND s.OPERATE_DATE IS NOT NULL
+        ORDER BY s.OPERATE_DATE_SORT DESC, s.BUSINESS_NUMBER DESC)
+        UNION ALL
+        SELECT *
+        FROM (<include refid="sql_sql_viewLegalProceedings"/>
+        AND s.OPERATE_DATE_SORT IS NULL
+        ORDER BY s.BUSINESS_NUMBER DESC)
+    </sql>
+    <select id="viewLegalProceedings" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        <include refid="sql_viewLegalProceedings"/>
+    </select>
+    <select id="countByViewLegalProceedings" parameterClass="java.util.HashMap" resultClass="java.lang.Integer">
+        <![CDATA[ select count(*) FROM ( ]]> <include refid="sql_viewLegalProceedings"/> <![CDATA[ ) ]]>
+    </select>
+
+    <!--查询诉讼跟进记录-->
+    <sql id="sql_viewLegalProceedingsDetail">
+        SELECT T1.FOLLOW_ID, T1.FOLLOW_LOG, T1.OPERATOR, TO_CHAR(T1.OPERATE_DATE, 'YYYY-MM-DD') AS OPERATE_DATE, T1.CREDITAPPLICATION_ID FROM RL_LEGAL_PROCEEDINGS T1 WHERE T1.CREDITAPPLICATION_ID = #creditapplication_id# ORDER BY T1.OPERATE_DATE ASC
+    </sql>
+    <select id="viewLegalProceedingsDetail" parameterClass="legalProceedings" resultClass="java.util.HashMap">
+        <include refid="sql_viewLegalProceedingsDetail"/>
+    </select>
+    <select id="countByViewLegalProceedingsDetail" parameterClass="legalProceedings" resultClass="java.lang.Integer">
+        <![CDATA[ select count(*) FROM ( ]]> <include refid="sql_viewLegalProceedingsDetail"/> <![CDATA[ ) ]]>
+    </select>
+
+    <!--保存跟进记录-->
+    <insert id="insertLegalProceedings" parameterClass="legalProceedings">
+        <selectKey keyProperty="follow_id" resultClass="java.lang.Long">
+            select SEQ_BASIC_INFO.NEXTVAL AS value from dual
+        </selectKey>
+        INSERT INTO RL_LEGAL_PROCEEDINGS
+        (FOLLOW_ID, FOLLOW_LOG, OPERATOR, OPERATE_DATE, CREDITAPPLICATION_ID)
+        VALUES
+        (#follow_id#,#follow_log#,#operator#,#operate_date#,#creditapplication_id#)
+    </insert>
+</sqlMap>
